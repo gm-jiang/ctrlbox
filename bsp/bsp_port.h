@@ -394,7 +394,6 @@ uint8_t wcs485_ChainDownAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_OrderStatusAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_ChainKeyDownAckSend(void);
 uint8_t wcs485_ChainAlarmAckSend(void);
-uint8_t wcs485_ChainDownOrOrderStatusAckSend(void);
 wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf,uint8_t *decodeLen);
 
 uint8_t wcs485_QueryCmd(void);
@@ -402,7 +401,7 @@ uint8_t wcs485_ChainDownCmd(uint8_t *dataBuf, uint8_t dataLen);
 uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen);
 
 //light sensor,after chain down
-void sensor_ChainDownStatus(void);
+//void sensor_ChainDownStatus(void);
 
 //the check sum of stc frame
 uint8_t check_Sum(uint8_t *uBuff, uint8_t uBuffLen);
