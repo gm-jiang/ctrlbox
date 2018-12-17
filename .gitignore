@@ -1,0 +1,10 @@
+lst/*
+obj/*
+*.dep
+*.ini
+*.bak
+JLinkLog.txt
+JLinkSettings.ini
+*.uvgui.*
+*.uvopt
+*.tools
