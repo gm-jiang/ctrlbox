@@ -481,6 +481,7 @@ void platform_Init()
 		dbg_Print(PRINT_LEVEL_ERROR, "create chainDownDataSemaphore failed\n");
 		while(1);
 	}
+	xSemaphoreGive(chainDownDataSemaphore);
 	
 	chainDownRfidOpenedQueue = xQueueCreate(CHAIN_DOWN_RFID_OPENED_QUEUE_LEN, sizeof(chainDownMsgFrame_t));
 	if(chainDownRfidOpenedQueue == NULL)
