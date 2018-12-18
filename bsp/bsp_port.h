@@ -181,6 +181,10 @@ typedef struct _bindMsgFrame_t {
 	uint8_t uhf_rfid[MT_UHF_MSG_LEN/2];
 	uint8_t low_rfid[MT_LOW_MSG_LEN];
 }bindMsgFrame_t;
+
+#define CHAIN_DOWN_CTRLBOX            0x01
+#define UHF_RFID_CTRLBOX              0x02
+#define RFID_CHECK_CTRLBOX            0x03
 /******************************************************/
 
 //UHF RFID-> USART3

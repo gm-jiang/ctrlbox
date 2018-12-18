@@ -78,7 +78,7 @@ void releasekeyInt_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
-    
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
 	// Enable GPIO used as key IRQ for interrupt
@@ -423,6 +423,12 @@ void platform_Init()
 	dbg_Print(PRINT_LEVEL_ERROR, "485 addr:%d\n", mcu485Addr);
 
 	mcuFuncConfig = get_CustomerConfig();
+	if (mcuFuncConfig != CHAIN_DOWN_CTRLBOX && 
+			mcuFuncConfig != UHF_RFID_CTRLBOX && 
+			mcuFuncConfig != RFID_CHECK_CTRLBOX)
+	{
+		mcuFuncConfig = CHAIN_DOWN_CTRLBOX;
+	}
 	dbg_Print(PRINT_LEVEL_ERROR, "device customer config:%d\n", mcuFuncConfig);
 
 	wcs485RecvMsgQueue = xQueueCreate(UART_QUEUE_LEN, sizeof(uartMsgFrame_t));
@@ -478,7 +484,7 @@ void platform_Init()
 	}
 	
 	chainDownRfidOpenedQueue = xQueueCreate(CHAIN_DOWN_RFID_OPENED_QUEUE_LEN, sizeof(chainDownMsgFrame_t));
-	if(chainDownRfidOpenedQueue == NULL) 
+	if(chainDownRfidOpenedQueue == NULL)
 	{
 		dbg_Print(PRINT_LEVEL_ERROR, "create chainDownRfidOpenedQueue failed\n");
 		while(1);

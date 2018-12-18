@@ -22,6 +22,13 @@ void save_uhfrfid_msg(uint8_t *msg, uint8_t msg_len)
 	memcpy(bindMsgFrame.uhf_rfid, msg, msg_len);
 }
 
+void set_event_msg(eventMsgFrame_t *eventMsg, eventMsgType_e msgType)
+{
+	eventMsg->msgType = msgType;
+	memcpy(eventMsg->msg, bindMsgFrame.uhf_rfid, 12);
+	memcpy(&(eventMsg->msg[UHF_RFID_LABLE_DATA_LEN]), bindMsgFrame.low_rfid, 4);
+}
+
 void uhfrfid_send_cmd(void)
 {
 	uint8_t cmd[2] = {'K', 'I'};

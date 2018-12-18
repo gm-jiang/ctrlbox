@@ -19,7 +19,7 @@ void dbg_Print(int print_level, char *fmt, ...)
 			vsprintf(buffer,fmt, argp);
 			len = strlen(buffer);
 			buffer[len] = '\r';
-			wcs485Uart_SendData((uint8_t *)&buffer, len + 1);
+			//wcs485Uart_SendData((uint8_t *)&buffer, len + 1);
 			va_end(argp);
 	}
 }

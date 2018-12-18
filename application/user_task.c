@@ -140,25 +140,57 @@ void wcs485_msg_task(void *pvParameters)
 
 void stc_msg_task(void *pvParameters)
 {
-	BaseType_t queue_recv_ret;
+	uint8_t i;
+	BaseType_t queue_recv_ret, queue_send_ret;
 	uint8_t recv_msg[MT_UART_MSG_LEN] = {0};
+	chainDownMsgFrame_t chainDownMsg, tmpChainDownMsg;
 
 	while(1)
 	{
 		queue_recv_ret = xQueueReceive(stcRecvMsgQueue, recv_msg, portMAX_DELAY);
 		if(queue_recv_ret == pdTRUE)
 		{
-			//business code
-			xSemaphoreGive(uhfMsgSemaphore);
-			save_lowrfid_msg(&recv_msg[DAT_INDEX], MT_LOW_MSG_LEN);
+			if (mcuFuncConfig == CHAIN_DOWN_CTRLBOX)
+			{
+				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
+				for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
+				{
+					if(memcmp(chainDownData[i].rfid, &recv_msg[STC_FRAME_LEN_INDEX + 1], STC_RFID_ID_LEN) == 0)
+					{
+						wcs485_ChainOpen();					
+						memcpy(chainDownMsg.msg, chainDownData[i].rfid, STC_RFID_ID_LEN);
+						queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+						if(queue_send_ret == errQUEUE_FULL)
+						{
+							xQueueReceive(chainDownRfidOpenedQueue, &tmpChainDownMsg, 0);
+							xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+						}
+						chainDownData[i].valid = CHAIN_DOWN_DATA_INVALID;
+						chainDownData[i].age = 0;
+						break;
+					}
+				}
+				xSemaphoreGive(chainDownDataSemaphore);
+			}
+			if(mcuFuncConfig == UHF_RFID_CTRLBOX)
+			{
+				//business code
+				xSemaphoreGive(uhfMsgSemaphore);
+				save_lowrfid_msg(&recv_msg[DAT_INDEX], MT_LOW_MSG_LEN);
+			}
+			if(mcuFuncConfig == RFID_CHECK_CTRLBOX)
+			{
+				//business code
+			}
 		}
 	}
 }
 
 void uhfRFID_msg_task(void *pvParameters)
 {
-	BaseType_t queue_recv_ret;
+	BaseType_t queue_recv_ret, queue_send_ret;
 	uint8_t recv_msg[MT_UHF_MSG_LEN] = {0};
+	eventMsgFrame_t eventMsg, tmpMsg;
 
 	while(1)
 	{
@@ -171,6 +203,15 @@ void uhfRFID_msg_task(void *pvParameters)
 			mt_uhfrfid_convert(recv_msg, MT_UHF_MSG_LEN);
 			save_uhfrfid_msg(recv_msg, MT_UHF_MSG_LEN/2);
 			//send_msg();
+			set_event_msg(&eventMsg, EVENT_MSG_CHAIN_UP);
+			xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
+			queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
+			if(queue_send_ret == errQUEUE_FULL)
+			{
+				xQueueReceive(eventMsgQueue, &tmpMsg, 0);
+				xQueueSend(eventMsgQueue, &eventMsg, 0);
+			}
+			xSemaphoreGive(eventMsgSemaphore);
 		}
 	}
 }

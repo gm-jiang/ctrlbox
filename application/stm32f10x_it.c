@@ -236,12 +236,12 @@ void USART1_IRQHandler(void)
 	uint8_t crc8 = 0;
 	BaseType_t xHigherPriorityTaskWoken;
 	
-	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //????(?????????0x0d 0x0a??)
+	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
 	{
-		res = USART_ReceiveData(USART1);//(USART1->DR);	//????????
+		res = USART_ReceiveData(USART1);
 		if((uart1_data_index == 0)&&(res != WCS_FRAME_HEAD_1))
 			return;
-		
+
 		if((uart1_data_index == 1)&&(res != WCS_FRAME_HEAD_2))
 		{
 			uart1_data_index = 0;
@@ -256,7 +256,7 @@ void USART1_IRQHandler(void)
 				return;
 			}
 		}
-		
+
 		uart1FrameData.msg[uart1_data_index] = res;
 		uart1_data_index++;
 		if(uart1_data_index == (uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3))
