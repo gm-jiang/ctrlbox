@@ -155,20 +155,24 @@ void stc_msg_task(void *pvParameters)
 				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
 				for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
 				{
-					if(memcmp(chainDownData[i].rfid, &recv_msg[STC_FRAME_LEN_INDEX + 1], STC_RFID_ID_LEN) == 0)
+					if(chainDownData[i].valid == CHAIN_DOWN_DATA_VALID)
 					{
-						wcs485_ChainOpen();					
-						memcpy(chainDownMsg.msg, chainDownData[i].rfid, STC_RFID_ID_LEN);
-						queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
-						if(queue_send_ret == errQUEUE_FULL)
+						if(memcmp(chainDownData[i].rfid, &recv_msg[STC_FRAME_LEN_INDEX + 1], STC_RFID_ID_LEN) == 0)
 						{
-							xQueueReceive(chainDownRfidOpenedQueue, &tmpChainDownMsg, 0);
-							xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+							wcs485_ChainOpen();					
+							memcpy(chainDownMsg.msg, chainDownData[i].rfid, STC_RFID_ID_LEN);
+							queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+							if(queue_send_ret == errQUEUE_FULL)
+							{
+								xQueueReceive(chainDownRfidOpenedQueue, &tmpChainDownMsg, 0);
+								xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+							}
+							chainDownData[i].valid = CHAIN_DOWN_DATA_INVALID;
+							chainDownData[i].age = 0;
+							break;
 						}
-						chainDownData[i].valid = CHAIN_DOWN_DATA_INVALID;
-						chainDownData[i].age = 0;
-						break;
 					}
+					
 				}
 				xSemaphoreGive(chainDownDataSemaphore);
 			}
