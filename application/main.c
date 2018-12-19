@@ -58,7 +58,7 @@ int main(void)
 		dbg_Print(PRINT_LEVEL_DEBUG, "create led_task successful\n");
 	}
 
-	#if 0
+	#if 1
 	//create watchdog task
 	ret = xTaskCreate(watch_dog_task, "watch_dog", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_WATCH_DOG_TASK, NULL);
 	if(ret != pdPASS)

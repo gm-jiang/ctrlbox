@@ -225,8 +225,8 @@ void watch_dog_task(void *pvParameters)
 	while(1)
 	{
 		IWDG_Feed();
-		dbg_Print(PRINT_LEVEL_DEBUG, "watchdog feed\n");
-		sleep_Ms(500); //500ms
+		//dbg_Print(PRINT_LEVEL_DEBUG, "watchdog feed\n");
+		sleep_Ms(1000); //1s
 	}
 }
 

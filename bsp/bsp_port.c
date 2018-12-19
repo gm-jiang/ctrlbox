@@ -396,6 +396,7 @@ void motor_CtrlInit(void)
 //platform init ,init the receive queue of uart
 void platform_Init()
 {
+	uint8_t i;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	GPIO_Configuration();
 	releasekeyInt_Init();
@@ -406,7 +407,7 @@ void platform_Init()
 	motor_CtrlInit();
 	mcu_485RE_Init();
 	uhfRfidDetect_Init();
-	//IWDG_Init(IWDG_Prescaler_64, 1250); //2s
+	IWDG_Init(IWDG_Prescaler_64, 3125); //5s
 
 	//disable interrupts
 	portDISABLE_INTERRUPTS();
@@ -499,6 +500,15 @@ void platform_Init()
 
 	//enable interrupts
 	portENABLE_INTERRUPTS();
+	
+	for(i = 0; i < 20; i++)
+	{
+		lamp_Ctrl(DEBUG_LED, TURN_ON);
+		sleep_Us(50*1000);
+		lamp_Ctrl(DEBUG_LED, TURN_OFF);
+		sleep_Us(50*1000);
+	}
+		
 }
 
 void wcs485Uart_SendData(uint8_t *buf,uint16_t length)
