@@ -8,11 +8,8 @@ void lamp_task(void *pvParameters)
 	while(1)
 	{
 		lamp_Ctrl(DEBUG_LED, TURN_ON);
-		//lamp_Ctrl(TRICOLOR_LAMP_RED, TURN_OFF);
 		vTaskDelay(500);
 		lamp_Ctrl(DEBUG_LED, TURN_OFF);
-		//lamp_Ctrl(TRICOLOR_LAMP_RED, TURN_ON);
-		//dbg_Print(PRINT_LEVEL_DEBUG, "uart3 test\n");
 		vTaskDelay(500);
 	}
 }
@@ -243,23 +240,7 @@ void watch_dog_task(void *pvParameters)
 	while(1)
 	{
 		IWDG_Feed();
-		//dbg_Print(PRINT_LEVEL_DEBUG, "watchdog feed\n");
 		sleep_Ms(1000); //1s
-	}
-}
-
-void uhfRFID_detect_task(void *pvParameters)
-{
-	while(1)
-	{
-		if(GPIO_ReadInputDataBit(UHFRFID_DETECT_SENSOR_GPIO, UHFRFID_DETECT_SENSOR_GPIO_PIN) == 0)
-		{
-			sleep_Ms(5); //5ms
-		}
-		else
-		{
-			sleep_Ms(5); //5ms
-		}
 	}
 }
 

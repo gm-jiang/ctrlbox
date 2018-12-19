@@ -406,7 +406,6 @@ void platform_Init()
 	chainDown_CtrlInit();
 	motor_CtrlInit();
 	mcu_485RE_Init();
-	uhfRfidDetect_Init();
 	IWDG_Init(IWDG_Prescaler_64, 3125); //5s
 
 	//disable interrupts
@@ -423,12 +422,13 @@ void platform_Init()
 	dbg_Print(PRINT_LEVEL_ERROR, "485 addr:%d\n", mcu485Addr);
 
 	mcuFuncConfig = get_CustomerConfig();
-	if (mcuFuncConfig != CHAIN_DOWN_CTRLBOX && 
-			mcuFuncConfig != UHF_RFID_CTRLBOX && 
+	if (mcuFuncConfig != CHAIN_DOWN_CTRLBOX &&
+			mcuFuncConfig != UHF_RFID_CTRLBOX &&
 			mcuFuncConfig != RFID_CHECK_CTRLBOX)
 	{
 		mcuFuncConfig = CHAIN_DOWN_CTRLBOX;
 	}
+
 	dbg_Print(PRINT_LEVEL_ERROR, "device customer config:%d\n", mcuFuncConfig);
 
 	wcs485RecvMsgQueue = xQueueCreate(UART_QUEUE_LEN, sizeof(uartMsgFrame_t));

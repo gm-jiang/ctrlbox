@@ -58,7 +58,6 @@ int main(void)
 		dbg_Print(PRINT_LEVEL_DEBUG, "create led_task successful\n");
 	}
 
-	#if 1
 	//create watchdog task
 	ret = xTaskCreate(watch_dog_task, "watch_dog", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_WATCH_DOG_TASK, NULL);
 	if(ret != pdPASS)
@@ -69,8 +68,7 @@ int main(void)
 	{
 		dbg_Print(PRINT_LEVEL_DEBUG, "create watch_dog_task successful\n");
 	}
-	#endif
-	
+
 	//create wcs485_msg task
 	ret = xTaskCreate(wcs485_msg_task, "wcs485_msg", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_WCS485_MSG_TASK, NULL);
 	if(ret != pdPASS)
@@ -81,7 +79,7 @@ int main(void)
 	{
 		dbg_Print(PRINT_LEVEL_DEBUG, "create wcs485_msg_task successful\n");
 	}
-	
+
 	//create stc_msg task
 	ret = xTaskCreate(stc_msg_task, "stc_msg", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_STC_MSG_TASK, NULL);
 	if(ret != pdPASS)
@@ -103,18 +101,7 @@ int main(void)
 	{
 		dbg_Print(PRINT_LEVEL_DEBUG, "create uhfRFID_msg_task successful\n");
 	}
-	
-	//create uhfRFID_msg task
-	ret = xTaskCreate(uhfRFID_detect_task, "uhfRFID_sensor_detect", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_UHFRFID_DETECT_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_Print(PRINT_LEVEL_DEBUG, " create uhfRFID_detect_task failed\n");
-	}
-	else
-	{
-		dbg_Print(PRINT_LEVEL_DEBUG, "create uhfRFID_detect_task successful\n");
-	}
-	
+
 	ret = xTaskCreate(chainDown_sensor_task, "chainDown_sensor", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_CHAINDOWN_SENSOR_TASK, NULL);
 	if(ret != pdPASS)
 	{
@@ -124,7 +111,7 @@ int main(void)
 	{
 		dbg_Print(PRINT_LEVEL_DEBUG, "create chainDown_sensor_task successful\n");
 	}
-	
+
 	// Start the FreeRTOS scheduler
 	vTaskStartScheduler();
 	// Should never reach there
