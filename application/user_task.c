@@ -144,6 +144,7 @@ void stc_msg_task(void *pvParameters)
 	BaseType_t queue_recv_ret, queue_send_ret;
 	uint8_t recv_msg[MT_UART_MSG_LEN] = {0};
 	chainDownMsgFrame_t chainDownMsg, tmpChainDownMsg;
+	eventMsgFrame_t eventMsg, tmpMsg;
 
 	while(1)
 	{
@@ -157,9 +158,9 @@ void stc_msg_task(void *pvParameters)
 				{
 					if(chainDownData[i].valid == CHAIN_DOWN_DATA_VALID)
 					{
-						if(memcmp(chainDownData[i].rfid, &recv_msg[STC_FRAME_LEN_INDEX + 1], STC_RFID_ID_LEN) == 0)
+						if(memcmp(chainDownData[i].rfid, &recv_msg[DAT_INDEX], STC_RFID_ID_LEN) == 0)
 						{
-							wcs485_ChainOpen();					
+							wcs485_ChainOpen();
 							memcpy(chainDownMsg.msg, chainDownData[i].rfid, STC_RFID_ID_LEN);
 							queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
 							if(queue_send_ret == errQUEUE_FULL)
@@ -172,7 +173,6 @@ void stc_msg_task(void *pvParameters)
 							break;
 						}
 					}
-					
 				}
 				xSemaphoreGive(chainDownDataSemaphore);
 			}
@@ -185,6 +185,24 @@ void stc_msg_task(void *pvParameters)
 			if(mcuFuncConfig == RFID_CHECK_CTRLBOX)
 			{
 				//business code
+				for (i = 0; i < STC_RFID_ID_LEN; i++)
+				{
+					if (recv_msg[DAT_INDEX + i] != 0 )
+						break;
+				}
+				if (i == STC_RFID_ID_LEN)
+				{
+					wcs485_MotorCtrl(TURN_OFF);
+					eventMsg.msgType = EVENT_MSG_ALARM;
+					xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
+					queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
+					if(queue_send_ret == errQUEUE_FULL)
+					{
+						xQueueReceive(eventMsgQueue, &tmpMsg, 0);
+						xQueueSend(eventMsgQueue, &eventMsg, 0);
+					}
+					xSemaphoreGive(eventMsgSemaphore);
+				}
 			}
 		}
 	}

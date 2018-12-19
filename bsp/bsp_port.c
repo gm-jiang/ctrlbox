@@ -500,7 +500,7 @@ void platform_Init()
 
 	//enable interrupts
 	portENABLE_INTERRUPTS();
-	
+
 	for(i = 0; i < 20; i++)
 	{
 		lamp_Ctrl(DEBUG_LED, TURN_ON);
@@ -508,7 +508,6 @@ void platform_Init()
 		lamp_Ctrl(DEBUG_LED, TURN_OFF);
 		sleep_Us(50*1000);
 	}
-		
 }
 
 void wcs485Uart_SendData(uint8_t *buf,uint16_t length)
