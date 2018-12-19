@@ -171,7 +171,7 @@ void EXTI4_IRQHandler(void)
 			xSemaphoreGiveFromISR(chainDownDetectSemaphore, &pxHigherPriorityTaskWoken);
 		}
 		//dbg_Print(PRINT_LEVEL_DEBUG, "detected key\n");
-		while(port_CheckChainDownFinishEXT_IRQ() != 1);
+		//while(port_CheckChainDownFinishEXT_IRQ() != 1);
 		EXTI_ClearITPendingBit(CHAIN_DOWN_FINISH_DETECTIRQ_EXTI);
 	}
 }
@@ -210,7 +210,7 @@ void EXTI9_5_IRQHandler(void)
 			//lamp_Ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW, TURN_OFF);
 		}
 		//dbg_Print(PRINT_LEVEL_DEBUG, "detected key\n");
-		while(port_CheckEXT_IRQ() != 1);
+		//while(port_CheckEXT_IRQ() != 1);
 		EXTI_ClearITPendingBit(KEYIRQ_EXTI);
 	}
 	
