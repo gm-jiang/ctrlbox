@@ -153,14 +153,12 @@ void EXTI0_IRQHandler(void)
 		{
 			//wcs485_MotorCtrl(TURN_OFF);
 			eventMsg.msgType = EVENT_MSG_EMER_STOP;
-			xSemaphoreTakeFromISR(eventMsgSemaphore, &xHigherPriorityTaskWoken);
 			ret = xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			if(ret == errQUEUE_FULL)
 			{
 				xQueueReceiveFromISR(eventMsgQueue, &tmpMsg, &xHigherPriorityTaskWoken);
 				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			}	
-			xSemaphoreGive(eventMsgSemaphore);
 		}
 		/*
 		else if(port_CheckEmerStopKeyEXT_IRQ() == 1)
@@ -210,16 +208,13 @@ void EXTI9_5_IRQHandler(void)
 		if(port_CheckEXT_IRQ() == 0)
 		{
 			eventMsg.msgType = EVENT_MSG_KEY_DOWN;
-			xSemaphoreTakeFromISR(eventMsgSemaphore, &xHigherPriorityTaskWoken);
 			ret = xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			if(ret == errQUEUE_FULL)
 			{
 				xQueueReceiveFromISR(eventMsgQueue, &tmpMsg, &xHigherPriorityTaskWoken);
 				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			}	
-			xSemaphoreGive(eventMsgSemaphore);
 		}
-		//while(port_CheckEXT_IRQ() != 1);
 		EXTI_ClearITPendingBit(KEYIRQ_EXTI);
 	}
 	

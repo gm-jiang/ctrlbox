@@ -198,14 +198,12 @@ void stc_msg_task(void *pvParameters)
 				{
 					wcs485_MotorCtrl(TURN_OFF);
 					eventMsg.msgType = EVENT_MSG_ALARM;
-					xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 					queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 					if(queue_send_ret == errQUEUE_FULL)
 					{
 						xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 						xQueueSend(eventMsgQueue, &eventMsg, 0);
 					}
-					xSemaphoreGive(eventMsgSemaphore);
 				}
 			}
 		}
@@ -230,14 +228,12 @@ void uhfRFID_msg_task(void *pvParameters)
 			save_uhfrfid_msg(recv_msg, MT_UHF_MSG_LEN/2);
 			//send_msg();
 			set_event_msg(&eventMsg, EVENT_MSG_CHAIN_UP);
-			xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 			queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 			if(queue_send_ret == errQUEUE_FULL)
 			{
 				xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 				xQueueSend(eventMsgQueue, &eventMsg, 0);
 			}
-			xSemaphoreGive(eventMsgSemaphore);
 		}
 	}
 }
@@ -268,27 +264,23 @@ void chainDown_sensor_task(void *pvParameters)
 			{
 				eventMsg.msgType = EVENT_MSG_CHAIN_DOWN;
 				memcpy(eventMsg.msg, chainDownMsg.msg, STC_RFID_ID_LEN);
-				xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 				queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 				if(queue_send_ret == errQUEUE_FULL)
 				{
 					xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 					xQueueSend(eventMsgQueue, &eventMsg, 0);
 				}
-				xSemaphoreGive(eventMsgSemaphore);
 			}
 			else
 			{
 				eventMsg.msgType = EVENT_MSG_CHAIN_DOWN;
 				memcpy(eventMsg.msg, chainDownMsg.msg, STC_RFID_ID_LEN);
-				xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 				queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 				if(queue_send_ret == errQUEUE_FULL)
 				{
 					xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 					xQueueSend(eventMsgQueue, &eventMsg, 0);
 				}
-				xSemaphoreGive(eventMsgSemaphore);
 			}
 		}
 		else

@@ -16,8 +16,6 @@ QueueHandle_t uhfRFIDRecvMsgQueue = NULL;
 QueueHandle_t chainDownRfidOpenedQueue = NULL;
 //event queue
 QueueHandle_t eventMsgQueue = NULL;
-//event semaphore
-SemaphoreHandle_t eventMsgSemaphore = NULL;
 //chain down sensor detected semaphore
 SemaphoreHandle_t chainDownDetectSemaphore = NULL;
 //chain down rfid data semaphore
@@ -458,15 +456,7 @@ void platform_Init()
 		dbg_Print(PRINT_LEVEL_ERROR, "create eventMsgQueue failed\n");
 		while(1);
 	}
-	
-	eventMsgSemaphore = xSemaphoreCreateBinary();
-	if(eventMsgSemaphore == NULL) 
-	{
-		dbg_Print(PRINT_LEVEL_ERROR, "create eventMsgSemaphore failed\n");
-		while(1);
-	}
-	xSemaphoreGive(eventMsgSemaphore);
-	
+
 	memset(chainDownData, 0, sizeof(chainDownData_t));
 	
 	chainDownDetectSemaphore = xSemaphoreCreateBinary();
@@ -1269,14 +1259,12 @@ uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen)
 	
 	eventMsg.msgType = EVENT_MSG_ORDER_STATUS;
 	eventMsg.msg[0] = lampAndKeyStatus & 0x07;
-	xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 	xQueueSend(eventMsgQueue, &eventMsg, 0);
 	if(queue_send_ret == errQUEUE_FULL)
 	{
 		xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 		xQueueSend(eventMsgQueue, &eventMsg, 0);
 	}
-	xSemaphoreGive(eventMsgSemaphore);
 	
 	return ret;
 }
@@ -1301,14 +1289,12 @@ uint8_t wcs485_MotorStartStopCmd(uint8_t *dataBuf, uint8_t dataLen)
 	}
 	
 	eventMsg.msgType = EVENT_MSG_START_STOP;
-	xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
 	xQueueSend(eventMsgQueue, &eventMsg, 0);
 	if(queue_send_ret == errQUEUE_FULL)
 	{
 		xQueueReceive(eventMsgQueue, &tmpMsg, 0);
 		xQueueSend(eventMsgQueue, &eventMsg, 0);
 	}
-	xSemaphoreGive(eventMsgSemaphore);
 	
 	return ret;
 }

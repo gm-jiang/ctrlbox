@@ -340,8 +340,6 @@ extern QueueHandle_t uhfRFIDRecvMsgQueue;
 extern QueueHandle_t chainDownRfidOpenedQueue;
 //event queue
 extern QueueHandle_t eventMsgQueue;
-//event semaphore
-extern SemaphoreHandle_t eventMsgSemaphore;
 //chain down sensor detected semaphore
 extern SemaphoreHandle_t chainDownDetectSemaphore;
 //chain down rfid data semaphore
