@@ -137,7 +137,7 @@
 #define UART_QUEUE_LEN	           5
 
 #define EVENT_MSG_DATA_LEN				 16
-#define EVENT_MSG_QUEUE_LEN				 5
+#define EVENT_MSG_QUEUE_LEN				 10
 
 //lamp define
 #define TRICOLOR_LAMP_RED		       0x01
@@ -198,22 +198,23 @@ typedef struct _bindMsgFrame_t {
 #define STC_RFID_ID_LEN						 4
 
 //WCS  -> USART1
-#define WCS_BROADCAST_ADDR				 0xFF
-#define WCS_FRAME_HEAD_1		       0xAA
-#define WCS_FRAME_HEAD_2		       0x55
-#define WCS_FRAME_LEN_INDEX		     0x02
-#define WCS_485_ADDR_INDEX				 0x03
-#define WCS_485_FUNC_INDEX				 0x04
-#define WCS_485_CONFIG_ADDR			 	 0xF1
-#define WCS_485_CONFIG_SN			 	 	 0xF2
-#define WCS_485_QUERY_ADDR_SN			 0xF3
-#define WCS_485_CONFIG_CUSTOMER		 0xF4
-#define WCS_485_QUERY_CUSTOMER		 0xF5
-#define WCS_485_QUERY_HW_SW_VER		 0xF6
-#define WCS_485_DEVICE_SN_LEN			 16
-#define WCS_DECODE_BUF_LEN				 25
-#define WCS_SEND_BUF_LEN					 30
-#define WCS_ORDER_STATUS_LEN			 1
+#define WCS_BROADCAST_ADDR				 				0xFF
+#define WCS_FRAME_HEAD_1		       				0xAA
+#define WCS_FRAME_HEAD_2		       				0x55
+#define WCS_FRAME_LEN_INDEX		     				0x02
+#define WCS_485_ADDR_INDEX				 				0x03
+#define WCS_485_FUNC_INDEX				 				0x04
+#define WCS_485_CONFIG_ADDR			 	 				0xF1
+#define WCS_485_CONFIG_SN			 	 	 				0xF2
+#define WCS_485_QUERY_ADDR_SN			 				0xF3
+#define WCS_485_CONFIG_CUSTOMER		 				0xF4
+#define WCS_485_QUERY_CUSTOMER		 				0xF5
+#define WCS_485_QUERY_HW_SW_VER		 				0xF6
+#define WCS_485_DEVICE_SN_LEN			 				16
+#define WCS_DECODE_BUF_LEN				 				25
+#define WCS_SEND_BUF_LEN					 				30
+#define WCS_ORDER_STATUS_LEN			 				1
+#define WCS_MOTOR_START_STOP_STATUS_LEN		1
 //WCS frame: function ID define
 #define	WCS_FRAME_QUERY																			0x00
 #define	WCS_FRAME_QUERY_EMPTY_ACK														0x00
@@ -222,23 +223,22 @@ typedef struct _bindMsgFrame_t {
 #define WCS_FRAME_QUERY_ORDER_STATUS_ACK										0x03
 #define	WCS_FRAME_QUERY_KEY_DOWN_ACK												0x04
 #define	WCS_FRAME_QUERY_ALARM_ACK														0x05
+#define	WCS_FRAME_QUERY_START_STOP_ACK											0x06
+#define	WCS_FRAME_QUERY_EMER_STOP_ACK											  0x07
+
 
 #define	WCS_FRAME_CHAIN_DOWN_CTRL														0x02
 #define WCS_FRAME_CHAIN_DOWN_CTRL_ACK												0xF2
 #define	WCS_FRAME_ORDER_STATUS_CTRL													0x03
 #define	WCS_FRAME_ORDER_STATUS_CTRL_ACK											0xF3
+#define WCS_FRAME_MOTOR_START_STOP_CTRL											0x06
+#define WCS_FRAME_MOTOR_START_STOP_CTRL_ACK									0xF6
+
+//motor run status
+#define MOTOR_STATUS_STOP																		0x00
+#define MOTOR_STATUS_START																	0x01
 
 //chain down status
-/*
-#define CHAIN_DOWN_STATUS_FLAG_INDEX  		0x00
-#define CHAIN_DOWN_RFID_ID_INDEX					0x01
-#define CHAIN_DOWN_STATUS_DATA_INVALID		0x00
-#define CHAIN_DOWN_STATUS_GET_RFID				0x01
-#define CHAIN_DOWN_STATUS_MATCH_ID				0x02
-#define CHAIN_DOWN_STATUS_FINISH					0x04
-#define CHAIN_DOWN_STATUS_DATA_LEN				(STC_RFID_ID_LEN + 1)
-#define CHAIN_DOWN_DATA_BUF_GROUP_NUM			5
-*/
 //#define CHAIN_DOWN_RFID_GETED_QUEUE_LEN			5
 #define CHAIN_DOWN_RFID_OPENED_QUEUE_LEN	5
 #define CHAIN_DOWN_DETECT_TIMEOUT					(2*1000)
@@ -293,10 +293,14 @@ typedef enum _wcsFrameType_e {
 	WCS_FRAME_QUERY_ORDER_STATUS_ACK_E,
 	WCS_FRAME_QUERY_KEY_DOWN_ACK_E,
 	WCS_FRAME_QUERY_ALARM_ACK_E,
+	WCS_FRAME_QUERY_START_STOP_ACK_E,
+	WCS_FRAME_QUERY_EMER_STOP_ACK_E,
 	WCS_FRAME_CHAIN_DOWN_CTRL_E,
 	WCS_FRAME_CHAIN_DOWN_CTRL_ACK_E,
 	WCS_FRAME_ORDER_STATUS_CTRL_E,
 	WCS_FRAME_ORDER_STATUS_CTRL_ACK_E,
+	WCS_FRAME_MOTOR_START_STOP_CTRL_E,
+	WCS_FRAME_MOTOR_START_STOP_CTRL_ACK_E,
 	WCS_FRAME_INVALID_E
 }wcsFrameType_e;
 
@@ -307,7 +311,9 @@ typedef enum _eventMsgType_e {
 	EVENT_MSG_CHAIN_DOWN,
 	EVENT_MSG_ORDER_STATUS,
 	EVENT_MSG_KEY_DOWN,
-	EVENT_MSG_ALARM
+	EVENT_MSG_ALARM,
+	EVENT_MSG_START_STOP,
+	EVENT_MSG_EMER_STOP
 }eventMsgType_e;
 
 //the queue of event
@@ -398,11 +404,14 @@ uint8_t wcs485_ChainDownAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_OrderStatusAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_ChainKeyDownAckSend(void);
 uint8_t wcs485_ChainAlarmAckSend(void);
+uint8_t wcs485_QueryEmerStopAckSend(void);
+uint8_t wcs485_QueryStartStopAckSend(uint8_t *buf, uint8_t len);
 wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf,uint8_t *decodeLen);
 
 uint8_t wcs485_QueryCmd(void);
 uint8_t wcs485_ChainDownCmd(uint8_t *dataBuf, uint8_t dataLen);
 uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen);
+uint8_t wcs485_MotorStartStopCmd(uint8_t *dataBuf, uint8_t dataLen);
 
 //light sensor,after chain down
 //void sensor_ChainDownStatus(void);

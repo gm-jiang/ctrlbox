@@ -62,6 +62,13 @@ void wcs485_msg_task(void *pvParameters)
 							continue;
 						}
 						break;
+					case WCS_FRAME_MOTOR_START_STOP_CTRL_E:
+						ret = wcs485_MotorStartStopCmd(decodeBuf, decodeLen);
+						if(ret != RTN_SUCCESS)
+						{
+							continue;
+						}
+						break;
 					default:
 						break;
 				}

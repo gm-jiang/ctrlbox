@@ -142,17 +142,32 @@ void SysTick_Handler(void)
 //emergency stop key detect
 void EXTI0_IRQHandler(void)
 {
+	BaseType_t xHigherPriorityTaskWoken;
+	eventMsgFrame_t eventMsg, tmpMsg;
+	BaseType_t ret;
+	
 	if(port_GetEmerStopKeyEXT_IRQStatus() != RESET)
 	{
 		sleep_Us(5*1000);
 		if(port_CheckEmerStopKeyEXT_IRQ() == 0)
 		{
-			wcs485_MotorCtrl(TURN_OFF);
+			//wcs485_MotorCtrl(TURN_OFF);
+			eventMsg.msgType = EVENT_MSG_EMER_STOP;
+			xSemaphoreTakeFromISR(eventMsgSemaphore, &xHigherPriorityTaskWoken);
+			ret = xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+			if(ret == errQUEUE_FULL)
+			{
+				xQueueReceiveFromISR(eventMsgQueue, &tmpMsg, &xHigherPriorityTaskWoken);
+				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+			}	
+			xSemaphoreGive(eventMsgSemaphore);
 		}
+		/*
 		else if(port_CheckEmerStopKeyEXT_IRQ() == 1)
 		{
 			wcs485_MotorCtrl(TURN_ON);
 		}
+		*/
 		
 		EXTI_ClearITPendingBit(EMER_STOP_KEY_DETECTIRQ_EXTI);
 	}
@@ -184,7 +199,7 @@ void EXTI4_IRQHandler(void)
   */
 void EXTI9_5_IRQHandler(void)
 {
-	BaseType_t pxHigherPriorityTaskWoken;
+	//BaseType_t pxHigherPriorityTaskWoken;
 	BaseType_t xHigherPriorityTaskWoken;
 	eventMsgFrame_t eventMsg, tmpMsg;
 	BaseType_t ret;
@@ -194,11 +209,8 @@ void EXTI9_5_IRQHandler(void)
 		sleep_Us(5*1000);
 		if(port_CheckEXT_IRQ() == 0)
 		{
-			
-			lampAndKeyStatus = lampAndKeyStatus | KEY_STATUS;
 			eventMsg.msgType = EVENT_MSG_KEY_DOWN;
-			eventMsg.msg[0] = 1;
-			xSemaphoreTakeFromISR(eventMsgSemaphore, &pxHigherPriorityTaskWoken);
+			xSemaphoreTakeFromISR(eventMsgSemaphore, &xHigherPriorityTaskWoken);
 			ret = xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			if(ret == errQUEUE_FULL)
 			{
@@ -206,10 +218,7 @@ void EXTI9_5_IRQHandler(void)
 				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			}	
 			xSemaphoreGive(eventMsgSemaphore);
-			//lampAndKeyStatus = lampAndKeyStatus & (~0x07);
-			//lamp_Ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW, TURN_OFF);
 		}
-		//dbg_Print(PRINT_LEVEL_DEBUG, "detected key\n");
 		//while(port_CheckEXT_IRQ() != 1);
 		EXTI_ClearITPendingBit(KEYIRQ_EXTI);
 	}

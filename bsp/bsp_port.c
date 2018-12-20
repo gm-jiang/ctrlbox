@@ -965,11 +965,20 @@ uint8_t wcs485_Encode(wcsFrameType_e frameType, uint8_t *dataBuf, uint8_t dataLe
 		case WCS_FRAME_QUERY_ALARM_ACK_E:
 			encodeBuf[i++] = WCS_FRAME_QUERY_ALARM_ACK;
 			break;
+		case WCS_FRAME_QUERY_START_STOP_ACK_E:
+			encodeBuf[i++] = WCS_FRAME_QUERY_START_STOP_ACK;
+			break;
+		case WCS_FRAME_QUERY_EMER_STOP_ACK_E:
+			encodeBuf[i++] = WCS_FRAME_QUERY_EMER_STOP_ACK;
+			break;
 		case WCS_FRAME_CHAIN_DOWN_CTRL_ACK_E:
 			encodeBuf[i++] = WCS_FRAME_CHAIN_DOWN_CTRL_ACK;
 			break;
 		case WCS_FRAME_ORDER_STATUS_CTRL_ACK_E:
 			encodeBuf[i++] = WCS_FRAME_ORDER_STATUS_CTRL_ACK;
+			break;
+		case WCS_FRAME_MOTOR_START_STOP_CTRL_ACK_E:
+			encodeBuf[i++] = WCS_FRAME_MOTOR_START_STOP_CTRL_ACK;
 			break;
 		default:
 			return RTN_FAIL;
@@ -1010,6 +1019,11 @@ wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *dec
 			break;
 		case WCS_FRAME_ORDER_STATUS_CTRL:
 			frameType = WCS_FRAME_ORDER_STATUS_CTRL_E;
+			*decodeLen = originBuf[WCS_FRAME_LEN_INDEX] - 3;
+			memcpy(decodeBuf, &originBuf[WCS_485_FUNC_INDEX + 1], *decodeLen);
+			break;
+		case WCS_FRAME_MOTOR_START_STOP_CTRL:
+			frameType = WCS_FRAME_MOTOR_START_STOP_CTRL_E;
 			*decodeLen = originBuf[WCS_FRAME_LEN_INDEX] - 3;
 			memcpy(decodeBuf, &originBuf[WCS_485_FUNC_INDEX + 1], *decodeLen);
 			break;
@@ -1067,7 +1081,6 @@ uint8_t wcs485_OrderStatusAckSend(uint8_t *buf, uint8_t len)
 	uint8_t ret;
 	uint8_t sendBuf[WCS_SEND_BUF_LEN];
 	uint8_t sendLen = 0;
-	//uint8_t tmpBuf = lampAndKeyStatus & 0x07;
 	ret = wcs485_Encode(WCS_FRAME_QUERY_ORDER_STATUS_ACK_E, buf, len, sendBuf, &sendLen);
 	if(ret == RTN_SUCCESS)
 	{
@@ -1102,6 +1115,32 @@ uint8_t wcs485_ChainAlarmAckSend(void)
 	return ret;
 }
 
+uint8_t wcs485_QueryStartStopAckSend(uint8_t *buf, uint8_t len)
+{
+	uint8_t ret;
+	uint8_t sendBuf[WCS_SEND_BUF_LEN];
+	uint8_t sendLen = 0;
+	ret = wcs485_Encode(WCS_FRAME_QUERY_START_STOP_ACK_E, buf, len, sendBuf, &sendLen);
+	if(ret == RTN_SUCCESS)
+	{
+		wcs485Uart_SendData(sendBuf, sendLen);
+	}
+	return ret;
+}
+
+uint8_t wcs485_QueryEmerStopAckSend(void)
+{
+	uint8_t ret;
+	uint8_t sendBuf[WCS_SEND_BUF_LEN];
+	uint8_t sendLen = 0;
+	ret = wcs485_Encode(WCS_FRAME_QUERY_EMER_STOP_ACK_E, NULL, 0, sendBuf, &sendLen);
+	if(ret == RTN_SUCCESS)
+	{
+		wcs485Uart_SendData(sendBuf, sendLen);
+	}
+	return ret;
+}
+
 uint8_t wcs485_ChainDownCmdAckSend(void)
 {
 	uint8_t ret;
@@ -1128,17 +1167,25 @@ uint8_t wcs485_OrderStatusCmdAckSend(void)
 	return ret;
 }
 
+uint8_t wcs485_MotorStartStopCmdAckSend(void)
+{
+	uint8_t ret;
+	uint8_t sendBuf[WCS_SEND_BUF_LEN];
+	uint8_t sendLen = 0;
+	ret = wcs485_Encode(WCS_FRAME_MOTOR_START_STOP_CTRL_ACK_E, NULL, 0, sendBuf, &sendLen);
+	if(ret == RTN_SUCCESS)
+	{
+		wcs485Uart_SendData(sendBuf, sendLen);
+	}
+	return ret;
+}
+
 uint8_t wcs485_QueryCmd()
 {
 	uint8_t ret = RTN_SUCCESS;
 	eventMsgFrame_t eventMsg;
 	BaseType_t queueRet;
-	#if 0
-	if(lampAndKeyStatus & KEY_STATUS)
-	{
-		ret = wcs485_ChainKeyDownAckSend();
-	}
-	#endif
+
 	queueRet = xQueueReceive(eventMsgQueue, &eventMsg, 0);
 	if(queueRet != pdTRUE)
 	{
@@ -1163,6 +1210,12 @@ uint8_t wcs485_QueryCmd()
 			case EVENT_MSG_ALARM:
 				ret = wcs485_ChainAlarmAckSend();
 				break;
+			case EVENT_MSG_START_STOP:
+				ret = wcs485_QueryStartStopAckSend(eventMsg.msg, WCS_MOTOR_START_STOP_STATUS_LEN);
+				break;
+			case EVENT_MSG_EMER_STOP:
+				ret = wcs485_QueryEmerStopAckSend();
+				break;
 			default:
 				break;
 		}
@@ -1174,20 +1227,7 @@ uint8_t wcs485_ChainDownCmd(uint8_t *dataBuf, uint8_t dataLen)
 {
 	uint8_t ret;
 	ret = wcs485_ChainDownCmdAckSend();
-	/*
-	//xSemaphoreTake(chainDownRfidSemaphore, portMAX_DELAY);
-	//chainDownRFID[CHAIN_DOWN_STATUS_FLAG_INDEX] = CHAIN_DOWN_STATUS_GET_RFID;
-	//ret = get_ChainDownValidBuf();
-	if(ret < 0xff)
-	{
-		if((dataBuf != NULL) && (dataLen >= STC_RFID_ID_LEN))
-		{
-			memcpy(&chainDownRFID[ret + 1], dataBuf, STC_RFID_ID_LEN);
-			chainDownRFID[ret] = chainDownRFID[ret] | CHAIN_DOWN_STATUS_GET_RFID;
-		}	
-	}
-	//xSemaphoreGive(chainDownRfidSemaphore);
-	*/
+	
 	ret = add_ChainDownData(dataBuf, STC_RFID_ID_LEN);
 	
 	return ret;
@@ -1241,36 +1281,37 @@ uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen)
 	return ret;
 }
 
-/*
-//light sensor,after chain down
-void sensor_ChainDownStatus(void)
+uint8_t wcs485_MotorStartStopCmd(uint8_t *dataBuf, uint8_t dataLen)
 {
+	uint8_t ret;
 	eventMsgFrame_t eventMsg, tmpMsg;
 	BaseType_t queue_send_ret;
-	uint8_t i;
 	
-	for(i = 0; i < CHAIN_DOWN_DATA_BUF_GROUP_NUM; i++)
+	ret = wcs485_MotorStartStopCmdAckSend();
+	
+	if(dataBuf[0] == MOTOR_STATUS_START)
 	{
-		if(chainDownRFID[i * CHAIN_DOWN_STATUS_DATA_LEN] == (CHAIN_DOWN_STATUS_GET_RFID | CHAIN_DOWN_STATUS_MATCH_ID))
-		{
-			//xSemaphoreTakeFromISR(chainDownRfidSemaphore, &pxHigherPriorityTaskWoken);
-			chainDownRFID[i * CHAIN_DOWN_STATUS_DATA_LEN] = CHAIN_DOWN_STATUS_DATA_INVALID;
-			
-			xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
-			eventMsg.msgType = EVENT_MSG_CHAIN_DOWN;
-			memcpy(eventMsg.msg, &chainDownRFID[i * CHAIN_DOWN_STATUS_DATA_LEN + 1], STC_RFID_ID_LEN);
-			xQueueSend(eventMsgQueue, &eventMsg, 0);
-			if(queue_send_ret == errQUEUE_FULL)
-			{
-				xQueueReceive(eventMsgQueue, &tmpMsg, 0);
-				xQueueSend(eventMsgQueue, &eventMsg, 0);
-			}
-			xSemaphoreGive(eventMsgSemaphore);
-			
-			//xSemaphoreGive(chainDownRfidSemaphore);
-		}
+		wcs485_MotorCtrl(TURN_ON);
+		eventMsg.msg[0] = MOTOR_STATUS_START;
+	}
+	else
+	{
+		wcs485_MotorCtrl(TURN_OFF);
+		eventMsg.msg[0] = MOTOR_STATUS_STOP;
 	}
 	
+	eventMsg.msgType = EVENT_MSG_START_STOP;
+	xSemaphoreTake(eventMsgSemaphore, portMAX_DELAY);
+	xQueueSend(eventMsgQueue, &eventMsg, 0);
+	if(queue_send_ret == errQUEUE_FULL)
+	{
+		xQueueReceive(eventMsgQueue, &tmpMsg, 0);
+		xQueueSend(eventMsgQueue, &eventMsg, 0);
+	}
+	xSemaphoreGive(eventMsgSemaphore);
+	
+	return ret;
 }
-*/
+
+
 
