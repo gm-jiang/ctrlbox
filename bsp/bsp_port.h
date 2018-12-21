@@ -2,24 +2,13 @@
 #define _BSP_PORT_H
 
 #include "stm32f10x.h"
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "semphr.h"
-
-/***********************************VERSION DEFINE***************************************/
-#define HW_VERSION_STR		"---HW V1.1"
-#define SW_VERSION_STR		"---SW V1.0"
-#define VERISON_INFO_LEN	10
-
-/***********************************INTTERRUPT PRIORITY DEFINE***************************************/
-#define PREEMPTION_PRIORITY_WCS485										7
-#define PREEMPTION_PRIORITY_UHFRFID										8
-#define PREEMPTION_PRIORITY_STC												9
-#define PREEMPTION_PRIORITY_EMER_STOP_KEY							13
-#define PREEMPTION_PRIORITY_REALEASE_KEY							14
-#define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR	15
+#include "ctrlbox_conf.h"
 
 /***********************************GPIO DEFINE***************************************/
+#define COM1                       1
+#define COM2                       2
+#define COM3                       3
+
 //USART1
 #define USART1_RX_PIN              GPIO_Pin_10
 #define USART1_RX_SOURCE           GPIO_PinSource10
@@ -44,7 +33,6 @@
 #define USART3_PORT                GPIOB
 #define USART3_BAUDRATE            115200
 
-/* not used
 //UART4
 #define UART4_RX_PIN               GPIO_Pin_11
 #define UART4_RX_SOURCE            GPIO_PinSource11
@@ -52,16 +40,24 @@
 #define UART4_TX_SOURCE            GPIO_PinSource10
 #define UART4_PORT                 GPIOC
 #define UART4_BAUDRATE             115200
-*/
 
 //USART1 MAX485 ctrl pin
-#if 1
 #define WCS_485_RE_GPIO						 GPIOC
 #define WCS_485_RE_GPIO_PIN				 GPIO_Pin_9
-#else
-#define WCS_485_RE_GPIO						 GPIOA
-#define WCS_485_RE_GPIO_PIN				 GPIO_Pin_8
-#endif
+
+/***************************INTTERRUPT PRIORITY DEFINE**********************************/
+#define PREEMPTION_PRIORITY_WCS485										7
+#define PREEMPTION_PRIORITY_UHFRFID										8
+#define PREEMPTION_PRIORITY_STC												9
+#define PREEMPTION_PRIORITY_EMER_STOP_KEY							13
+#define PREEMPTION_PRIORITY_REALEASE_KEY							14
+#define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR	15
+
+//lamp define
+#define TRICOLOR_LAMP_RED		       0x01
+#define TRICOLOR_LAMP_GREEN		     0x02
+#define TRICOLOR_LAMP_YELLOW		   0x04
+#define DEBUG_LED							     0x08
 
 //release key
 #define KEYIRQ                     								GPIO_Pin_7
@@ -131,71 +127,32 @@
 #define TRICOLOR_LAMP_YELLOW_GPIO_PIN	 	GPIO_Pin_6
 
 /***********************************FRAME DEFINE***************************************/
-//the max length of the frame buffer
-#define UART_MSG_LEN			         50
-//the max length of the uart msg queue
-#define UART_QUEUE_LEN	           5
+#define SYN_STATE                  0x00
+#define STX_STATE                  0x01
+#define LEN_STATE                  0x02
+#define DAT_STATE                  0x03
+#define CRC_STATE                  0x04
 
-#define EVENT_MSG_DATA_LEN				 16
-#define EVENT_MSG_QUEUE_LEN				 10
+#define SYN_INDEX                     0
+#define STX_INDEX                     1
+#define LEN_INDEX                     2
+#define DAT_INDEX                     3
+#define CRC_INDEX                     7
+#define CRC_CHECK_LEN                 7
 
-//lamp define
-#define TRICOLOR_LAMP_RED		       0x01
-#define TRICOLOR_LAMP_GREEN		     0x02
-#define TRICOLOR_LAMP_YELLOW		   0x04
-#define DEBUG_LED							     0x08
-//key define
-#define	KEY_STATUS								 0x10
+#define DATA_CRC_LEN                  5
 
-/****************************************************/
-#define SYN_STATE                0x00
-#define STX_STATE                0x01
-#define LEN_STATE                0x02
-#define DAT_STATE                0x03
-#define CRC_STATE                0x04
+/*************************************************************************************/
 
-#define SYN_INDEX                   0
-#define LEN_INDEX                   1
-#define DAT_INDEX                   2
-#define CRC_INDEX                   6
-#define CRC_CHECK_LEN               6
-
-//the length of uhf rfid tag id
-#define MT_UHF_MSG_LEN			           24
-//the length of low rfid tag id
-#define MT_LOW_MSG_LEN			            4
-//the length of uart msg 
-#define MT_UART_MSG_LEN			           10
-
-//the max length of the uart msg queue
-#define MT_UART_QUEUE_LEN	              5
-
-//the frame head of low rfid
-#define MT_LOW_RFID_FRAME_HEAD	      0xFE
-//the frame head of uhf rfid
-#define MT_UHF_RFID_FRAME_HEAD	      0x02
-
-typedef struct _bindMsgFrame_t {
-	uint8_t low_flag;
-	uint8_t uhf_flag;
-	uint8_t uhf_rfid[MT_UHF_MSG_LEN/2];
-	uint8_t low_rfid[MT_LOW_MSG_LEN];
-}bindMsgFrame_t;
-
-#define CHAIN_DOWN_CTRLBOX            0x01
-#define UHF_RFID_CTRLBOX              0x02
-#define RFID_CHECK_CTRLBOX            0x03
-/******************************************************/
-
-//UHF RFID-> USART3
-#define UHF_RFID_FRAME_HEAD	       0xFE
-#define UHF_RFID_FRAME_LEN_INDEX	 0x01
-#define UHF_RFID_LABLE_DATA_LEN		 12
+//UHF RFID -> USART3
+#define UHF_RFID_FRAME_HEAD	          0x02
+#define UHF_RFID_LABLE_DATA_LEN		      12
 
 //STC -> USART2
-#define STC_FRAME_HEAD		         0xFE
-#define STC_FRAME_LEN_INDEX		     0x01
-#define STC_RFID_ID_LEN						 4
+#define STC_FRAME_SYN		              0xAA
+#define STC_FRAME_STX	                0x55
+#define STC_FRAME_LEN_INDEX		        0x01
+#define STC_RFID_ID_LEN				           4
 
 //WCS  -> USART1
 #define WCS_BROADCAST_ADDR				 				0xFF
@@ -210,11 +167,11 @@ typedef struct _bindMsgFrame_t {
 #define WCS_485_CONFIG_CUSTOMER		 				0xF4
 #define WCS_485_QUERY_CUSTOMER		 				0xF5
 #define WCS_485_QUERY_HW_SW_VER		 				0xF6
-#define WCS_485_DEVICE_SN_LEN			 				16
-#define WCS_DECODE_BUF_LEN				 				25
-#define WCS_SEND_BUF_LEN					 				30
-#define WCS_ORDER_STATUS_LEN			 				1
-#define WCS_MOTOR_START_STOP_STATUS_LEN		1
+#define WCS_485_DEVICE_SN_LEN			 				  16
+#define WCS_DECODE_BUF_LEN				 			 	  25
+#define WCS_SEND_BUF_LEN					 			   	30
+#define WCS_ORDER_STATUS_LEN			 			     1
+#define WCS_MOTOR_START_STOP_STATUS_LEN		   1
 //WCS frame: function ID define
 #define	WCS_FRAME_QUERY																			0x00
 #define	WCS_FRAME_QUERY_EMPTY_ACK														0x00
@@ -238,201 +195,35 @@ typedef struct _bindMsgFrame_t {
 #define MOTOR_STATUS_STOP																		0x00
 #define MOTOR_STATUS_START																	0x01
 
-//chain down status
-//#define CHAIN_DOWN_RFID_GETED_QUEUE_LEN			5
-#define CHAIN_DOWN_RFID_OPENED_QUEUE_LEN	5
-#define CHAIN_DOWN_DETECT_TIMEOUT					(2*1000)
-#define CHAIN_DOWN_DATA_VALID							1
-#define CHAIN_DOWN_DATA_INVALID						0
-#define CHAIN_DOWN_DATA_BUF_LEN						CHAIN_DOWN_RFID_OPENED_QUEUE_LEN
-#define CHAIN_DOWN_DATA_AGE_MAX						0xff
-
-/***********************************FUNCTION RETURN DEFINE***************************************/
-//function return value
-#define RTN_SUCCESS																					0x00
-#define RTN_FAIL																						0x01
-
-/***********************************485 ADDRESS FLASH DEFINE***************************************/
-//flash define
-#define FLASH_SIZE                     256          //MCU flash(k)
-#if FLASH_SIZE < 256
-  #define SECTOR_SIZE           			 1024    //Byte
-#else 
-  #define SECTOR_SIZE           			 2048    //Byte
-#endif
-#define MCU_485_ADDR_BASE							 (0x08000000 + 127 * SECTOR_SIZE)
-#define MCU_485_DEV_SN_BASE						 (0x08000000 + 126 * SECTOR_SIZE)
-#define MCU_485_DEV_CUSTOMER_BASE			 (0x08000000 + 125 * SECTOR_SIZE)
-/*
-//uart frame type, unused
-typedef enum _uartMsgType_e {
-	MSG_STC_TYPE,
-	MSG_WCS_TYPE,
-	MSG_DEBUG_TYPE
-}uartMsgType_e; 
-*/
-/***********************************UART FRAME DEFINE***************************************/
-//the queue of uart frame
-typedef struct _uartMsgFrame_t {
-	//uartMsgType_e msgType;
-	uint8_t msg[UART_MSG_LEN];
-}uartMsgFrame_t;
-
 //lamp on or off
 typedef enum _statusCtrlType_e {
 	TURN_ON,
 	TURN_OFF
 }statusCtrlType_e;
 
-//wcs frame type
-typedef enum _wcsFrameType_e {
-	WCS_FRAME_QUERY_E,
-	WCS_FRAME_QUERY_EMPTY_ACK_E,
-	WCS_FRAME_QUERY_CHAIN_UP_ACK_E,
-	WCS_FRAME_QUERY_CHAIN_DOWN_ACK_E,
-	WCS_FRAME_QUERY_ORDER_STATUS_ACK_E,
-	WCS_FRAME_QUERY_KEY_DOWN_ACK_E,
-	WCS_FRAME_QUERY_ALARM_ACK_E,
-	WCS_FRAME_QUERY_START_STOP_ACK_E,
-	WCS_FRAME_QUERY_EMER_STOP_ACK_E,
-	WCS_FRAME_CHAIN_DOWN_CTRL_E,
-	WCS_FRAME_CHAIN_DOWN_CTRL_ACK_E,
-	WCS_FRAME_ORDER_STATUS_CTRL_E,
-	WCS_FRAME_ORDER_STATUS_CTRL_ACK_E,
-	WCS_FRAME_MOTOR_START_STOP_CTRL_E,
-	WCS_FRAME_MOTOR_START_STOP_CTRL_ACK_E,
-	WCS_FRAME_INVALID_E
-}wcsFrameType_e;
-
-//event type
-typedef enum _eventMsgType_e {
-	EVENT_MSG_EMPTY,
-	EVENT_MSG_CHAIN_UP,
-	EVENT_MSG_CHAIN_DOWN,
-	EVENT_MSG_ORDER_STATUS,
-	EVENT_MSG_KEY_DOWN,
-	EVENT_MSG_ALARM,
-	EVENT_MSG_START_STOP,
-	EVENT_MSG_EMER_STOP
-}eventMsgType_e;
-
-//the queue of event
-typedef struct _eventMsgFrame_t {
-	eventMsgType_e msgType;
-	uint8_t msg[EVENT_MSG_DATA_LEN];
-}eventMsgFrame_t;
-
-typedef struct _chainDownMsgFrame_t {
-	uint8_t msg[STC_RFID_ID_LEN];
-}chainDownMsgFrame_t;
-
-typedef struct _chainDownData_t {
-	uint8_t valid;
-	uint8_t age;
-	uint8_t rfid[STC_RFID_ID_LEN];
-}chainDownData_t;
-/***********************************VARIABLE STATEMENT***************************************/
-//the receive message queue of uart
-extern QueueHandle_t wcs485RecvMsgQueue;
-extern QueueHandle_t stcRecvMsgQueue;
-extern QueueHandle_t uhfRFIDRecvMsgQueue;
-//extern QueueHandle_t chainDownRfidGetedQueue;
-extern QueueHandle_t chainDownRfidOpenedQueue;
-//event queue
-extern QueueHandle_t eventMsgQueue;
-//chain down sensor detected semaphore
-extern SemaphoreHandle_t chainDownDetectSemaphore;
-//chain down rfid data semaphore
-extern SemaphoreHandle_t chainDownDataSemaphore;
-extern SemaphoreHandle_t uhfMsgSemaphore;
-
-//extern uint32_t cpuID[3];
-
-/*chain down stc rfid
-		byte0:flag bit0[0,invalid][1,valid(get id)] bit1[0,invalid][1,valid(match id)] bit2[0,invalid][1,valid(chaindown finish)]
-		byte1~byte4:rfid id data
-*/
-//extern uint8_t chainDownRFID[CHAIN_DOWN_STATUS_DATA_LEN * CHAIN_DOWN_DATA_BUF_GROUP_NUM];
-extern chainDownData_t chainDownData[CHAIN_DOWN_DATA_BUF_LEN];
-extern uint8_t mcu485Addr;
-extern uint8_t mcuFuncConfig;
-
-/*lamp status and key status
-		bit0:red							[0,OFF][1,ON], 
-    bit1:green						[0,OFF][1,ON], 
-		bit2:yellow						[0,OFF][1,ON],
-		bit3:debug_led				[0,OFF][1,ON],
-		bit4:key_status				[0,UNVALID][1,VALID]
-*/
-extern uint8_t lampAndKeyStatus;
-
-/***********************************FUNCTION STATEMENT***************************************/
-//
-void GPIO_Configuration(void);
-void wcs485Uart_Init(void);
-void stcUart_Init(void);
-void uhfRfidUart_Init(void);
-void releasekeyInt_Init(void);
-void emerStopkeyInt_Init(void);
-void chainDownFinishSensorInt_Init(void);
-void mcu_485RE_Init(void);
-void uhfRfidDetect_Init(void);
-void lamp_Init(void);
-void platform_Init(void);
-void IWDG_Init(uint8_t prv ,uint16_t rlv);
-void chainDown_CtrlInit(void);
-void motor_CtrlInit(void);
-
-void wcs485Uart_SendData(uint8_t *buf,uint16_t length);
-void stcUart_SendData(uint8_t *buf,uint16_t length);
-void uhfRfidUart_SendData(uint8_t *buf,uint16_t length);
-void lamp_Ctrl(uint8_t lamp, statusCtrlType_e lampCtrl);
-//use nop
-void sleep_Us(uint32_t time_us);
-//use freeRTOS
-void sleep_Ms(unsigned int time_ms);
-
-void wcs485_ChainOpen(void);
-void wcs485_MotorCtrl(statusCtrlType_e statusCtrl);
-uint8_t add_ChainDownData(uint8_t *buf, uint8_t len);
-void wcs485_Update485AddrOrSNackSend(uint8_t *dataBuf, uint8_t dataLen);
-uint8_t wcs485_QueryEmptyAckSend(void);
-uint8_t wcs485_ChainUpAckSend(uint8_t *buf, uint8_t len);
-uint8_t wcs485_ChainDownAckSend(uint8_t *buf, uint8_t len);
-uint8_t wcs485_OrderStatusAckSend(uint8_t *buf, uint8_t len);
-uint8_t wcs485_ChainKeyDownAckSend(void);
-uint8_t wcs485_ChainAlarmAckSend(void);
-uint8_t wcs485_QueryEmerStopAckSend(void);
-uint8_t wcs485_QueryStartStopAckSend(uint8_t *buf, uint8_t len);
-wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf,uint8_t *decodeLen);
-
-uint8_t wcs485_QueryCmd(void);
-uint8_t wcs485_ChainDownCmd(uint8_t *dataBuf, uint8_t dataLen);
-uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen);
-uint8_t wcs485_MotorStartStopCmd(uint8_t *dataBuf, uint8_t dataLen);
-
-//light sensor,after chain down
-//void sensor_ChainDownStatus(void);
-
-//the check sum of stc frame
-uint8_t check_Sum(uint8_t *uBuff, uint8_t uBuffLen);
-//calc crc8,CRC8/MAXIM,X8+X5+X4+1
-uint8_t cal_crc8(uint8_t *uBuff,uint32_t uBuffLen);
-
-//watch dog
-void IWDG_Feed(void);
-//get cpuID for sn
-//void get_CpuID(void);
-
-uint8_t get_485Addr(void);
-void set_485Addr(uint8_t addr);
-
-uint8_t get_DevSn(uint8_t *snBuf, uint8_t *snLen);
-uint8_t set_DevSn(uint8_t *snBuf, uint8_t snLen);
-
-//get customer config
-uint8_t get_CustomerConfig(void);
-//set customer config
-void set_CustomerConfig(uint8_t config);
+void bsp_gpio_configuration(void);
+void bsp_releasekey_init(void);
+void bsp_emerstopkey_init(void);
+void bsp_chaindown_finish_sensor_init(void);
+void bsp_wcs_uart_init(void);
+void bsp_stc_uart_init(void);
+void bsp_uhfrfid_uart_init(void);
+void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
+void bsp_mcu_485RE_init(void);
+void bsp_uhfrfid_detect_init(void);
+void bsp_lamp_init(void);
+void bsp_chaindown_ctrl_init(void);
+void bsp_motor_ctrl_init(void);
+void bsp_enable_485_pin(void);
+void bsp_disable_485_pin(void);
+void bsp_uart1_send(uint8_t *buf, uint16_t length);
+void bsp_uart2_send(uint8_t *buf, uint16_t length);
+void bsp_uart3_send(uint8_t *buf, uint16_t length);
+void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl);
+void bsp_IWDG_feed(void);
+uint16_t bsp_FLASH_ReadHalfWord(uint32_t address);
+uint32_t bsp_FLASH_ReadWord(uint32_t address);
+void bsp_FLASH_ReadMoreData(uint32_t startAddress, uint16_t *readData, uint16_t countToRead);
+void bsp_FLASH_WriteMoreData(uint32_t startAddress, uint16_t *writeData, uint16_t countToWrite);
 
 #endif

@@ -1,7 +1,8 @@
+#include "stm32f10x.h"
 #include "mt_common.h"
 #include <string.h>
 
-void mt_delay_ms(uint16_t time)
+void mt_sleep_ms(uint16_t time)
 {    
    uint16_t i=0;
 	
@@ -10,6 +11,18 @@ void mt_delay_ms(uint16_t time)
       i=8500;
       while(i--); 
    }
+}
+
+void mt_sleep_us(uint32_t time_us)
+{
+	uint32_t i = 0;
+	for(i = 0;i < time_us;i++){
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	}
 }
 
 uint8_t mt_hex2ascii(uint8_t hex)
@@ -48,4 +61,25 @@ uint8_t mt_check_sum(uint8_t *ubuff, uint8_t ubufflen)
 	usum = (~usum) + 1;
 
 	return usum;
+}
+
+uint8_t mt_cal_crc8(uint8_t *ubuff,uint32_t ubufflen)
+{
+	uint8_t crc = 0;
+	uint8_t i;
+
+	while(ubufflen--)
+	{
+		crc ^= *ubuff++;
+		for(i = 0;i < 8;i++)
+		{
+			if(crc & 0x01)
+			{
+				crc = (crc >> 1) ^ 0x8C;
+			}
+			else 
+				crc >>= 1;
+		}
+	}
+	return crc;
 }

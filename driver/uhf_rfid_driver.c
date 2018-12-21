@@ -1,5 +1,5 @@
 #include <string.h>
-#include "uhf_rfid.h"
+#include "uhf_rfid_driver.h"
 #include "bsp_port.h"
 #include "mt_common.h"
 
@@ -25,15 +25,14 @@ void save_uhfrfid_msg(uint8_t *msg, uint8_t msg_len)
 void set_event_msg(eventMsgFrame_t *eventMsg, eventMsgType_e msgType)
 {
 	eventMsg->msgType = msgType;
-	memcpy(eventMsg->msg, bindMsgFrame.uhf_rfid, 12);
+	memcpy(eventMsg->msg, bindMsgFrame.uhf_rfid, UHF_RFID_LABLE_DATA_LEN);
 	memcpy(&(eventMsg->msg[UHF_RFID_LABLE_DATA_LEN]), bindMsgFrame.low_rfid, 4);
 }
 
 void uhfrfid_send_cmd(void)
 {
 	uint8_t cmd[2] = {'K', 'I'};
-
-	uhfRfidUart_SendData(&cmd[0], 1);
-	mt_delay_ms(500);
-	uhfRfidUart_SendData(&cmd[1], 1);
+	bsp_uart3_send(&cmd[0], 1);
+	mt_sleep_ms(500);
+	bsp_uart3_send(&cmd[1], 1);
 }

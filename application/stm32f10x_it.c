@@ -23,8 +23,14 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-#include "bsp_port.h"
 #include <string.h>
+#include "bsp_port.h"
+#include "user_task.h"
+#include "mt_common.h"
+#include "wcs_parser.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
@@ -145,13 +151,12 @@ void EXTI0_IRQHandler(void)
 	BaseType_t xHigherPriorityTaskWoken;
 	eventMsgFrame_t eventMsg, tmpMsg;
 	BaseType_t ret;
-	
+
 	if(port_GetEmerStopKeyEXT_IRQStatus() != RESET)
 	{
-		sleep_Us(5*1000);
+		mt_sleep_us(5*1000);
 		if(port_CheckEmerStopKeyEXT_IRQ() == 0)
 		{
-			//wcs485_MotorCtrl(TURN_OFF);
 			eventMsg.msgType = EVENT_MSG_EMER_STOP;
 			ret = xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			if(ret == errQUEUE_FULL)
@@ -160,13 +165,7 @@ void EXTI0_IRQHandler(void)
 				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
 			}	
 		}
-		/*
-		else if(port_CheckEmerStopKeyEXT_IRQ() == 1)
-		{
-			wcs485_MotorCtrl(TURN_ON);
-		}
-		*/
-		
+
 		EXTI_ClearITPendingBit(EMER_STOP_KEY_DETECTIRQ_EXTI);
 	}
 } 
@@ -177,19 +176,14 @@ void EXTI4_IRQHandler(void)
 	BaseType_t pxHigherPriorityTaskWoken;
 	if(port_GetChainDownFinishEXT_IRQStatus() != RESET)
 	{
-		//sleep_Us(5*100);
 		if(port_CheckChainDownFinishEXT_IRQ() == 0)
 		{
-			//sensor_ChainDownStatus();
 			xSemaphoreGiveFromISR(chainDownDetectSemaphore, &pxHigherPriorityTaskWoken);
 		}
-		//dbg_Print(PRINT_LEVEL_DEBUG, "detected key\n");
-		//while(port_CheckChainDownFinishEXT_IRQ() != 1);
 		EXTI_ClearITPendingBit(CHAIN_DOWN_FINISH_DETECTIRQ_EXTI);
 	}
 }
 
-//static uint8_t key_flag = 0;
 /**
   * @brief  This function handles USARTx global interrupt request.
   * @param  None
@@ -197,14 +191,13 @@ void EXTI4_IRQHandler(void)
   */
 void EXTI9_5_IRQHandler(void)
 {
-	//BaseType_t pxHigherPriorityTaskWoken;
 	BaseType_t xHigherPriorityTaskWoken;
 	eventMsgFrame_t eventMsg, tmpMsg;
 	BaseType_t ret;
 	
 	if(port_GetEXT_IRQStatus() != RESET)
 	{
-		sleep_Us(5*1000);
+		mt_sleep_us(5*1000);
 		if(port_CheckEXT_IRQ() == 0)
 		{
 			eventMsg.msgType = EVENT_MSG_KEY_DOWN;
@@ -217,7 +210,6 @@ void EXTI9_5_IRQHandler(void)
 		}
 		EXTI_ClearITPendingBit(KEYIRQ_EXTI);
 	}
-	
 }
 
 /******************************************************************************/
@@ -232,14 +224,14 @@ void EXTI9_5_IRQHandler(void)
   * @param  None
   * @retval None
   */
-static uint8_t uart1_data_index = 0;
-static uartMsgFrame_t uart1FrameData;
 void USART1_IRQHandler(void)
 {
 	uint8_t res;
 	uint8_t crc8 = 0;
 	BaseType_t xHigherPriorityTaskWoken;
-	
+	static uint8_t uart1_data_index = 0;
+	static uartMsgFrame_t uart1FrameData;
+		
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
 	{
 		res = USART_ReceiveData(USART1);
@@ -251,10 +243,10 @@ void USART1_IRQHandler(void)
 			uart1_data_index = 0;
 			return;
 		}
-		
+
 		if(uart1_data_index == WCS_485_ADDR_INDEX)
 		{
-			if((res != mcu485Addr) && (res != WCS_BROADCAST_ADDR)) 
+			if((res != g_mcu485Addr) && (res != WCS_BROADCAST_ADDR)) 
 			{
 				uart1_data_index = 0;
 				return;
@@ -265,15 +257,14 @@ void USART1_IRQHandler(void)
 		uart1_data_index++;
 		if(uart1_data_index == (uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3))
 		{
-			crc8 = cal_crc8(&(uart1FrameData.msg[0]), uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3 - 1);
+			crc8 = mt_cal_crc8(&(uart1FrameData.msg[0]), uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3 - 1);
 			if(crc8 == uart1FrameData.msg[uart1_data_index - 1])
 			{
-				//uart1FrameData.msgType = MSG_DEBUG_TYPE;
 				xQueueSendFromISR(wcs485RecvMsgQueue, &uart1FrameData, &xHigherPriorityTaskWoken);
 			}
 			uart1_data_index = 0;
 		}
-		uart1_data_index = uart1_data_index % UART_MSG_LEN;	
+		uart1_data_index = uart1_data_index % WCS_MSG_LEN;	
 	}
 }
 
@@ -294,19 +285,26 @@ void USART2_IRQHandler(void)
 	uint8_t tmp_char = 0;
 	static uint8_t state = 0;
 	static uint8_t recv_cnt = 0;
-	static uint8_t recv_buf[MT_UART_MSG_LEN] = {0};
+	static uint8_t recv_buf[STC_MSG_LEN] = {0};
 	BaseType_t xHigherPriorityTaskWoken;
 
 	if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
 	{
 		tmp_char = USART_ReceiveData(USART2);
-		switch (state)
+		switch (state) 
 		{
 			case SYN_STATE:
-				if (tmp_char == MT_LOW_RFID_FRAME_HEAD)
+				if (tmp_char == STC_FRAME_SYN)
+				{
+					state = STX_STATE;
+					recv_buf[SYN_INDEX] = tmp_char;
+				}
+				break;
+			case STX_STATE:
+				if (tmp_char == STC_FRAME_STX)
 				{
 					state = LEN_STATE;
-					recv_buf[SYN_INDEX] = tmp_char;
+					recv_buf[STX_INDEX] = tmp_char;
 				}
 				break;
 			case LEN_STATE:
@@ -315,24 +313,20 @@ void USART2_IRQHandler(void)
 				break;
 			case DAT_STATE:
 				recv_buf[DAT_INDEX + recv_cnt++] = tmp_char;
-				if (recv_cnt == recv_buf[1] - 1)
+				if (recv_cnt == recv_buf[LEN_INDEX])
 				{
-					state = CRC_STATE;
+					state = SYN_STATE;
 					recv_cnt = 0;
-				}
-				break;
-			case CRC_STATE:
-				recv_buf[CRC_INDEX] = tmp_char;
-				state = SYN_STATE;
-				if (recv_buf[CRC_INDEX] == check_Sum(recv_buf, CRC_CHECK_LEN))
-				{
-					xQueueSendFromISR(stcRecvMsgQueue, recv_buf, &xHigherPriorityTaskWoken);
-					memset(recv_buf, 0, MT_UART_MSG_LEN);
-					portYIELD_FROM_ISR(xHigherPriorityTaskWoken);	
+					if (recv_buf[CRC_INDEX] == mt_check_sum(recv_buf, CRC_CHECK_LEN))
+					{
+						xQueueSendFromISR(stcRecvMsgQueue, recv_buf, &xHigherPriorityTaskWoken);
+						memset(recv_buf, 0, STC_MSG_LEN);
+						portYIELD_FROM_ISR(xHigherPriorityTaskWoken);	
+					}
 				}
 				break;
 			default:
-				break;
+					break;
 		}
 	}
 }
@@ -347,7 +341,7 @@ void USART3_IRQHandler(void)
 	uint8_t tmp_char = 0;
 	static uint8_t state = 0;
 	static uint8_t recv_cnt = 0;
-	static uint8_t recv_buf[MT_UHF_MSG_LEN] = {0};
+	static uint8_t recv_buf[UHF_MSG_LEN] = {0};
 	BaseType_t xHigherPriorityTaskWoken;
 
 	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
@@ -356,19 +350,19 @@ void USART3_IRQHandler(void)
 		switch (state)
 		{
 			case SYN_STATE:
-				if (tmp_char == MT_UHF_RFID_FRAME_HEAD)
+				if (tmp_char == UHF_RFID_FRAME_HEAD)
 				{
 					state = DAT_STATE;
 				}
 				break;
 			case DAT_STATE:
 				recv_buf[recv_cnt++] = tmp_char;
-				if (recv_cnt == MT_UHF_MSG_LEN)
+				if (recv_cnt == UHF_MSG_LEN)
 				{
 					state = SYN_STATE;
 					recv_cnt = 0;
 					xQueueSendFromISR(uhfRFIDRecvMsgQueue, recv_buf, &xHigherPriorityTaskWoken);
-					memset(recv_buf, 0, MT_UHF_MSG_LEN);
+					memset(recv_buf, 0, UHF_MSG_LEN);
 					portYIELD_FROM_ISR(xHigherPriorityTaskWoken);	
 				}
 				break;

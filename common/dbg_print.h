@@ -1,7 +1,8 @@
-#ifndef _DBG_PRINT_H
-#define _DBG_PRINT_H
+#ifndef _dbg_print_H
+#define _dbg_print_H
 
-#include "stm32f10x.h"
+#include <stdint.h>
+
 #define PRINT_BUFFER_LEN          512
 
 enum
@@ -14,8 +15,9 @@ enum
     PRINT_LEVEL_VERBOSE
 };
 
-#define PRINT_LEVEL PRINT_LEVEL_DEBUG
+#define PRINT_LEVEL PRINT_LEVEL_WARNING
 
-void dbg_Print(int printf_level, char *fmt, ...);
+void dbg_print(int printf_level, char *fmt, ...);
+void dbg_print_msg(int print_level, uint8_t *preMsg, uint8_t len, uint8_t *msg);
 
 #endif
