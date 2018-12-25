@@ -156,6 +156,7 @@ void wcs485_msg_task(void *pvParameters)
 		queue_recv_ret = xQueueReceive(wcs485RecvMsgQueue, &recv_msg, portMAX_DELAY);
 		if(queue_recv_ret == pdTRUE)
 		{
+			dbg_print_msg(PRINT_LEVEL_DEBUG, "WCS DATA IN: <--", recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, recv_msg.msg);
 			frameType = wcs485_Decode(recv_msg.msg, recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, decodeBuf, &decodeLen);
 			if(frameType != WCS_FRAME_INVALID_E)
 			{

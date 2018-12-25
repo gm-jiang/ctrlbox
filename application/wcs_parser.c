@@ -165,13 +165,13 @@ uint8_t wcs485_Encode(wcsFrameType_e frameType, uint8_t *dataBuf, uint8_t dataLe
 	return RTN_SUCCESS;
 }
 
-wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf,uint8_t *decodeLen)
+wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf, uint8_t *decodeLen)
 {
 	wcsFrameType_e frameType = WCS_FRAME_INVALID_E;
-	
+
 	if((originBuf == NULL) || (decodeBuf == NULL))
 		return WCS_FRAME_INVALID_E;
-	
+
 	switch(originBuf[WCS_485_FUNC_INDEX])
 	{
 		case WCS_FRAME_QUERY:

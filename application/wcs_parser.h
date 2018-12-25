@@ -75,7 +75,7 @@ void wcs485_Update485AddrOrSNackSend(uint8_t *dataBuf, uint8_t dataLen);
 void wcs485_ChainOpen(void);
 void wcs485_MotorCtrl(statusCtrlType_e statusCtrl);
 uint8_t wcs485_Encode(wcsFrameType_e frameType, uint8_t *dataBuf, uint8_t dataLen, uint8_t *encodeBuf, uint8_t *encodeLen);
-wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf,uint8_t *decodeLen);
+wcsFrameType_e wcs485_Decode(uint8_t *originBuf, uint8_t originLen, uint8_t *decodeBuf, uint8_t *decodeLen);
 uint8_t wcs485_QueryEmptyAckSend(void);
 uint8_t wcs485_ChainUpAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_ChainDownAckSend(uint8_t *buf, uint8_t len);

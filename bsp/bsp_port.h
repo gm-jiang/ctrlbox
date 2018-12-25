@@ -5,9 +5,6 @@
 #include "ctrlbox_conf.h"
 
 /***********************************GPIO DEFINE***************************************/
-#define COM1                       1
-#define COM2                       2
-#define COM3                       3
 
 //USART1
 #define USART1_RX_PIN              GPIO_Pin_10

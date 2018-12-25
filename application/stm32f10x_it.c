@@ -148,9 +148,9 @@ void SysTick_Handler(void)
 //emergency stop key detect
 void EXTI0_IRQHandler(void)
 {
+	BaseType_t ret;
 	BaseType_t xHigherPriorityTaskWoken;
 	eventMsgFrame_t eventMsg, tmpMsg;
-	BaseType_t ret;
 
 	if(port_GetEmerStopKeyEXT_IRQStatus() != RESET)
 	{
@@ -163,7 +163,7 @@ void EXTI0_IRQHandler(void)
 			{
 				xQueueReceiveFromISR(eventMsgQueue, &tmpMsg, &xHigherPriorityTaskWoken);
 				xQueueSendFromISR(eventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
-			}	
+			}
 		}
 
 		EXTI_ClearITPendingBit(EMER_STOP_KEY_DETECTIRQ_EXTI);
@@ -226,45 +226,57 @@ void EXTI9_5_IRQHandler(void)
   */
 void USART1_IRQHandler(void)
 {
-	uint8_t res;
-	uint8_t crc8 = 0;
+	uint8_t tmp_char = 0;
+	static uint8_t state = 0;
+	static uint8_t recv_cnt = 0;
+	static uint8_t recv_buf[WCS_MSG_LEN] = {0};
 	BaseType_t xHigherPriorityTaskWoken;
-	static uint8_t uart1_data_index = 0;
-	static uartMsgFrame_t uart1FrameData;
-		
+
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
 	{
-		res = USART_ReceiveData(USART1);
-		if((uart1_data_index == 0)&&(res != WCS_FRAME_HEAD_1))
-			return;
-
-		if((uart1_data_index == 1)&&(res != WCS_FRAME_HEAD_2))
+		tmp_char = USART_ReceiveData(USART1);
+		switch (state)
 		{
-			uart1_data_index = 0;
-			return;
+			case SYN_STATE:
+				if (tmp_char == STC_FRAME_SYN)
+				{
+					state = STX_STATE;
+					recv_buf[SYN_INDEX] = tmp_char;
+				}
+				break;
+			case STX_STATE:
+				if (tmp_char == STC_FRAME_STX)
+				{
+					state = LEN_STATE;
+					recv_buf[STX_INDEX] = tmp_char;
+				}
+				break;
+			case LEN_STATE:
+				state = DAT_STATE;
+				recv_buf[LEN_INDEX] = tmp_char;
+				break;
+			case DAT_STATE:
+				recv_buf[DAT_INDEX + recv_cnt++] = tmp_char;
+				if (recv_cnt == recv_buf[LEN_INDEX])
+				{
+					state = SYN_STATE;
+					recv_cnt = 0;
+					if (recv_buf[DAT_INDEX] != g_mcu485Addr && recv_buf[DAT_INDEX] != WCS_BROADCAST_ADDR)
+					{
+						memset(recv_buf, 0, WCS_MSG_LEN);
+						return;
+					}
+					if (recv_buf[recv_buf[LEN_INDEX] + 2] == mt_cal_crc8(recv_buf, recv_buf[LEN_INDEX] + 2))
+					{
+						xQueueSendFromISR(wcs485RecvMsgQueue, recv_buf, &xHigherPriorityTaskWoken);
+						memset(recv_buf, 0, WCS_MSG_LEN);
+						portYIELD_FROM_ISR(xHigherPriorityTaskWoken);	
+					}
+				}
+				break;
+			default:
+				break;
 		}
-
-		if(uart1_data_index == WCS_485_ADDR_INDEX)
-		{
-			if((res != g_mcu485Addr) && (res != WCS_BROADCAST_ADDR)) 
-			{
-				uart1_data_index = 0;
-				return;
-			}
-		}
-
-		uart1FrameData.msg[uart1_data_index] = res;
-		uart1_data_index++;
-		if(uart1_data_index == (uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3))
-		{
-			crc8 = mt_cal_crc8(&(uart1FrameData.msg[0]), uart1FrameData.msg[WCS_FRAME_LEN_INDEX] + 3 - 1);
-			if(crc8 == uart1FrameData.msg[uart1_data_index - 1])
-			{
-				xQueueSendFromISR(wcs485RecvMsgQueue, &uart1FrameData, &xHigherPriorityTaskWoken);
-			}
-			uart1_data_index = 0;
-		}
-		uart1_data_index = uart1_data_index % WCS_MSG_LEN;	
 	}
 }
 
@@ -326,7 +338,7 @@ void USART2_IRQHandler(void)
 				}
 				break;
 			default:
-					break;
+				break;
 		}
 	}
 }

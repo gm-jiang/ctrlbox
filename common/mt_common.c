@@ -63,7 +63,7 @@ uint8_t mt_check_sum(uint8_t *ubuff, uint8_t ubufflen)
 	return usum;
 }
 
-uint8_t mt_cal_crc8(uint8_t *ubuff,uint32_t ubufflen)
+uint8_t mt_cal_crc8(uint8_t *ubuff, uint32_t ubufflen)
 {
 	uint8_t crc = 0;
 	uint8_t i;
