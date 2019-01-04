@@ -20,6 +20,7 @@ SemaphoreHandle_t chainDownDetectSemaphore = NULL;
 SemaphoreHandle_t chainDownDataSemaphore = NULL;
 SemaphoreHandle_t uhfMsgSemaphore = NULL;
 
+
 void system_init_success_led(void)
 {
 	uint8_t i;
@@ -34,6 +35,7 @@ void system_init_success_led(void)
 
 void platform_init(void)
 {
+	uint8_t ret;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	bsp_gpio_configuration();
 	bsp_releasekey_init();
@@ -57,6 +59,7 @@ void platform_init(void)
 	{
 		//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox 485 addr: %02X...\r\n", g_mcu485Addr);
 	}
+	/*
 	g_mcuFuncConfig = get_customer_config();
 	if (g_mcuFuncConfig != CHAIN_DOWN_CTRLBOX &&
 			g_mcuFuncConfig != UHF_RFID_CTRLBOX &&
@@ -64,9 +67,52 @@ void platform_init(void)
 	{
 		g_mcuFuncConfig = CHAIN_DOWN_CTRLBOX;
 	}
+	*/
 	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
-  dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox mode: 0x%02X\r\n", g_mcuFuncConfig);
+  //dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox mode: 0x%02X\r\n", g_mcuFuncConfig);
+	
+	ret = get_config_info(&g_mcuConfigInfo);
+	if(ret != RTN_SUCCESS)
+	{
+		g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
+		//g_mcuConfigInfo.debugLedFlashTime = 500; //ms
+		g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME; //s
+		g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
+		g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
+	}
+	else
+	{
+		if((g_mcuConfigInfo.function != CHAIN_DOWN_CTRLBOX) &&
+			 (g_mcuConfigInfo.function != UHF_RFID_CTRLBOX) &&
+			 (g_mcuConfigInfo.function != RFID_CHECK_CTRLBOX))
+		{
+			g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
+		}
+
+		if(g_mcuConfigInfo.valveCtrlTime > VALVE_CTRL_TIME_MAX)
+		{
+			g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME_MAX;
+		}
+
+		if((g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+
+		if((g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.motorCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+
+		if((g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+	}
 
 	wcs485RecvMsgQueue = xQueueCreate(UART_QUEUE_NUM, WCS_MSG_LEN);
 	if(wcs485RecvMsgQueue == NULL)
@@ -135,9 +181,38 @@ void lamp_task(void *pvParameters)
 	while(1)
 	{
 		bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
-		vTaskDelay(500);
+		switch(g_mcuConfigInfo.function)
+		{
+			case CHAIN_DOWN_CTRLBOX:
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
+				break;
+			case UHF_RFID_CTRLBOX:
+				vTaskDelay(UHF_RFID_LAMP_DELAY);
+				break;
+			case RFID_CHECK_CTRLBOX:
+				vTaskDelay(RFID_CHECK_LAMP_DELAY);
+				break;
+			default:
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
+				break;
+		}
+		//vTaskDelay(500);
 		bsp_lamp_ctrl(DEBUG_LED, TURN_OFF);
-		vTaskDelay(500);
+		switch(g_mcuConfigInfo.function)
+		{
+			case CHAIN_DOWN_CTRLBOX:
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
+				break;
+			case UHF_RFID_CTRLBOX:
+				vTaskDelay(UHF_RFID_LAMP_DELAY);
+				break;
+			case RFID_CHECK_CTRLBOX:
+				vTaskDelay(RFID_CHECK_LAMP_DELAY);
+				break;
+			default:
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
+				break;
+		}
 	}
 }
 
@@ -146,6 +221,7 @@ void wcs485_msg_task(void *pvParameters)
 	BaseType_t queue_recv_ret;
 	uartMsgFrame_t recv_msg;
 	uint8_t ret;
+	configInfoType_t configInfo;
 	wcsFrameType_e frameType;
 	uint8_t decodeBuf[WCS_DECODE_BUF_LEN];
 	uint8_t decodeLen = 0;
@@ -231,20 +307,51 @@ void wcs485_msg_task(void *pvParameters)
 					wcs485_Update485AddrOrSNackSend(decodeBuf, WCS_485_DEVICE_SN_LEN + 2);
 				}
 			}
-			
+
 			if(recv_msg.msg[WCS_485_FUNC_INDEX] == WCS_485_CONFIG_CUSTOMER)
 			{
-				set_customer_config(recv_msg.msg[WCS_485_FUNC_INDEX + 1]);
-				g_mcuFuncConfig = get_customer_config();
+				//set_customer_config(recv_msg.msg[WCS_485_FUNC_INDEX + 1]);
+				configInfo.function = recv_msg.msg[WCS_485_FUNC_INDEX + 1];
+				configInfo.lampCtrlLevel = recv_msg.msg[WCS_485_FUNC_INDEX + 2];
+				configInfo.motorCtrlLevel = recv_msg.msg[WCS_485_FUNC_INDEX + 3];
+				configInfo.valveCtrlLevel = recv_msg.msg[WCS_485_FUNC_INDEX + 4];
+				configInfo.valveCtrlTime = ((recv_msg.msg[WCS_485_FUNC_INDEX + 5])<<8)|(recv_msg.msg[WCS_485_FUNC_INDEX + 6]);
+				ret = set_config_info(&configInfo);
+				if(ret != RTN_SUCCESS)
+				{
+					continue;
+				}
+				//g_mcuFuncConfig = get_customer_config();
+				ret = get_config_info(&g_mcuConfigInfo);
+				if(ret != RTN_SUCCESS)
+				{
+					continue;
+				}
+				
 				decodeBuf[0] = recv_msg.msg[WCS_485_FUNC_INDEX];
-				decodeBuf[1] = g_mcuFuncConfig;				
-				wcs485_Update485AddrOrSNackSend(decodeBuf, 2);
+				decodeBuf[1] = g_mcuConfigInfo.function;
+				decodeBuf[2] = g_mcuConfigInfo.lampCtrlLevel;		
+				decodeBuf[3] = g_mcuConfigInfo.motorCtrlLevel;
+				decodeBuf[4] = g_mcuConfigInfo.valveCtrlLevel;
+				decodeBuf[5] = ((g_mcuConfigInfo.valveCtrlTime)>>8)&0xff;
+				decodeBuf[6] = (g_mcuConfigInfo.valveCtrlTime)&0xff;
+				wcs485_Update485AddrOrSNackSend(decodeBuf, 7);
 			}
 			else if(recv_msg.msg[WCS_485_FUNC_INDEX] == WCS_485_QUERY_CUSTOMER)
 			{
+				ret = get_config_info(&configInfo);
+				if(ret != RTN_SUCCESS)
+				{
+					continue;
+				}
 				decodeBuf[0] = recv_msg.msg[WCS_485_FUNC_INDEX];
-				decodeBuf[1] = get_customer_config();				
-				wcs485_Update485AddrOrSNackSend(decodeBuf, 2);
+				decodeBuf[1] = configInfo.function;
+				decodeBuf[2] = configInfo.lampCtrlLevel;		
+				decodeBuf[3] = configInfo.motorCtrlLevel;
+				decodeBuf[4] = configInfo.valveCtrlLevel;
+				decodeBuf[5] = ((configInfo.valveCtrlTime)>>8)&0xff;
+				decodeBuf[6] = (configInfo.valveCtrlTime)&0xff;
+				wcs485_Update485AddrOrSNackSend(decodeBuf, 7);
 			}
 			else if(recv_msg.msg[WCS_485_FUNC_INDEX] == WCS_485_QUERY_HW_SW_VER)
 			{
@@ -275,7 +382,7 @@ void stc_msg_task(void *pvParameters)
 		if(queue_recv_ret == pdTRUE)
 		{
 			dbg_print_msg(PRINT_LEVEL_DEBUG, "STC DATA IN:", STC_MSG_LEN, recv_msg);
-			if (g_mcuFuncConfig == CHAIN_DOWN_CTRLBOX)
+			if (g_mcuConfigInfo.function == CHAIN_DOWN_CTRLBOX)
 			{
 				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
 				for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
@@ -300,13 +407,13 @@ void stc_msg_task(void *pvParameters)
 				}
 				xSemaphoreGive(chainDownDataSemaphore);
 			}
-			if(g_mcuFuncConfig == UHF_RFID_CTRLBOX)
+			if(g_mcuConfigInfo.function == UHF_RFID_CTRLBOX)
 			{
 				//business code
 				xSemaphoreGive(uhfMsgSemaphore);
 				save_lowrfid_msg(&recv_msg[DAT_INDEX], STC_RFID_ID_LEN);
 			}
-			if(g_mcuFuncConfig == RFID_CHECK_CTRLBOX)
+			if(g_mcuConfigInfo.function == RFID_CHECK_CTRLBOX)
 			{
 				//business code
 				for (i = 0; i < STC_RFID_ID_LEN; i++)

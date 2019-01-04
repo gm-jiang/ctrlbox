@@ -32,15 +32,39 @@
 #define MCU_485_DEV_SN_BASE						 (0x08000000 + 126 * SECTOR_SIZE)
 #define MCU_485_DEV_CUSTOMER_BASE			 (0x08000000 + 125 * SECTOR_SIZE)
 
+#define LEVEL_CTRL_HIGH								1
+#define LEVEL_CTRL_LOW								2
+
+#define CHAIN_DOWN_LAMP_DELAY					500 //ms
+#define UHF_RFID_LAMP_DELAY					  1000 //ms
+#define RFID_CHECK_LAMP_DELAY					2000 //ms
+
+#define VALVE_CTRL_TIME								2000 //ms
+#define VALVE_CTRL_TIME_MAX						20000 //ms
+
+typedef struct _configInfoType_t {
+	uint8_t function;
+	//uint8_t debugLedFlashTime; //ms
+	uint8_t lampCtrlLevel;
+	uint8_t motorCtrlLevel;
+	uint8_t valveCtrlLevel;
+	uint16_t valveCtrlTime; //ms
+}configInfoType_t;
+
+#define CONFIG_INFO_TYPE_LEN					(sizeof(configInfoType_t))
+
 extern uint8_t g_mcu485Addr;
-extern uint8_t g_mcuFuncConfig;
+//extern uint8_t g_mcuFuncConfig;
+extern configInfoType_t g_mcuConfigInfo;
 
 uint8_t get_485_addr(void);
 void set_485_addr(uint8_t addr);
 uint8_t get_dev_sn(uint8_t *snBuf, uint8_t *snLen);
 uint8_t set_dev_sn(uint8_t *snBuf, uint8_t snLen);
-uint8_t get_customer_config(void);
-void set_customer_config(uint8_t config);
+//uint8_t get_customer_config(void);
+//void set_customer_config(uint8_t config);
+uint8_t get_config_info(configInfoType_t *configInfo);
+uint8_t set_config_info(configInfoType_t *configInfo);
 
 
 #endif

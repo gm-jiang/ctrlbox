@@ -320,7 +320,10 @@ void bsp_chaindown_ctrl_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(CHAIN_DOWN_CTRL_GPIO, &GPIO_InitStructure);
 
-	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	if(g_mcuConfigInfo.valveCtrlLevel == LEVEL_CTRL_HIGH)
+		GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	else
+		GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
 }
 
 void bsp_motor_ctrl_init(void)
@@ -333,7 +336,10 @@ void bsp_motor_ctrl_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(CHAIN_MOTOR_CTRL_GPIO, &GPIO_InitStructure);
 
-	GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+	if(g_mcuConfigInfo.motorCtrlLevel == LEVEL_CTRL_HIGH)
+		GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+	else
+		GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
 }
 
 void bsp_enable_485_pin(void)
@@ -383,17 +389,29 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 	{
 		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
 		{
-			GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			else
+				GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_RED;
 		}
 		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
 		{
-			GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			else
+				GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_GREEN;
 		}
 		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
 		{
-			GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			else
+				GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_YELLOW;
 		}
 		if((lamp & DEBUG_LED) == DEBUG_LED)
@@ -406,17 +424,29 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 	{
 		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
 		{
-			GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			else
+				GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_RED);
 		}
 		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
 		{
-			GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			else
+				GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_GREEN);
 		}
 		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
 		{
-			GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
+				GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			else
+				GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+			
 			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_YELLOW);
 		}
 		if((lamp & DEBUG_LED) == DEBUG_LED)

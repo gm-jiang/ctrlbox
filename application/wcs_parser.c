@@ -83,20 +83,34 @@ void wcs485_Update485AddrOrSNackSend(uint8_t *dataBuf, uint8_t dataLen)
 
 void wcs485_ChainOpen(void)
 {
-	GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
-	mt_sleep_ms(200);
-	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	if(g_mcuConfigInfo.valveCtrlLevel == LEVEL_CTRL_HIGH)
+		GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	else
+		GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	
+	vTaskDelay(g_mcuConfigInfo.valveCtrlTime);
+	
+	if(g_mcuConfigInfo.valveCtrlLevel == LEVEL_CTRL_HIGH)
+		GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	else
+		GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
 }
 
 void wcs485_MotorCtrl(statusCtrlType_e statusCtrl)
 {
 	if(statusCtrl == TURN_ON)
 	{
-		GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+		if(g_mcuConfigInfo.motorCtrlLevel == LEVEL_CTRL_HIGH)
+			GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+		else
+			GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
 	}
 	else
 	{
-		GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+		if(g_mcuConfigInfo.motorCtrlLevel == LEVEL_CTRL_HIGH)
+			GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+		else
+			GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
 	}
 }
 

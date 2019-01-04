@@ -13,7 +13,7 @@ void dbg_print(int print_level, char *fmt, ...)
 {
 	//mutex_lock();
 	uint16_t len = 0;
-	if (print_level > PRINT_LEVEL || g_mcuFuncConfig == UHF_RFID_CTRLBOX) 
+	if (print_level > PRINT_LEVEL || g_mcuConfigInfo.function == UHF_RFID_CTRLBOX) 
 	{
 		//mutex_unlock();
 		return;
