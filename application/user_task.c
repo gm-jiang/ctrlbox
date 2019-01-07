@@ -51,22 +51,21 @@ void platform_init(void)
 	bsp_wcs_uart_init();
 	bsp_stc_uart_init();
 	bsp_uhfrfid_uart_init();
-	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
 
 	g_mcu485Addr = get_485_addr();
 	if (g_mcu485Addr == 0xFF)
 	{
 		//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox 485 addr: %02X...\r\n", g_mcu485Addr);
 	}
-	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
-
 	g_mcuFuncConfig = get_customer_config();
 	if (g_mcuFuncConfig != CHAIN_DOWN_CTRLBOX &&
-		g_mcuFuncConfig != UHF_RFID_CTRLBOX &&
-		g_mcuFuncConfig != RFID_CHECK_CTRLBOX)
+			g_mcuFuncConfig != UHF_RFID_CTRLBOX &&
+			g_mcuFuncConfig != RFID_CHECK_CTRLBOX)
 	{
 		g_mcuFuncConfig = CHAIN_DOWN_CTRLBOX;
 	}
+	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
+	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
   dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox mode: 0x%02X\r\n", g_mcuFuncConfig);
 
 	wcs485RecvMsgQueue = xQueueCreate(UART_QUEUE_NUM, WCS_MSG_LEN);
