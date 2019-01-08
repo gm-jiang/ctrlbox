@@ -15,105 +15,14 @@ QueueHandle_t stcRecvMsgQueue = NULL;
 QueueHandle_t uhfRFIDRecvMsgQueue = NULL;
 QueueHandle_t chainDownRfidOpenedQueue = NULL;
 QueueHandle_t eventMsgQueue = NULL;
+QueueHandle_t lowRFIDMsgQueue = NULL;
 
 SemaphoreHandle_t chainDownDetectSemaphore = NULL;
 SemaphoreHandle_t chainDownDataSemaphore = NULL;
 SemaphoreHandle_t uhfMsgSemaphore = NULL;
 
-
-void system_init_success_led(void)
+void message_queue_init(void)
 {
-	uint8_t i;
-	for(i = 0; i < 20; i++)
-	{
-		bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
-		mt_sleep_us(50*1000);
-		bsp_lamp_ctrl(DEBUG_LED, TURN_OFF);
-		mt_sleep_us(50*1000);
-	}
-}
-
-void platform_init(void)
-{
-	uint8_t ret;
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-	bsp_gpio_configuration();
-	bsp_releasekey_init();
-	bsp_emerstopkey_init();
-	bsp_chaindown_finish_sensor_init();
-	bsp_lamp_init();
-	bsp_chaindown_ctrl_init();
-	bsp_motor_ctrl_init();
-	bsp_mcu_485RE_init();
-	bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
-
-	//disable interrupts
-	portDISABLE_INTERRUPTS();
-
-	bsp_wcs_uart_init();
-	bsp_stc_uart_init();
-	bsp_uhfrfid_uart_init();
-
-	g_mcu485Addr = get_485_addr();
-	if (g_mcu485Addr == 0xFF)
-	{
-		//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox 485 addr: %02X...\r\n", g_mcu485Addr);
-	}
-	/*
-	g_mcuFuncConfig = get_customer_config();
-	if (g_mcuFuncConfig != CHAIN_DOWN_CTRLBOX &&
-			g_mcuFuncConfig != UHF_RFID_CTRLBOX &&
-			g_mcuFuncConfig != RFID_CHECK_CTRLBOX)
-	{
-		g_mcuFuncConfig = CHAIN_DOWN_CTRLBOX;
-	}
-	*/
-	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
-	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
-  //dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox mode: 0x%02X\r\n", g_mcuFuncConfig);
-	
-	ret = get_config_info(&g_mcuConfigInfo);
-	if(ret != RTN_SUCCESS)
-	{
-		g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
-		//g_mcuConfigInfo.debugLedFlashTime = 500; //ms
-		g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME; //s
-		g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
-		g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
-	}
-	else
-	{
-		if((g_mcuConfigInfo.function != CHAIN_DOWN_CTRLBOX) &&
-			 (g_mcuConfigInfo.function != UHF_RFID_CTRLBOX) &&
-			 (g_mcuConfigInfo.function != RFID_CHECK_CTRLBOX))
-		{
-			g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
-		}
-
-		if(g_mcuConfigInfo.valveCtrlTime > VALVE_CTRL_TIME_MAX)
-		{
-			g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME_MAX;
-		}
-
-		if((g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_HIGH)&&
-			 (g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_LOW))
-		{
-			g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
-		}
-
-		if((g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_HIGH)&&
-			 (g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_LOW))
-		{
-			g_mcuConfigInfo.motorCtrlLevel = LEVEL_CTRL_HIGH;
-		}
-
-		if((g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_HIGH)&&
-			 (g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_LOW))
-		{
-			g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
-		}
-	}
-
 	wcs485RecvMsgQueue = xQueueCreate(UART_QUEUE_NUM, WCS_MSG_LEN);
 	if(wcs485RecvMsgQueue == NULL)
 	{
@@ -144,10 +53,17 @@ void platform_init(void)
 		dbg_print(PRINT_LEVEL_ERROR, "create chainDownRfidOpenedQueue failed\r\n");
 		while(1);
 	}
-  dbg_print(PRINT_LEVEL_INFO, "message queue creation completed\r\n");
+	lowRFIDMsgQueue = xQueueCreate(LOWRFID_QUEUE_NUM, LOWRFID_QUEUE_LEN);
+	if(lowRFIDMsgQueue == NULL)
+	{
+		dbg_print(PRINT_LEVEL_ERROR, "create lowRFIDMsgQueue failed\r\n");
+		while(1);
+	}
+	dbg_print(PRINT_LEVEL_INFO, "message queue creation completed\r\n");
+}
 
-	memset(g_chainDownData, 0, sizeof(chainDownData_t));
-
+void message_semaphore_init(void)
+{
 	chainDownDetectSemaphore = xSemaphoreCreateBinary();
 	if(chainDownDetectSemaphore == NULL) 
 	{
@@ -170,10 +86,51 @@ void platform_init(void)
 		while(1);
 	}
 	dbg_print(PRINT_LEVEL_INFO, "message semaphore creation completed\r\n");
+}
+
+void system_init_success_led(void)
+{
+	uint8_t i;
+	for(i = 0; i < 20; i++)
+	{
+		bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
+		mt_sleep_us(50*1000);
+		bsp_lamp_ctrl(DEBUG_LED, TURN_OFF);
+		mt_sleep_us(50*1000);
+	}
+}
+
+void platform_init(void)
+{
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+	bsp_gpio_configuration();
+	bsp_releasekey_init();
+	bsp_emerstopkey_init();
+	bsp_chaindown_finish_sensor_init();
+	bsp_lamp_init();
+
+	bsp_motor_ctrl_init();
+	bsp_mcu_485RE_init();
+
+	//disable interrupts
+	portDISABLE_INTERRUPTS();
+
+	bsp_wcs_uart_init();
+	bsp_stc_uart_init();
+	bsp_uhfrfid_uart_init();
+
+	ctrlbox_configinfo_init();
+	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
+	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
+	bsp_chaindown_ctrl_init();
+	memset(g_chainDownData, 0, sizeof(chainDownData_t));
+	message_queue_init();
+	message_semaphore_init();
 	//enable interrupts
 	portENABLE_INTERRUPTS();
 	system_init_success_led();
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox init completed\r\n");
+	bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
 }
 
 void lamp_task(void *pvParameters)
@@ -411,7 +368,7 @@ void stc_msg_task(void *pvParameters)
 			{
 				//business code
 				xSemaphoreGive(uhfMsgSemaphore);
-				save_lowrfid_msg(&recv_msg[DAT_INDEX], STC_RFID_ID_LEN);
+				xQueueSend(lowRFIDMsgQueue, recv_msg, 0);
 			}
 			if(g_mcuConfigInfo.function == RFID_CHECK_CTRLBOX)
 			{
@@ -432,28 +389,36 @@ void stc_msg_task(void *pvParameters)
 					}
 				}
 			}
+			if(g_mcuConfigInfo.function == RFID_DEBUG_CTRLBOX)
+			{
+				wcs485_ChainOpen();
+			}
 		}
 	}
 }
 
 void uhfRFID_msg_task(void *pvParameters)
 {
-	BaseType_t queue_recv_ret, queue_send_ret;
-	uint8_t recv_msg[UHF_MSG_LEN] = {0};
+	BaseType_t queue_recv_ret1, queue_recv_ret2, queue_send_ret;
+	uint8_t recv_uhf_msg[UHF_MSG_LEN] = {0};
+	uint8_t recv_low_msg[STC_MSG_LEN] = {0};
+	uint8_t bind_msg[UHF_RFID_LABLE_DATA_LEN + STC_RFID_ID_LEN] = {0};
 	eventMsgFrame_t eventMsg, tmpMsg;
 
 	while(1)
 	{
 		xSemaphoreTake(uhfMsgSemaphore, portMAX_DELAY);
+		queue_recv_ret1 = xQueueReceive(lowRFIDMsgQueue, recv_low_msg, portMAX_DELAY);
 		uhfrfid_send_cmd();
-		queue_recv_ret = xQueueReceive(uhfRFIDRecvMsgQueue, recv_msg, 2000);
-		if(queue_recv_ret == pdTRUE)
+		queue_recv_ret2 = xQueueReceive(uhfRFIDRecvMsgQueue, recv_uhf_msg, 2000);
+		if(queue_recv_ret1 == pdTRUE && queue_recv_ret2 == pdTRUE)
 		{
 			//business code
-			mt_uhfrfid_convert(recv_msg, UHF_MSG_LEN);
-			save_uhfrfid_msg(recv_msg, UHF_MSG_LEN/2);
-			//send_msg();
-			set_event_msg(&eventMsg, EVENT_MSG_CHAIN_UP);
+			mt_uhfrfid_convert(recv_uhf_msg, UHF_MSG_LEN/2);
+			memcpy(&bind_msg[0], recv_uhf_msg, UHF_RFID_LABLE_DATA_LEN);
+			memcpy(&bind_msg[UHF_RFID_LABLE_DATA_LEN], &recv_low_msg[DAT_INDEX], STC_RFID_ID_LEN);
+			eventMsg.msgType = EVENT_MSG_CHAIN_UP;
+			memcpy(eventMsg.msg, bind_msg, UHF_RFID_LABLE_DATA_LEN + STC_RFID_ID_LEN);
 			queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 			if(queue_send_ret == errQUEUE_FULL)
 			{

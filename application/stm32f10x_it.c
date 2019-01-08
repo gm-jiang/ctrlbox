@@ -365,6 +365,7 @@ void USART3_IRQHandler(void)
 				if (tmp_char == UHF_RFID_FRAME_HEAD)
 				{
 					state = DAT_STATE;
+					recv_cnt = 0;
 				}
 				break;
 			case DAT_STATE:

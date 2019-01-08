@@ -19,6 +19,7 @@
 #define CHAIN_DOWN_CTRLBOX            0x01
 #define UHF_RFID_CTRLBOX              0x02
 #define RFID_CHECK_CTRLBOX            0x03
+#define RFID_DEBUG_CTRLBOX            0x04
 
 
 //flash define
@@ -39,12 +40,12 @@
 #define UHF_RFID_LAMP_DELAY					  1000 //ms
 #define RFID_CHECK_LAMP_DELAY					2000 //ms
 
+#define VALVE_CTRL_TIME_MIN						100 //ms
 #define VALVE_CTRL_TIME								2000 //ms
 #define VALVE_CTRL_TIME_MAX						20000 //ms
 
 typedef struct _configInfoType_t {
 	uint8_t function;
-	//uint8_t debugLedFlashTime; //ms
 	uint8_t lampCtrlLevel;
 	uint8_t motorCtrlLevel;
 	uint8_t valveCtrlLevel;
@@ -65,6 +66,7 @@ uint8_t set_dev_sn(uint8_t *snBuf, uint8_t snLen);
 //void set_customer_config(uint8_t config);
 uint8_t get_config_info(configInfoType_t *configInfo);
 uint8_t set_config_info(configInfoType_t *configInfo);
+void ctrlbox_configinfo_init(void);
 
 
 #endif

@@ -128,3 +128,56 @@ uint8_t set_config_info(configInfoType_t *configInfo)
 	return RTN_SUCCESS;
 }
 
+void ctrlbox_configinfo_init(void)
+{
+	uint8_t ret;
+
+	g_mcu485Addr = get_485_addr();
+	if (g_mcu485Addr == 0xFF)
+	{
+		//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox 485 addr: %02X...\r\n", g_mcu485Addr);
+	}
+  ret = get_config_info(&g_mcuConfigInfo);
+	if(ret != RTN_SUCCESS)
+	{
+		g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
+		g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME; //s
+		g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
+		g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
+	}
+	else
+	{
+		if ((g_mcuConfigInfo.function != CHAIN_DOWN_CTRLBOX) &&
+			 (g_mcuConfigInfo.function != UHF_RFID_CTRLBOX) &&
+			 (g_mcuConfigInfo.function != RFID_CHECK_CTRLBOX) &&
+			 (g_mcuConfigInfo.function != RFID_DEBUG_CTRLBOX))
+		{
+			g_mcuConfigInfo.function = CHAIN_DOWN_CTRLBOX;
+		}
+
+		if(g_mcuConfigInfo.valveCtrlTime > VALVE_CTRL_TIME_MAX || 
+			 g_mcuConfigInfo.valveCtrlTime < VALVE_CTRL_TIME_MIN)
+		{
+			g_mcuConfigInfo.valveCtrlTime = VALVE_CTRL_TIME;
+		}
+
+		if((g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.lampCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.lampCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+
+		if((g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.motorCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.motorCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+
+		if((g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_HIGH)&&
+			 (g_mcuConfigInfo.valveCtrlLevel != LEVEL_CTRL_LOW))
+		{
+			g_mcuConfigInfo.valveCtrlLevel = LEVEL_CTRL_HIGH;
+		}
+	}
+	//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox mode: 0x%02X\r\n", g_mcuFuncConfig);
+}

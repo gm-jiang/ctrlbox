@@ -24,6 +24,9 @@
 #define UHF_MSG_LEN									24  //the max length of the frame buffer
 #define UART_QUEUE_NUM							5  //the max length of the uart msg queue
 
+#define LOWRFID_QUEUE_NUM						5  //the max length of the uart msg queue
+#define LOWRFID_QUEUE_LEN						10  //the max length of the uart msg queue
+
 //the receive message queue of uart
 extern QueueHandle_t wcs485RecvMsgQueue;
 extern QueueHandle_t stcRecvMsgQueue;

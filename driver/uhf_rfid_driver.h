@@ -9,14 +9,6 @@
 extern "C" {
 #endif
 
-typedef struct _bindMsgFrame_t 
-{
-	uint8_t low_flag;
-	uint8_t uhf_flag;
-	uint8_t uhf_rfid[12];
-	uint8_t low_rfid[4];
-}bindMsgFrame_t;
-
 void bind_msg_init(void);
 void save_lowrfid_msg(uint8_t *msg, uint8_t msg_len);
 void save_uhfrfid_msg(uint8_t *msg, uint8_t msg_len);
