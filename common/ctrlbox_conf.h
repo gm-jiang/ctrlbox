@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 /***********************************VERSION DEFINE***************************************/
-#define HW_VERSION_STR		"---HW V2.00"
-#define SW_VERSION_STR		"---SW V1.00"
+#define HW_VERSION_STR		HW_V
+#define SW_VERSION_STR		SW_V
 
 #define VERISON_INFO_LEN	10
 
