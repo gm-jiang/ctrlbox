@@ -67,7 +67,7 @@ int main(void)
 	}
 
 	//create wcs485_msg task
-	ret = xTaskCreate(wcs485_msg_task, "wcs485_msg", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_WCS485_MSG_TASK, NULL);
+	ret = xTaskCreate(wcs485_msg_task, "wcs485_msg", configMINIMAL_STACK_SIZE*10, NULL, PRIORITIES_WCS485_MSG_TASK, NULL);
 	if(ret != pdPASS)
 	{
 		dbg_print(PRINT_LEVEL_ERROR, " create wcs485_msg_task failed\r\n");

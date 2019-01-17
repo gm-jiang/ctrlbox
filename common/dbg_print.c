@@ -6,16 +6,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "user_task.h"
 
 static char buffer[PRINT_BUFFER_LEN];
 
 void dbg_print(int print_level, char *fmt, ...)
 {
-	//mutex_lock();
 	uint16_t len = 0;
+	sys_mutex_lock(printMutex);
 	if (print_level > PRINT_LEVEL || g_mcuConfigInfo.function == UHF_RFID_CTRLBOX) 
 	{
-		//mutex_unlock();
+		sys_mutex_unlock(printMutex);
 		return;
 	}
 	else
@@ -27,7 +28,7 @@ void dbg_print(int print_level, char *fmt, ...)
 		bsp_uart3_send((uint8_t *)&buffer, len);
 		va_end(argp);
 	}
-	//mutex_unlock();
+	sys_mutex_unlock(printMutex);
 }
 
 void dbg_print_msg(int print_level, uint8_t *preMsg, uint8_t len, uint8_t *msg)

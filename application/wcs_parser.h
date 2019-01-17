@@ -15,9 +15,12 @@
 #define EVENT_MSG_DATA_LEN				 16
 #define EVENT_MSG_QUEUE_NUM				 10
 
+#define MT_WCS_GET_VER_MSG         0x10
+#define MT_WCS_SET_OTA_MSG         0x11
+
 //the queue of uart frame
 typedef struct _uartMsgFrame_t {
-	uint8_t msg[50];
+	uint8_t msg[128];
 }uartMsgFrame_t;
 
 //wcs frame type

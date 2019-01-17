@@ -19,7 +19,7 @@
 #define PRIORITIES_UHFRFID_DETECT_TASK			configMAX_PRIORITIES - 3
 #define PRIORITIES_CHAINDOWN_SENSOR_TASK		configMAX_PRIORITIES - 6
 
-#define WCS_MSG_LEN									50  //the max length of the frame buffer
+#define WCS_MSG_LEN									128  //the max length of the frame buffer
 #define STC_MSG_LEN									10  //the max length of the frame buffer
 #define UHF_MSG_LEN									24  //the max length of the frame buffer
 #define UART_QUEUE_NUM							5  //the max length of the uart msg queue
@@ -37,7 +37,11 @@ extern QueueHandle_t eventMsgQueue;
 extern SemaphoreHandle_t chainDownDetectSemaphore;
 extern SemaphoreHandle_t chainDownDataSemaphore;
 extern SemaphoreHandle_t uhfMsgSemaphore;
+extern SemaphoreHandle_t printMutex;
 
+
+void sys_mutex_lock(SemaphoreHandle_t xMutex);
+void sys_mutex_unlock(SemaphoreHandle_t xMutex);
 void platform_init(void);
 void lamp_task(void *pvParameters);
 void wcs485_msg_task(void *pvParameters);

@@ -4,7 +4,9 @@
 #include "mt_common.h"
 #include "uhf_rfid_driver.h"
 #include "ctrlbox_conf.h"
+
 #include "wcs_parser.h"
+#include "upgrade.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -20,6 +22,32 @@ QueueHandle_t lowRFIDMsgQueue = NULL;
 SemaphoreHandle_t chainDownDetectSemaphore = NULL;
 SemaphoreHandle_t chainDownDataSemaphore = NULL;
 SemaphoreHandle_t uhfMsgSemaphore = NULL;
+
+SemaphoreHandle_t printMutex = NULL;
+
+static void ota_msg_process(uint8_t *payload, uint8_t payload_length);
+static void wcs_ver_process(uint8_t *payload, uint8_t payload_len);
+static void wcs_ota_process(uint8_t *payload, uint8_t payload_len);
+
+static void sys_mutex_init(void)
+{
+	printMutex = xSemaphoreCreateMutex();
+	if(printMutex == NULL) 
+	{
+		dbg_print(PRINT_LEVEL_ERROR, "create printMutex failed\n");
+		while(1);
+	}
+}
+
+void sys_mutex_lock(SemaphoreHandle_t xMutex)
+{
+	xSemaphoreTake(xMutex, portMAX_DELAY);
+}
+
+void sys_mutex_unlock(SemaphoreHandle_t xMutex)
+{
+	xSemaphoreGive(xMutex);
+}
 
 void message_queue_init(void)
 {
@@ -103,6 +131,11 @@ void system_init_success_led(void)
 void platform_init(void)
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+#ifdef ODD_CODE
+	NVIC_SetVectorTable(NVIC_VectTab_FLASH, ODD_OFFSET);
+#else
+	NVIC_SetVectorTable(NVIC_VectTab_FLASH, EVEN_OFFSET);
+#endif
 	bsp_gpio_configuration();
 	bsp_releasekey_init();
 	bsp_emerstopkey_init();
@@ -119,8 +152,10 @@ void platform_init(void)
 	bsp_stc_uart_init();
 	bsp_uhfrfid_uart_init();
 
+	sys_mutex_init();
 	ctrlbox_configinfo_init();
 	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
+	g_mcu485Addr = 0x03;
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
 	bsp_chaindown_ctrl_init();
 	memset(g_chainDownData, 0, sizeof(chainDownData_t));
@@ -188,7 +223,8 @@ void wcs485_msg_task(void *pvParameters)
 		queue_recv_ret = xQueueReceive(wcs485RecvMsgQueue, &recv_msg, portMAX_DELAY);
 		if(queue_recv_ret == pdTRUE)
 		{
-			dbg_print_msg(PRINT_LEVEL_DEBUG, "WCS DATA IN: <--", recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, recv_msg.msg);
+			dbg_print_msg(PRINT_LEVEL_DEBUG, (uint8_t *)"UART1 IN <--", recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, recv_msg.msg);
+			ota_msg_process(&recv_msg.msg[WCS_485_ADDR_INDEX], recv_msg.msg[WCS_FRAME_LEN_INDEX]);
 			frameType = wcs485_Decode(recv_msg.msg, recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, decodeBuf, &decodeLen);
 			if(frameType != WCS_FRAME_INVALID_E)
 			{
@@ -476,3 +512,60 @@ void chainDown_sensor_task(void *pvParameters)
 		}
 	}
 }
+
+static void ota_msg_process(uint8_t *payload, uint8_t payload_length)
+{
+	uint8_t payload_len = payload_length - 3;
+	/*payload[0] == shortaddr  payload[1] == type  payload[2] == data... */
+	switch (payload[1])
+	{
+	case MT_WCS_GET_VER_MSG:
+		wcs_ver_process(&payload[2], payload_len);
+		break;
+	case MT_WCS_SET_OTA_MSG:
+		wcs_ota_process(&payload[2], payload_len);
+		break;
+	default:
+		break;
+	}
+}
+
+static void wcs_ver_process(uint8_t *payload, uint8_t payload_len)
+{
+	/*add business code*/
+	if (mtOtaCbs.pfnOtaVerHandler != NULL)
+	{
+		ota_ver_msg_t ota_ver_msg;
+
+		memset(&ota_ver_msg, 0, sizeof(ota_ver_msg_t));
+		ota_ver_msg.sw = (payload[0] << 8) | payload[1];
+		ota_ver_msg.hw = (payload[2] << 8) | payload[3];
+		dbg_print(PRINT_LEVEL_DEBUG, "sys_ver_process: sw:%d hw:%d\r\n", ota_ver_msg.sw, ota_ver_msg.hw);
+		mtOtaCbs.pfnOtaVerHandler(&ota_ver_msg);
+	}
+	else
+	{
+		dbg_print(PRINT_LEVEL_DEBUG, "sys_ver_process is null\r\n");
+	}
+}
+
+static void wcs_ota_process(uint8_t *payload, uint8_t payload_len)
+{
+	/*add business code*/
+	if (mtOtaCbs.pfnOtaDataHandler != NULL)
+	{
+		ota_code_msg_t ota_code_msg;
+
+		memset(&ota_code_msg, 0, sizeof(ota_code_msg_t));
+		ota_code_msg.seq = (payload[0] << 8) | payload[1];
+		ota_code_msg.size = payload[2];
+		memcpy(ota_code_msg.msg, &payload[3], ota_code_msg.size);
+		dbg_print(PRINT_LEVEL_DEBUG, "sys_ota_process: seq: %d size:%d\r\n", ota_code_msg.seq, ota_code_msg.size);
+		mtOtaCbs.pfnOtaDataHandler(&ota_code_msg);
+	}
+	else
+	{
+		dbg_print(PRINT_LEVEL_DEBUG, "sys_ota_process is null\r\n");
+	}
+}
+
