@@ -300,13 +300,19 @@ void bsp_uhfrfid_detect_init(void)
 //lamp init
 void bsp_lamp_init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructureC, GPIO_InitStructureB;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOB, ENABLE);
 	
-	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_GPIO_PIN | TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN | TRICOLOR_LAMP_YELLOW_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructure);
+	GPIO_InitStructureC.GPIO_Pin = DEBUG_LED_GPIO_PIN | TRICOLOR_LAMP_YELLOW_GPIO_PIN;
+	GPIO_InitStructureC.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructureC.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructureC);
+	
+	GPIO_InitStructureB.GPIO_Pin = TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
+	GPIO_InitStructureB.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructureB.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(TRICOLOR_LAMP_RED_GPIO, &GPIO_InitStructureB);
+	
 	bsp_lamp_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED, TURN_OFF);
 }
 
