@@ -448,7 +448,7 @@ uint8_t wcs485_OrderStatusCmd(uint8_t *dataBuf, uint8_t dataLen)
 	}
 	
 	eventMsg.msgType = EVENT_MSG_ORDER_STATUS;
-	//eventMsg.msg[0] = lampAndKeyStatus & 0x07;
+	eventMsg.msg[0] = dataBuf[0] & 0x07;
 	xQueueSend(eventMsgQueue, &eventMsg, 0);
 	if(queue_send_ret == errQUEUE_FULL)
 	{
