@@ -88,7 +88,7 @@ uint8_t mt_cal_crc8(uint8_t *ubuff, uint32_t ubufflen)
 uint16_t get_version(char *str)
 {
 	int i;
-	char ver[8];
+	char ver[8], temp[2];
 	unsigned char high = 0;
 	unsigned char low = 0;
 	unsigned short version;
@@ -104,7 +104,9 @@ uint16_t get_version(char *str)
 
 	high = (unsigned char)atoi(ver);
 	low = (unsigned char)atoi(ver+i+1);
-	version = (high << 8) + low;
+	temp[0] = low/10  << 4 | low%10;
+	temp[1] = high/10 << 4 | high%10;
+	version = *(uint16_t *)temp;
 	return version;
 }
 

@@ -9,7 +9,7 @@
 #define CHAIN_DOWN_DETECT_TIMEOUT					(2*1000)
 #define CHAIN_DOWN_DATA_VALID							1
 #define CHAIN_DOWN_DATA_INVALID						0
-#define CHAIN_DOWN_DATA_BUF_LEN						5
+#define CHAIN_DOWN_DATA_BUF_LEN						15
 #define CHAIN_DOWN_DATA_AGE_MAX						0xff
 
 #define EVENT_MSG_DATA_LEN				 16
