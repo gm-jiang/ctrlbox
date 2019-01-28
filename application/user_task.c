@@ -500,7 +500,7 @@ void chainDown_sensor_task(void *pvParameters)
 			}
 			else
 			{
-				eventMsg.msgType = EVENT_MSG_CHAIN_DOWN;
+				eventMsg.msgType = EVENT_MSG_CHAIN_DOWN_DETECT_TIMEOUT;
 				memcpy(eventMsg.msg, chainDownMsg.msg, STC_RFID_ID_LEN);
 				queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
 				if(queue_send_ret == errQUEUE_FULL)

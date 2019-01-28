@@ -179,14 +179,16 @@
 #define	WCS_FRAME_QUERY_ALARM_ACK														0x05
 #define	WCS_FRAME_QUERY_START_STOP_ACK											0x06
 #define	WCS_FRAME_QUERY_EMER_STOP_ACK											  0x07
+#define	WCS_FRAME_QUERY_CHAIN_DOWN_DETECT_TIMEOUT_ACK				0x71
+#define	WCS_FRAME_QUERY_NO_CHAIN_DOWN_TIMEOUT_ACK						0x72
 
 
-#define	WCS_FRAME_CHAIN_DOWN_CTRL														0x02
-#define WCS_FRAME_CHAIN_DOWN_CTRL_ACK												0xF2
-#define	WCS_FRAME_ORDER_STATUS_CTRL													0x03
-#define	WCS_FRAME_ORDER_STATUS_CTRL_ACK											0xF3
-#define WCS_FRAME_MOTOR_START_STOP_CTRL											0x06
-#define WCS_FRAME_MOTOR_START_STOP_CTRL_ACK									0xF6
+#define	WCS_FRAME_CHAIN_DOWN_CTRL														0x81
+#define WCS_FRAME_CHAIN_DOWN_CTRL_ACK												0x81
+#define	WCS_FRAME_ORDER_STATUS_CTRL													0x82
+#define	WCS_FRAME_ORDER_STATUS_CTRL_ACK											0x82
+#define WCS_FRAME_MOTOR_START_STOP_CTRL											0x83
+#define WCS_FRAME_MOTOR_START_STOP_CTRL_ACK									0x83
 
 //motor run status
 #define MOTOR_STATUS_STOP																		0x00

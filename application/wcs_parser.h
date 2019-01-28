@@ -34,6 +34,8 @@ typedef enum _wcsFrameType_e {
 	WCS_FRAME_QUERY_ALARM_ACK_E,
 	WCS_FRAME_QUERY_START_STOP_ACK_E,
 	WCS_FRAME_QUERY_EMER_STOP_ACK_E,
+	WCS_FRAME_QUERY_CHAIN_DOWN_DETECT_TIMEOUT_ACK_E,
+	WCS_FRAME_QUERY_NO_CHAIN_DOWN_TIMEOUT_ACK_E,
 	WCS_FRAME_CHAIN_DOWN_CTRL_E,
 	WCS_FRAME_CHAIN_DOWN_CTRL_ACK_E,
 	WCS_FRAME_ORDER_STATUS_CTRL_E,
@@ -52,7 +54,9 @@ typedef enum _eventMsgType_e {
 	EVENT_MSG_KEY_DOWN,
 	EVENT_MSG_ALARM,
 	EVENT_MSG_START_STOP,
-	EVENT_MSG_EMER_STOP
+	EVENT_MSG_EMER_STOP,
+	EVENT_MSG_CHAIN_DOWN_DETECT_TIMEOUT,
+	EVENT_MSG_NO_CHAIN_DOWN_TIMEOUT
 }eventMsgType_e;
 
 //the queue of event
@@ -85,8 +89,10 @@ uint8_t wcs485_ChainDownAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_OrderStatusAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_ChainKeyDownAckSend(void);
 uint8_t wcs485_ChainAlarmAckSend(void);
-uint8_t wcs485_QueryStartStopAckSend(uint8_t *buf, uint8_t len);\
+uint8_t wcs485_QueryStartStopAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_QueryEmerStopAckSend(void);
+uint8_t wcs485_ChainDownDetectTimeoutAckSend(uint8_t *buf, uint8_t len);
+uint8_t wcs485_NoChainDownTimeoutAckSend(uint8_t *buf, uint8_t len);
 uint8_t wcs485_ChainDownCmdAckSend(void);
 uint8_t wcs485_OrderStatusCmdAckSend(void);
 uint8_t wcs485_MotorStartStopCmdAckSend(void);
