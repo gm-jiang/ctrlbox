@@ -157,6 +157,9 @@ uint8_t wcs485_Encode(wcsFrameType_e frameType, uint8_t *dataBuf, uint8_t dataLe
 		case WCS_FRAME_QUERY_NO_CHAIN_DOWN_TIMEOUT_ACK_E:
 			encodeBuf[i++] = WCS_FRAME_QUERY_NO_CHAIN_DOWN_TIMEOUT_ACK;
 			break;
+		case WCS_FRAME_QUERY_VALVE_ERROR_OPEN_ACK_E:
+			encodeBuf[i++] = WCS_FRAME_QUERY_VALVE_ERROR_OPEN_ACK;
+			break;
 		case WCS_FRAME_CHAIN_DOWN_CTRL_ACK_E:
 			encodeBuf[i++] = WCS_FRAME_CHAIN_DOWN_CTRL_ACK;
 			break;
@@ -357,6 +360,19 @@ uint8_t wcs485_NoChainDownTimeoutAckSend(uint8_t *buf, uint8_t len)
 	return ret;
 }
 
+uint8_t wcs485_QueryValveErrOpenAckSend(void)
+{
+	uint8_t ret;
+	uint8_t sendBuf[WCS_SEND_BUF_LEN];
+	uint8_t sendLen = 0;
+	ret = wcs485_Encode(WCS_FRAME_QUERY_VALVE_ERROR_OPEN_ACK_E, NULL, 0, sendBuf, &sendLen);
+	if(ret == RTN_SUCCESS)
+	{
+		wcs_send_data(sendBuf, sendLen);
+	}
+	return ret;
+}
+
 uint8_t wcs485_ChainDownCmdAckSend(void)
 {
 	uint8_t ret;
@@ -437,6 +453,9 @@ uint8_t wcs485_QueryCmd()
 				break;
 			case EVENT_MSG_NO_CHAIN_DOWN_TIMEOUT:
 				ret = wcs485_NoChainDownTimeoutAckSend(eventMsg.msg, STC_RFID_ID_LEN);
+				break;
+			case EVENT_MSG_VALVE_ERROR_OPEN:
+				ret = wcs485_QueryValveErrOpenAckSend();
 				break;
 			default:
 				break;
