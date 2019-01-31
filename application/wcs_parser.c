@@ -3,63 +3,58 @@
 #include "wcs_parser.h"
 #include "wcs_485_driver.h"
 #include "mt_common.h"
-
-chainDownData_t g_chainDownData[CHAIN_DOWN_DATA_BUF_LEN];
+#include "dlink.h"
 
 uint8_t add_ChainDownData(uint8_t *buf, uint8_t len)
 {
 	uint8_t ret = RTN_SUCCESS;
-	uint8_t i, max = 0;
-	
+	tagNode_t *tagNode = NULL;
+
 	if((len != STC_RFID_ID_LEN) || (buf == NULL))
 		return RTN_FAIL;
 
 	xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
-	for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
+	if (node_list_find_tagid(&g_node_list, buf, STC_RFID_ID_LEN) == NULL)
 	{
-		if((g_chainDownData[i].valid == CHAIN_DOWN_DATA_VALID) && (memcmp(g_chainDownData[i].rfid, buf, STC_RFID_ID_LEN) == 0))
-		{
-			xSemaphoreGive(chainDownDataSemaphore);
-			return ret;
-		}
+		tagNode = pvPortMalloc(sizeof(tagNode_t));
+		tagNode->msg = pvPortMalloc(sizeof(tagNode->msg));
+		memset(tagNode->msg, 0x00, sizeof(tagNode->msg));
+		tagNode->msg->aged = xTaskGetTickCount();
+		memcpy(tagNode->msg->tagId, buf, sizeof(tagNode->msg->tagId));
+		node_list_add_tail(&g_node_list, tagNode);
 	}
-		
-	for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
-	{
-		if(g_chainDownData[i].valid == CHAIN_DOWN_DATA_INVALID)
-		{
-			memcpy(g_chainDownData[i].rfid, buf, STC_RFID_ID_LEN);
-			g_chainDownData[i].age = 0;
-			g_chainDownData[i].valid = CHAIN_DOWN_DATA_VALID;
-			break;
-		}
-	}
-	
-	if(i == CHAIN_DOWN_DATA_BUF_LEN)
-	{
-		max = 0;
-		for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
-		{
-			if(g_chainDownData[i].age >= g_chainDownData[max].age)
-			{
-				max = i;
-			}
-		}
-		memcpy(g_chainDownData[max].rfid, buf, STC_RFID_ID_LEN);
-		g_chainDownData[max].age = 0;
-		g_chainDownData[max].valid = CHAIN_DOWN_DATA_VALID;
-	}
-	
-	for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
-	{
-		if(g_chainDownData[i].valid == CHAIN_DOWN_DATA_VALID)
-		{
-			g_chainDownData[i].age = (g_chainDownData[i].age + 1) % CHAIN_DOWN_DATA_AGE_MAX;
-		}
-	}
+	//node_list_print(&g_node_list);
 	xSemaphoreGive(chainDownDataSemaphore);
-	
+
 	return ret;
+}
+
+uint8_t wcs_remove_aged_node(void)
+{
+	uint32_t cur_ts;
+	tagNode_t *tagNode = NULL;
+	BaseType_t queue_send_ret;
+	eventMsgFrame_t eventMsg, tmpMsg;
+	chainDownMsgFrame_t chainDownMsg;
+
+	xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
+	cur_ts = xTaskGetTickCount();
+	tagNode = node_list_find_aged(&g_node_list, cur_ts);
+	if (tagNode != NULL)
+	{
+		eventMsg.msgType = EVENT_MSG_NO_CHAIN_DOWN_TIMEOUT;
+		memcpy(eventMsg.msg, chainDownMsg.msg, STC_RFID_ID_LEN);
+		queue_send_ret = xQueueSend(eventMsgQueue, &eventMsg, 0);
+		if(queue_send_ret == errQUEUE_FULL)
+		{
+			xQueueReceive(eventMsgQueue, &tmpMsg, 0);
+			xQueueSend(eventMsgQueue, &eventMsg, 0);
+		}
+		node_list_remove(&g_node_list, tagNode);
+	}
+	node_list_print(&g_node_list);
+	xSemaphoreGive(chainDownDataSemaphore);
+	return 0;
 }
 
 void wcs485_Update485AddrOrSNackSend(uint8_t *dataBuf, uint8_t dataLen)

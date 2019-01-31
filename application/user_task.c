@@ -11,6 +11,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+tagNode_t g_node_list;
+
 //the receive message queue of uart
 QueueHandle_t wcs485RecvMsgQueue = NULL;
 QueueHandle_t stcRecvMsgQueue = NULL;
@@ -158,9 +160,9 @@ void platform_init(void)
 	g_mcu485Addr = 0x03;
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
 	bsp_chaindown_ctrl_init();
-	memset(g_chainDownData, 0, sizeof(chainDownData_t));
 	message_queue_init();
 	message_semaphore_init();
+	node_list_init(&g_node_list);
 	//enable interrupts
 	//portENABLE_INTERRUPTS();
 	system_init_success_led();
@@ -220,7 +222,7 @@ void wcs485_msg_task(void *pvParameters)
 
 	while(1)
 	{
-		queue_recv_ret = xQueueReceive(wcs485RecvMsgQueue, &recv_msg, portMAX_DELAY);
+		queue_recv_ret = xQueueReceive(wcs485RecvMsgQueue, &recv_msg, 10*1000);
 		if(queue_recv_ret == pdTRUE)
 		{
 			dbg_print_msg(PRINT_LEVEL_DEBUG, (uint8_t *)"UART1 IN <--", recv_msg.msg[WCS_FRAME_LEN_INDEX] + 3, recv_msg.msg);
@@ -356,7 +358,7 @@ void wcs485_msg_task(void *pvParameters)
 		}
 		else
 		{
-			dbg_print(PRINT_LEVEL_ERROR, "read wcs485_msg recv queue failed\n");
+			wcs_remove_aged_node();
 		}
 	}
 }
@@ -368,6 +370,7 @@ void stc_msg_task(void *pvParameters)
 	uint8_t recv_msg[STC_MSG_LEN] = {0};
 	chainDownMsgFrame_t chainDownMsg, tmpChainDownMsg;
 	eventMsgFrame_t eventMsg, tmpMsg;
+	tagNode_t *tagNode = NULL;
 
 	while(1)
 	{
@@ -378,25 +381,18 @@ void stc_msg_task(void *pvParameters)
 			if (g_mcuConfigInfo.function == CHAIN_DOWN_CTRLBOX)
 			{
 				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
-				for(i = 0; i < CHAIN_DOWN_DATA_BUF_LEN; i++)
+				tagNode = node_list_find_tagid(&g_node_list, recv_msg, STC_RFID_ID_LEN);
+				if (tagNode != NULL)
 				{
-					if(g_chainDownData[i].valid == CHAIN_DOWN_DATA_VALID)
+					wcs485_ChainOpen();
+					memcpy(chainDownMsg.msg, tagNode->msg->tagId, STC_RFID_ID_LEN);
+					queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
+					if(queue_send_ret == errQUEUE_FULL)
 					{
-						if(memcmp(g_chainDownData[i].rfid, &recv_msg[DAT_INDEX], STC_RFID_ID_LEN) == 0)
-						{
-							wcs485_ChainOpen();
-							memcpy(chainDownMsg.msg, g_chainDownData[i].rfid, STC_RFID_ID_LEN);
-							queue_send_ret = xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
-							if(queue_send_ret == errQUEUE_FULL)
-							{
-								xQueueReceive(chainDownRfidOpenedQueue, &tmpChainDownMsg, 0);
-								xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
-							}
-							g_chainDownData[i].valid = CHAIN_DOWN_DATA_INVALID;
-							g_chainDownData[i].age = 0;
-							break;
-						}
+						xQueueReceive(chainDownRfidOpenedQueue, &tmpChainDownMsg, 0);
+						xQueueSend(chainDownRfidOpenedQueue, &chainDownMsg, 0);
 					}
+					node_list_remove(&g_node_list, tagNode);
 				}
 				xSemaphoreGive(chainDownDataSemaphore);
 			}

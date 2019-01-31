@@ -15,8 +15,8 @@
 #define EVENT_MSG_DATA_LEN				 16
 #define EVENT_MSG_QUEUE_NUM				 10
 
-#define MT_WCS_GET_VER_MSG         0x10
-#define MT_WCS_SET_OTA_MSG         0x11
+#define MT_WCS_GET_VER_MSG         0xB0
+#define MT_WCS_SET_OTA_MSG         0xB1
 
 //the queue of uart frame
 typedef struct _uartMsgFrame_t {
@@ -71,14 +71,7 @@ typedef struct _chainDownMsgFrame_t {
 	uint8_t msg[STC_RFID_ID_LEN];
 }chainDownMsgFrame_t;
 
-typedef struct _chainDownData_t {
-	uint8_t valid;
-	uint8_t age;
-	uint8_t rfid[STC_RFID_ID_LEN];
-}chainDownData_t;
-
-extern chainDownData_t g_chainDownData[CHAIN_DOWN_DATA_BUF_LEN];
-
+uint8_t wcs_remove_aged_node(void);
 uint8_t add_ChainDownData(uint8_t *buf, uint8_t len);
 void wcs485_Update485AddrOrSNackSend(uint8_t *dataBuf, uint8_t dataLen);
 void wcs485_ChainOpen(void);

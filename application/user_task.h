@@ -11,6 +11,8 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "dlink.h"
+
 #define PRIORITIES_LAMP_TASK								configMAX_PRIORITIES - 7
 #define PRIORITIES_WCS485_MSG_TASK					configMAX_PRIORITIES - 1
 #define PRIORITIES_STC_MSG_TASK							configMAX_PRIORITIES - 2
@@ -27,6 +29,7 @@
 #define LOWRFID_QUEUE_NUM						5  //the max length of the uart msg queue
 #define LOWRFID_QUEUE_LEN						10  //the max length of the uart msg queue
 
+extern tagNode_t g_node_list;
 //the receive message queue of uart
 extern QueueHandle_t wcs485RecvMsgQueue;
 extern QueueHandle_t stcRecvMsgQueue;

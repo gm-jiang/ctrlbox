@@ -14,7 +14,7 @@ typedef enum type_msg {
 	ACK_FROM_CTRL,
 	GET_DEV_INFO,
 	GET_SYS_LOG,
-	GET_OTA_SW_VER = 16,
+	GET_OTA_SW_VER = 0xB0,
 	SET_OTA_CODE,
 } type_msg_e;
 
