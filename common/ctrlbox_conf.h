@@ -7,7 +7,7 @@
 #define HW_VERSION_STR		HW_V
 #define SW_VERSION_STR		SW_V
 
-#define VERISON_INFO_LEN	10
+#define VERISON_INFO_LEN	4
 
 
 /***********************************FUNCTION RETURN DEFINE***************************************/

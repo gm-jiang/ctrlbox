@@ -157,7 +157,7 @@ void platform_init(void)
 	sys_mutex_init();
 	ctrlbox_configinfo_init();
 	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
-	g_mcu485Addr = 0x03;
+	//g_mcu485Addr = 0x03;
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
 	bsp_chaindown_ctrl_init();
 	message_queue_init();
