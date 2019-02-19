@@ -248,6 +248,44 @@ void bsp_uhfrfid_uart_init(void)
 	USART_Cmd(USART3, ENABLE);
 }
 
+void bsp_dbg_uart_init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	USART_InitTypeDef USART_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+
+	GPIO_InitStructure.GPIO_Pin = UART4_TX_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(UART4_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = UART4_RX_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(UART4_PORT, &GPIO_InitStructure);
+
+	USART_InitStructure.USART_BaudRate = UART4_BAUDRATE;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_Init(UART4, &USART_InitStructure);
+
+	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
+
+	NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_DBG;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	USART_Cmd(UART4, ENABLE);
+}
+
 /*  IWDG init
  * Tout = prv/40 * rlv (s)
  *      prv[4,8,16,32,64,128,256]
@@ -303,15 +341,17 @@ void bsp_lamp_init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOB, ENABLE);
 
-	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_GPIO_PIN | TRICOLOR_LAMP_YELLOW_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_RED_GPIO_PIN | DEBUG_LED_YEL_GPIO_PIN | DEBUG_LED_GRE_GPIO_PIN | \
+																TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
+
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_YELLOW_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(TRICOLOR_LAMP_RED_GPIO, &GPIO_InitStructure);
+	GPIO_Init(TRICOLOR_LAMP_YELLOW_GPIO, &GPIO_InitStructure);
 
 	bsp_lamp_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED, TURN_OFF);
 }
@@ -388,6 +428,16 @@ void bsp_uart3_send(uint8_t *buf, uint16_t length)
   }
 }
 
+void bsp_uart4_send(uint8_t *buf, uint16_t length)
+{
+	uint16_t i;
+	for(i = 0; i < length; i++)
+	{
+		USART_SendData(UART4, buf[i]);
+		while(USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET);
+  }
+}
+
 //lamp ctrl, lamp: TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED
 void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 {
@@ -422,7 +472,7 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 		}
 		if((lamp & DEBUG_LED) == DEBUG_LED)
 		{
-			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GPIO_PIN);
+			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
 			g_lampStatus = g_lampStatus | DEBUG_LED;
 		}
 	}
@@ -457,7 +507,7 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 		}
 		if((lamp & DEBUG_LED) == DEBUG_LED)
 		{
-			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_GPIO_PIN);
+			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
 			g_lampStatus = g_lampStatus & (~DEBUG_LED);
 		}
 	}

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* When Enable ODD_CODE,Set IROM1 offset to 0x8003000,and Set 0x800F000 When Disable */
-//#define ODD_CODE
+#define ODD_CODE
 
 #define ODD_OFFSET               (0x3000)
 #define EVEN_OFFSET              (0xF000)

@@ -46,6 +46,7 @@
 #define PREEMPTION_PRIORITY_WCS485										7
 #define PREEMPTION_PRIORITY_UHFRFID										8
 #define PREEMPTION_PRIORITY_STC												9
+#define PREEMPTION_PRIORITY_DBG												10
 #define PREEMPTION_PRIORITY_EMER_STOP_KEY							13
 #define PREEMPTION_PRIORITY_REALEASE_KEY							14
 #define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR	15
@@ -111,8 +112,10 @@
 #define CHAIN_MOTOR_CTRL_GPIO_PIN				GPIO_Pin_8
 
 //the define of debug gpio
-#define DEBUG_LED_GPIO		             	GPIOC
-#define DEBUG_LED_GPIO_PIN	           	GPIO_Pin_3
+#define DEBUG_LED_GPIO		             	GPIOB
+#define DEBUG_LED_RED_GPIO_PIN	        GPIO_Pin_5
+#define DEBUG_LED_YEL_GPIO_PIN	        GPIO_Pin_6
+#define DEBUG_LED_GRE_GPIO_PIN	        GPIO_Pin_7
 //the define of red lamp gpio
 #define TRICOLOR_LAMP_RED_GPIO		     	GPIOB
 #define TRICOLOR_LAMP_RED_GPIO_PIN     	GPIO_Pin_14
@@ -208,6 +211,7 @@ void bsp_chaindown_finish_sensor_init(void);
 void bsp_wcs_uart_init(void);
 void bsp_stc_uart_init(void);
 void bsp_uhfrfid_uart_init(void);
+void bsp_dbg_uart_init(void);
 void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
 void bsp_mcu_485RE_init(void);
 void bsp_uhfrfid_detect_init(void);
@@ -219,6 +223,7 @@ void bsp_disable_485_pin(void);
 void bsp_uart1_send(uint8_t *buf, uint16_t length);
 void bsp_uart2_send(uint8_t *buf, uint16_t length);
 void bsp_uart3_send(uint8_t *buf, uint16_t length);
+void bsp_uart4_send(uint8_t *buf, uint16_t length);
 void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl);
 void bsp_IWDG_feed(void);
 uint16_t bsp_FLASH_ReadHalfWord(uint32_t address);

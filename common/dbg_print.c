@@ -2,7 +2,6 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x.h"
 #include "bsp_port.h"
-#include "ctrlbox_conf.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -14,7 +13,7 @@ void dbg_print(int print_level, char *fmt, ...)
 {
 	uint16_t len = 0;
 	sys_mutex_lock(printMutex);
-	if (print_level > PRINT_LEVEL || g_mcuConfigInfo.function == UHF_RFID_CTRLBOX) 
+	if (print_level > PRINT_LEVEL)
 	{
 		sys_mutex_unlock(printMutex);
 		return;
@@ -25,7 +24,7 @@ void dbg_print(int print_level, char *fmt, ...)
 		va_start(argp, fmt);
 		vsprintf(buffer, fmt, argp);
 		len = strlen(buffer);
-		bsp_uart3_send((uint8_t *)&buffer, len);
+		bsp_uart4_send((uint8_t *)&buffer, len);
 		va_end(argp);
 	}
 	sys_mutex_unlock(printMutex);

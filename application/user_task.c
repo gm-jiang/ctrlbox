@@ -148,12 +148,12 @@ void platform_init(void)
 	bsp_mcu_485RE_init();
 
 	//disable interrupts
-	//portDISABLE_INTERRUPTS();
+	portDISABLE_INTERRUPTS();
 
 	bsp_wcs_uart_init();
 	bsp_stc_uart_init();
 	bsp_uhfrfid_uart_init();
-
+	bsp_dbg_uart_init();
 	sys_mutex_init();
 	ctrlbox_configinfo_init();
 	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
@@ -164,7 +164,7 @@ void platform_init(void)
 	message_semaphore_init();
 	node_list_init(&g_node_list);
 	//enable interrupts
-	//portENABLE_INTERRUPTS();
+	portENABLE_INTERRUPTS();
 	system_init_success_led();
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox init completed\r\n");
 	bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
