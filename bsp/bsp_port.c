@@ -134,6 +134,29 @@ void bsp_chaindown_finish_sensor_init(void)
 	NVIC_Init(&NVIC_InitStructure);
 }
 
+void bsp_ctrlbox_funcion_init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT0_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(CTRLBOX_FUNCTION_BIT0_GPIO, &GPIO_InitStructure);
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT1_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(CTRLBOX_FUNCTION_BIT1_GPIO, &GPIO_InitStructure);
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT2_GPIO_PIN | CTRLBOX_FUNCTION_BIT3_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(CTRLBOX_FUNCTION_BIT2_GPIO, &GPIO_InitStructure);
+}
+
 void bsp_wcs_uart_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -353,7 +376,7 @@ void bsp_lamp_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(TRICOLOR_LAMP_YELLOW_GPIO, &GPIO_InitStructure);
 
-	bsp_lamp_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED, TURN_OFF);
+	bsp_lamp_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_OFF);
 }
 
 void bsp_chaindown_ctrl_init(void)
@@ -470,10 +493,20 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 			
 			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_YELLOW;
 		}
-		if((lamp & DEBUG_LED) == DEBUG_LED)
+		if((lamp & DEBUG_LED_RED) == DEBUG_LED_RED)
 		{
 			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-			g_lampStatus = g_lampStatus | DEBUG_LED;
+			g_lampStatus = g_lampStatus | DEBUG_LED_RED;
+		}
+		if((lamp & DEBUG_LED_YEL) == DEBUG_LED_YEL)
+		{
+			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
+			g_lampStatus = g_lampStatus | DEBUG_LED_YEL;
+		}
+		if((lamp & DEBUG_LED_GRE) == DEBUG_LED_GRE)
+		{
+			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
+			g_lampStatus = g_lampStatus | DEBUG_LED_GRE;
 		}
 	}
 	else if(lampCtrl == TURN_OFF)
@@ -505,10 +538,20 @@ void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
 			
 			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_YELLOW);
 		}
-		if((lamp & DEBUG_LED) == DEBUG_LED)
+		if((lamp & DEBUG_LED_RED) == DEBUG_LED_RED)
 		{
 			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-			g_lampStatus = g_lampStatus & (~DEBUG_LED);
+			g_lampStatus = g_lampStatus & (~DEBUG_LED_RED);
+		}
+		if((lamp & DEBUG_LED_YEL) == DEBUG_LED_YEL)
+		{
+			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
+			g_lampStatus = g_lampStatus & (~DEBUG_LED_YEL);
+		}
+		if((lamp & DEBUG_LED_GRE) == DEBUG_LED_GRE)
+		{
+			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
+			g_lampStatus = g_lampStatus & (~DEBUG_LED_GRE);
 		}
 	}
 }

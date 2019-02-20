@@ -17,10 +17,10 @@
 
 /***********************************485 ADDRESS FLASH DEFINE***************************************/
 
-#define CHAIN_DOWN_CTRLBOX            0x01
-#define UHF_RFID_CTRLBOX              0x02
-#define RFID_CHECK_CTRLBOX            0x03
-#define RFID_DEBUG_CTRLBOX            0x04
+#define CHAIN_DOWN_CTRLBOX            0x00
+#define UHF_RFID_CTRLBOX              0x01
+#define RFID_CHECK_CTRLBOX            0x02
+#define RFID_DEBUG_CTRLBOX            0x03
 
 
 //flash define

@@ -94,6 +94,7 @@ uint8_t get_config_info(configInfoType_t *configInfo)
 	uint16_t buf[CONFIG_INFO_TYPE_LEN];
 	uint8_t configData[CONFIG_INFO_TYPE_LEN];
 	uint8_t i;
+	//uint8_t bit0,bit1,bit2,bit3;
 	//configInfoType_t configInfo;
 	
 	bsp_FLASH_ReadMoreData(MCU_485_DEV_CUSTOMER_BASE, buf, CONFIG_INFO_TYPE_LEN);
@@ -104,7 +105,16 @@ uint8_t get_config_info(configInfoType_t *configInfo)
 	}
 	
 	memcpy(configInfo, configData, CONFIG_INFO_TYPE_LEN);
-	
+	configInfo->function = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT0_GPIO, CTRLBOX_FUNCTION_BIT0_GPIO_PIN) | \
+												 (GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT1_GPIO, CTRLBOX_FUNCTION_BIT1_GPIO_PIN)<<1) | \
+												 (GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT2_GPIO, CTRLBOX_FUNCTION_BIT2_GPIO_PIN)<<2) | \
+												 (GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT3_GPIO, CTRLBOX_FUNCTION_BIT3_GPIO_PIN)<<3) ;
+	/*
+	bit0 = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT0_GPIO, CTRLBOX_FUNCTION_BIT0_GPIO_PIN);
+	bit1 = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT1_GPIO, CTRLBOX_FUNCTION_BIT1_GPIO_PIN);
+	bit2 = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT2_GPIO, CTRLBOX_FUNCTION_BIT2_GPIO_PIN);
+	bit3 = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT3_GPIO, CTRLBOX_FUNCTION_BIT3_GPIO_PIN);
+	*/
 	return RTN_SUCCESS;
 }
 
@@ -137,6 +147,9 @@ void ctrlbox_configinfo_init(void)
 	{
 		//dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox 485 addr: %02X...\r\n", g_mcu485Addr);
 	}
+	
+	bsp_ctrlbox_funcion_init();
+	
   ret = get_config_info(&g_mcuConfigInfo);
 	if(ret != RTN_SUCCESS)
 	{

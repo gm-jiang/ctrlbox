@@ -55,7 +55,9 @@
 #define TRICOLOR_LAMP_RED		       0x01
 #define TRICOLOR_LAMP_GREEN		     0x02
 #define TRICOLOR_LAMP_YELLOW		   0x04
-#define DEBUG_LED							     0x08
+#define DEBUG_LED_RED							 0x08
+#define DEBUG_LED_YEL							 0x10
+#define DEBUG_LED_GRE							 0x20
 
 //release key
 #define KEYIRQ                     								GPIO_Pin_7
@@ -125,6 +127,16 @@
 //the define of yellow lamp gpio
 #define TRICOLOR_LAMP_YELLOW_GPIO		   	GPIOC
 #define TRICOLOR_LAMP_YELLOW_GPIO_PIN	 	GPIO_Pin_6
+
+//the define of ctrlbox function
+#define CTRLBOX_FUNCTION_BIT0_GPIO			GPIOC
+#define CTRLBOX_FUNCTION_BIT0_GPIO_PIN	GPIO_Pin_12
+#define CTRLBOX_FUNCTION_BIT1_GPIO			GPIOD
+#define CTRLBOX_FUNCTION_BIT1_GPIO_PIN	GPIO_Pin_2
+#define CTRLBOX_FUNCTION_BIT2_GPIO			GPIOB
+#define CTRLBOX_FUNCTION_BIT2_GPIO_PIN	GPIO_Pin_3
+#define CTRLBOX_FUNCTION_BIT3_GPIO			GPIOB
+#define CTRLBOX_FUNCTION_BIT3_GPIO_PIN	GPIO_Pin_4
 
 /***********************************FRAME DEFINE***************************************/
 #define SYN_STATE                  0x00
@@ -208,6 +220,7 @@ void bsp_gpio_configuration(void);
 void bsp_releasekey_init(void);
 void bsp_emerstopkey_init(void);
 void bsp_chaindown_finish_sensor_init(void);
+void bsp_ctrlbox_funcion_init(void);
 void bsp_wcs_uart_init(void);
 void bsp_stc_uart_init(void);
 void bsp_uhfrfid_uart_init(void);

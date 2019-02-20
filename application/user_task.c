@@ -123,9 +123,9 @@ void system_init_success_led(void)
 	uint8_t i;
 	for(i = 0; i < 20; i++)
 	{
-		bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
+		bsp_lamp_ctrl(DEBUG_LED_RED, TURN_ON);
 		mt_sleep_us(50*1000);
-		bsp_lamp_ctrl(DEBUG_LED, TURN_OFF);
+		bsp_lamp_ctrl(DEBUG_LED_RED, TURN_OFF);
 		mt_sleep_us(50*1000);
 	}
 }
@@ -174,36 +174,44 @@ void lamp_task(void *pvParameters)
 {
 	while(1)
 	{
-		bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
+		//bsp_lamp_ctrl(DEBUG_LED, TURN_ON);
 		switch(g_mcuConfigInfo.function)
 		{
 			case CHAIN_DOWN_CTRLBOX:
+				bsp_lamp_ctrl(DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_ON);
 				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			case UHF_RFID_CTRLBOX:
-				vTaskDelay(UHF_RFID_LAMP_DELAY);
+				bsp_lamp_ctrl(DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_ON);
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			case RFID_CHECK_CTRLBOX:
-				vTaskDelay(RFID_CHECK_LAMP_DELAY);
+				bsp_lamp_ctrl(DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_ON);
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			default:
+				bsp_lamp_ctrl(DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_ON);
 				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 		}
 		//vTaskDelay(500);
-		bsp_lamp_ctrl(DEBUG_LED, TURN_OFF);
+		
 		switch(g_mcuConfigInfo.function)
 		{
 			case CHAIN_DOWN_CTRLBOX:
+				bsp_lamp_ctrl(DEBUG_LED_RED, TURN_OFF);
 				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			case UHF_RFID_CTRLBOX:
-				vTaskDelay(UHF_RFID_LAMP_DELAY);
+				bsp_lamp_ctrl(DEBUG_LED_YEL, TURN_OFF);
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			case RFID_CHECK_CTRLBOX:
-				vTaskDelay(RFID_CHECK_LAMP_DELAY);
+				bsp_lamp_ctrl(DEBUG_LED_GRE, TURN_OFF);
+				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 			default:
+				bsp_lamp_ctrl(DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_OFF);
 				vTaskDelay(CHAIN_DOWN_LAMP_DELAY);
 				break;
 		}
