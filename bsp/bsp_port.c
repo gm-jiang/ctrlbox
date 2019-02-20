@@ -138,22 +138,24 @@ void bsp_ctrlbox_funcion_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT0_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;	//
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT0_GPIO, &GPIO_InitStructure);
 	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT1_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT1_GPIO, &GPIO_InitStructure);
 	
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT2_GPIO_PIN | CTRLBOX_FUNCTION_BIT3_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IN_FLOATING;	//
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT2_GPIO, &GPIO_InitStructure);
 }
 
