@@ -139,11 +139,11 @@ void platform_init(void)
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, EVEN_OFFSET);
 #endif
 	bsp_gpio_configuration();
+	ctrlbox_configinfo_init();
 	bsp_releasekey_init();
 	bsp_emerstopkey_init();
 	bsp_chaindown_finish_sensor_init();
 	bsp_lamp_init();
-
 	bsp_motor_ctrl_init();
 	bsp_mcu_485RE_init();
 
@@ -155,7 +155,7 @@ void platform_init(void)
 	bsp_uhfrfid_uart_init();
 	bsp_dbg_uart_init();
 	sys_mutex_init();
-	ctrlbox_configinfo_init();
+
 	dbg_print(PRINT_LEVEL_DEBUG, "%s %s\r\n", SW_VERSION_STR, HW_VERSION_STR);
 	//g_mcu485Addr = 0x03;
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox addr: 0x%02X\r\n", g_mcu485Addr);
