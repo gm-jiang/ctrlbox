@@ -389,7 +389,7 @@ void stc_msg_task(void *pvParameters)
 			if (g_mcuConfigInfo.function == CHAIN_DOWN_CTRLBOX)
 			{
 				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
-				tagNode = node_list_find_tagid(&g_node_list, recv_msg, STC_RFID_ID_LEN);
+				tagNode = node_list_find_tagid(&g_node_list, &recv_msg[DAT_INDEX], STC_RFID_ID_LEN);
 				if (tagNode != NULL)
 				{
 					wcs485_ChainOpen();
