@@ -138,6 +138,9 @@ void platform_init(void)
 #else
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, EVEN_OFFSET);
 #endif
+	//disable interrupts
+	portDISABLE_INTERRUPTS();
+
 	bsp_gpio_configuration();
 	ctrlbox_configinfo_init();
 	bsp_releasekey_init();
@@ -146,9 +149,6 @@ void platform_init(void)
 	bsp_lamp_init();
 	bsp_motor_ctrl_init();
 	bsp_mcu_485RE_init();
-
-	//disable interrupts
-	portDISABLE_INTERRUPTS();
 
 	bsp_wcs_uart_init();
 	bsp_stc_uart_init();
@@ -163,11 +163,11 @@ void platform_init(void)
 	message_queue_init();
 	message_semaphore_init();
 	node_list_init(&g_node_list);
-	//enable interrupts
-	portENABLE_INTERRUPTS();
 	system_init_success_led();
 	dbg_print(PRINT_LEVEL_DEBUG, "ctrlbox init completed\r\n");
 	bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
+	//enable interrupts
+	portENABLE_INTERRUPTS();
 }
 
 void lamp_task(void *pvParameters)
