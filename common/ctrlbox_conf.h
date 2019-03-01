@@ -42,7 +42,7 @@
 #define RFID_CHECK_LAMP_DELAY					2000 //ms
 
 #define VALVE_CTRL_TIME_MIN						100 //ms
-#define VALVE_CTRL_TIME								2000 //ms
+#define VALVE_CTRL_TIME								500 //ms
 #define VALVE_CTRL_TIME_MAX						20000 //ms
 
 typedef struct _configInfoType_t {
