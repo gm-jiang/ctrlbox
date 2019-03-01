@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define SW_V            "2.02"
+#define SW_V            "1.00"
 #define HW_V            "1.00"
 
 void mt_sleep_ms(uint16_t time);
