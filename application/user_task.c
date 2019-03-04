@@ -379,6 +379,7 @@ void stc_msg_task(void *pvParameters)
 	chainDownMsgFrame_t chainDownMsg, tmpChainDownMsg;
 	eventMsgFrame_t eventMsg, tmpMsg;
 	tagNode_t *tagNode = NULL;
+	static uint8_t last_rfid[STC_RFID_ID_LEN] = {0};
 
 	while(1)
 	{
@@ -386,6 +387,11 @@ void stc_msg_task(void *pvParameters)
 		if(queue_recv_ret == pdTRUE)
 		{
 			dbg_print_msg(PRINT_LEVEL_DEBUG, "STC DATA IN:", STC_MSG_LEN, recv_msg);
+			if (memcmp(last_rfid, &recv_msg[DAT_INDEX], STC_RFID_ID_LEN) == 0)
+				continue;
+			else
+				memcpy(last_rfid, &recv_msg[DAT_INDEX], STC_RFID_ID_LEN);
+
 			if (g_mcuConfigInfo.function == CHAIN_DOWN_CTRLBOX)
 			{
 				xSemaphoreTake(chainDownDataSemaphore, portMAX_DELAY);
