@@ -151,7 +151,6 @@ void platform_init(void)
 	bsp_mcu_485RE_init();
 
 	bsp_wcs_uart_init();
-	bsp_stc_uart_init();
 	bsp_uhfrfid_uart_init();
 	bsp_dbg_uart_init();
 	sys_mutex_init();
@@ -381,6 +380,7 @@ void stc_msg_task(void *pvParameters)
 	tagNode_t *tagNode = NULL;
 	static uint8_t last_rfid[STC_RFID_ID_LEN] = {0};
 
+	bsp_stc_uart_init();
 	while(1)
 	{
 		queue_recv_ret = xQueueReceive(stcRecvMsgQueue, recv_msg, portMAX_DELAY);
