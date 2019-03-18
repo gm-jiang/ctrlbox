@@ -3,9 +3,9 @@ obj/*
 *.dep
 *.ini
 *.bak
-*.bin
 JLinkLog.txt
 JLinkSettings.ini
 *.uvgui.*
 *.uvopt
 *.tools
+*.bin

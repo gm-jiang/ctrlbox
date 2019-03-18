@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "user_task.h"
+#include "system_init.h" //just use sys_mutex_lock unlock function
 
 static char buffer[PRINT_BUFFER_LEN];
 
@@ -13,7 +13,7 @@ void dbg_print(int print_level, char *fmt, ...)
 {
 	uint16_t len = 0;
 	sys_mutex_lock(printMutex);
-	if (print_level > PRINT_LEVEL)
+	if (print_level > PRINT_LEVEL) 
 	{
 		sys_mutex_unlock(printMutex);
 		return;

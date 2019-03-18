@@ -3,11 +3,9 @@
 
 #include <stdint.h>
 
-#define RFID_LEN        4
-
 typedef struct _tagInfo
 {
-	uint8_t tagId[RFID_LEN];
+	uint8_t tagId[4];
 	uint32_t aged;
 } tagInfo;
 

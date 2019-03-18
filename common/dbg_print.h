@@ -1,5 +1,5 @@
-#ifndef _dbg_print_H
-#define _dbg_print_H
+#ifndef _log_print_h
+#define _log_print_h
 
 #include <stdint.h>
 
@@ -7,9 +7,9 @@
 
 enum
 {
-    PRINT_LEVEL_DEBUG,
     PRINT_LEVEL_ERROR,
     PRINT_LEVEL_WARNING,
+    PRINT_LEVEL_DEBUG,
     PRINT_LEVEL_INFO,
     PRINT_LEVEL_INFO_LOWLEVEL,
     PRINT_LEVEL_VERBOSE

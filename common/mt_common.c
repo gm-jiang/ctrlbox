@@ -2,27 +2,32 @@
 #include "mt_common.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void mt_sleep_ms(uint16_t time)
 {    
-   uint16_t i=0;
-	
-   while(time--)
-   {
-      i=8500;
-      while(i--); 
-   }
+	uint16_t i=0;
+
+	while(time--)
+	{
+		i=8500;
+		while(i--); 
+	}
 }
 
 void mt_sleep_us(uint32_t time_us)
 {
 	uint32_t i = 0;
-	for(i = 0;i < time_us;i++){
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	for(i = 0;i < time_us;i++)
+	{
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
 	}
 }
 
@@ -44,7 +49,7 @@ void mt_uhfrfid_convert(uint8_t *buff, uint8_t bufflen)
 	uint8_t i;
 	uint8_t tmp[30] = {0};
 
-	for (i = 0; i < bufflen; i++)
+	for (i = 0; i < bufflen/2; i++)
 	{
 		tmp[i] = (mt_hex2ascii(buff[i*2])<<4 |  mt_hex2ascii(buff[i*2+1]));
 	}
@@ -204,11 +209,10 @@ static const unsigned int crc32tab[] = {
 
 uint32_t mt_crc32(unsigned char *buf, unsigned int size)
 {
-	uint32_t i, crc;
+	unsigned int i, crc;
 	crc = 0xFFFFFFFF;
 	for (i = 0; i < size; i++)
 	crc = crc32tab[(crc ^ buf[i]) & 0xff] ^ (crc >> 8);
 
 	return crc^0xFFFFFFFF;
 }
-

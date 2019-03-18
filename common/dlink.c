@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "FreeRTOS.h"
+#include "dbg_print.h"
 
 void node_list_init(tagNode_t *node)
 {
@@ -56,7 +57,7 @@ tagNode_t *node_list_find_aged(tagNode_t *head, uint32_t current_ts)
 	tagNode_t *curNode;
 	for (curNode = head->next; curNode != NULL; curNode = curNode->next)
 	{
-		if (current_ts - curNode->msg->aged > 5*60*1000) //5min
+		if (current_ts - curNode->msg->aged > 60000)
 			return curNode;
 	}
 	return NULL;
@@ -64,15 +65,15 @@ tagNode_t *node_list_find_aged(tagNode_t *head, uint32_t current_ts)
 
 void node_list_print(tagNode_t *head)
 {
-	//uint8_t i;
+	uint8_t i;
 	tagNode_t *curNode;
-	//dbg_print(PRINT_LEVEL_DEBUG, "print a node list:\r\n");
+	dbg_print(PRINT_LEVEL_DEBUG, "print a node list:\r\n");
 	for (curNode = head->next; curNode != NULL; curNode = curNode->next)
 	{
-		//dbg_print(PRINT_LEVEL_DEBUG, "tag id: ");
-		//for (i = 0; i < 4; i++)
-			//dbg_print(PRINT_LEVEL_DEBUG, "%02X ", curNode->msg->tagId[i]);
+		dbg_print(PRINT_LEVEL_DEBUG, "tag id: ");
+		for (i = 0; i < 4; i++)
+			dbg_print(PRINT_LEVEL_DEBUG, "%02X ", curNode->msg->tagId[i]);
 
-		//dbg_print(PRINT_LEVEL_DEBUG, "\ttag aded: %d\r\n", curNode->msg->aged);
+		dbg_print(PRINT_LEVEL_DEBUG, "\ttag aded: %d\r\n", curNode->msg->aged);
 	}
 }

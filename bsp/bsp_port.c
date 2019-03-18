@@ -1,16 +1,7 @@
 #include "stm32f10x.h"
 #include "bsp_port.h"
 
-/*lamp status and key status
-		bit0:red							[0,OFF][1,ON], 
-    bit1:green						[0,OFF][1,ON], 
-		bit2:yellow						[0,OFF][1,ON],
-		bit3:debug_led				[0,OFF][1,ON],
-		bit4:key_status				[0,UNVALID][1,VALID]
-*/
-uint8_t g_lampStatus = 0;
-
-void bsp_gpio_configuration(void)
+void bsp_all_gpio_configuration(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -129,37 +120,69 @@ void bsp_chaindown_finish_sensor_init(void)
 	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_USEIRQ;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
 
 	NVIC_Init(&NVIC_InitStructure);
 }
 
-void bsp_ctrlbox_funcion_init(void)
+void bsp_chaindown_finish_sensor_exit_enable(void)
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+	/* Enable and set EXTI Interrupt to the lowest priority */
+	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+void bsp_chaindown_finish_sensor_exit_disable(void)
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+	/* Enable and set EXTI Interrupt to the lowest priority */
+	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+void bsp_ctrlbox_mode_pin_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT0_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;	//
-	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT0_GPIO, &GPIO_InitStructure);
-	
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT1_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPD;	//
-	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT1_GPIO, &GPIO_InitStructure);
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);
 	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT2_GPIO_PIN | CTRLBOX_FUNCTION_BIT3_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPD;	//
-	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
 	GPIO_Init(CTRLBOX_FUNCTION_BIT2_GPIO, &GPIO_InitStructure);
 }
 
-void bsp_wcs_uart_init(void)
+uint8_t bsp_switch_4bit_value(void)
+{
+	uint8_t value = 0x00;
+	value = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT0_GPIO, CTRLBOX_FUNCTION_BIT0_GPIO_PIN) | \
+          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT1_GPIO, CTRLBOX_FUNCTION_BIT1_GPIO_PIN) << 1 | \
+          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT2_GPIO, CTRLBOX_FUNCTION_BIT2_GPIO_PIN) << 2 | \
+          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT3_GPIO, CTRLBOX_FUNCTION_BIT3_GPIO_PIN) << 3;
+	value = ~value & 0x0F;
+	return value;
+}
+
+void bsp_wcs_uart1_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -197,7 +220,7 @@ void bsp_wcs_uart_init(void)
 	USART_Cmd(USART1, ENABLE);
 }
 
-void bsp_stc_uart_init(void)
+void bsp_stc_uart2_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -235,7 +258,7 @@ void bsp_stc_uart_init(void)
 	USART_Cmd(USART2, ENABLE);
 }
 
-void bsp_uhfrfid_uart_init(void)
+void bsp_uhf_uart3_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -273,7 +296,7 @@ void bsp_uhfrfid_uart_init(void)
 	USART_Cmd(USART3, ENABLE);
 }
 
-void bsp_dbg_uart_init(void)
+void bsp_dbg_uart4_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -311,31 +334,6 @@ void bsp_dbg_uart_init(void)
 	USART_Cmd(UART4, ENABLE);
 }
 
-/*  IWDG init
- * Tout = prv/40 * rlv (s)
- *      prv[4,8,16,32,64,128,256]
- * prv:the value of Prescaler:
- *     @arg IWDG_Prescaler_4: IWDG prescaler set to 4
- *     @arg IWDG_Prescaler_8: IWDG prescaler set to 8
- *     @arg IWDG_Prescaler_16: IWDG prescaler set to 16
- *     @arg IWDG_Prescaler_32: IWDG prescaler set to 32
- *     @arg IWDG_Prescaler_64: IWDG prescaler set to 64
- *     @arg IWDG_Prescaler_128: IWDG prescaler set to 128
- *     @arg IWDG_Prescaler_256: IWDG prescaler set to 256
- *
-   rlv:the value of reload
- * IWDG_Init(IWDG_Prescaler_64 ,625);  // IWDG 1s
- *                        (64/40)*625 = 1s
- */
-void bsp_IWDG_init(uint8_t prv ,uint16_t rlv)
-{
-	IWDG_WriteAccessCmd( IWDG_WriteAccess_Enable );
-	IWDG_SetPrescaler( prv );
-	IWDG_SetReload( rlv );
-	IWDG_ReloadCounter();
-	IWDG_Enable();    
-}
-
 void bsp_mcu_485RE_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -349,6 +347,44 @@ void bsp_mcu_485RE_init(void)
 	GPIO_ResetBits(WCS_485_RE_GPIO, WCS_485_RE_GPIO_PIN);
 }
 
+void bsp_status_led_init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
+	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_RED_GPIO_PIN | DEBUG_LED_YEL_GPIO_PIN | DEBUG_LED_GRE_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructure);
+	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
+	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
+	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
+}
+
+void bsp_status_red_led_set(uint8_t status)
+{
+	if (status)
+		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
+	else
+		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
+}
+
+void bsp_status_gre_led_set(uint8_t status)
+{
+	if (status)
+		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
+	else
+		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
+}
+
+void bsp_status_yel_led_set(uint8_t status)
+{
+	if (status)
+		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
+	else
+		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
+}
+
 void bsp_uhfrfid_detect_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -360,25 +396,55 @@ void bsp_uhfrfid_detect_init(void)
 	GPIO_Init(UHFRFID_DETECT_SENSOR_GPIO, &GPIO_InitStructure);
 }
 
-//lamp init
-void bsp_lamp_init(void)
+void bsp_lamp_led_ctrl(uint8_t lamp, uint8_t status)
+{
+	if(status == TURN_ON)
+	{
+		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
+		{
+			GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+		}
+		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
+		{
+			GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+		}
+		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
+		{
+			GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+		}
+	}
+	else if(status == TURN_OFF)
+	{
+		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
+		{
+			GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
+		}
+		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
+		{
+			GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
+		}
+		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
+		{
+			GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
+		}
+	}
+}
+
+void bsp_lamp_led_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOB, ENABLE);
 
-	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_RED_GPIO_PIN | DEBUG_LED_YEL_GPIO_PIN | DEBUG_LED_GRE_GPIO_PIN | \
-																TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
-
+	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructure);
-	
+	GPIO_Init(TRICOLOR_LAMP_RED_GPIO, &GPIO_InitStructure);
+
 	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_YELLOW_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(TRICOLOR_LAMP_YELLOW_GPIO, &GPIO_InitStructure);
-
-	bsp_lamp_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED_RED | DEBUG_LED_YEL | DEBUG_LED_GRE, TURN_OFF);
+	bsp_lamp_led_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW, TURN_OFF);
 }
 
 void bsp_chaindown_ctrl_init(void)
@@ -391,10 +457,7 @@ void bsp_chaindown_ctrl_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(CHAIN_DOWN_CTRL_GPIO, &GPIO_InitStructure);
 
-	if(g_mcuConfigInfo.valveCtrlLevel == LEVEL_CTRL_HIGH)
-		GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
-	else
-		GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
 }
 
 void bsp_motor_ctrl_init(void)
@@ -407,10 +470,30 @@ void bsp_motor_ctrl_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(CHAIN_MOTOR_CTRL_GPIO, &GPIO_InitStructure);
 
-	if(g_mcuConfigInfo.motorCtrlLevel == LEVEL_CTRL_HIGH)
-		GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
-	else
+	GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+}
+
+
+void bsp_motor_ctrl(uint8_t status)
+{
+	if(status == TURN_ON)
+	{
 		GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+	}
+	else
+	{
+		GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
+	}
+}
+
+void bsp_chain_open(void)
+{
+	GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
+}
+
+void bsp_chain_close(void)
+{
+	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
 }
 
 void bsp_enable_485_pin(void)
@@ -463,99 +546,29 @@ void bsp_uart4_send(uint8_t *buf, uint16_t length)
   }
 }
 
-//lamp ctrl, lamp: TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW | DEBUG_LED
-void bsp_lamp_ctrl(uint8_t lamp, statusCtrlType_e lampCtrl)
+/*  IWDG init
+ * Tout = prv/40 * rlv (s)
+ *      prv[4,8,16,32,64,128,256]
+ * prv:the value of Prescaler:
+ *     @arg IWDG_Prescaler_4: IWDG prescaler set to 4
+ *     @arg IWDG_Prescaler_8: IWDG prescaler set to 8
+ *     @arg IWDG_Prescaler_16: IWDG prescaler set to 16
+ *     @arg IWDG_Prescaler_32: IWDG prescaler set to 32
+ *     @arg IWDG_Prescaler_64: IWDG prescaler set to 64
+ *     @arg IWDG_Prescaler_128: IWDG prescaler set to 128
+ *     @arg IWDG_Prescaler_256: IWDG prescaler set to 256
+ *
+   rlv:the value of reload
+ * IWDG_Init(IWDG_Prescaler_64 ,625);  // IWDG 1s
+ *                        (64/40)*625 = 1s
+ */
+void bsp_IWDG_init(uint8_t prv ,uint16_t rlv)
 {
-	if(lampCtrl == TURN_ON)
-	{
-		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-			else
-				GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_RED;
-		}
-		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-			else
-				GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_GREEN;
-		}
-		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-			else
-				GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus | TRICOLOR_LAMP_YELLOW;
-		}
-		if((lamp & DEBUG_LED_RED) == DEBUG_LED_RED)
-		{
-			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-			g_lampStatus = g_lampStatus | DEBUG_LED_RED;
-		}
-		if((lamp & DEBUG_LED_YEL) == DEBUG_LED_YEL)
-		{
-			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
-			g_lampStatus = g_lampStatus | DEBUG_LED_YEL;
-		}
-		if((lamp & DEBUG_LED_GRE) == DEBUG_LED_GRE)
-		{
-			GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
-			g_lampStatus = g_lampStatus | DEBUG_LED_GRE;
-		}
-	}
-	else if(lampCtrl == TURN_OFF)
-	{
-		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-			else
-				GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_RED);
-		}
-		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-			else
-				GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_GREEN);
-		}
-		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
-		{
-			if(g_mcuConfigInfo.lampCtrlLevel == LEVEL_CTRL_HIGH)
-				GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-			else
-				GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-			
-			g_lampStatus = g_lampStatus & (~TRICOLOR_LAMP_YELLOW);
-		}
-		if((lamp & DEBUG_LED_RED) == DEBUG_LED_RED)
-		{
-			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-			g_lampStatus = g_lampStatus & (~DEBUG_LED_RED);
-		}
-		if((lamp & DEBUG_LED_YEL) == DEBUG_LED_YEL)
-		{
-			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
-			g_lampStatus = g_lampStatus & (~DEBUG_LED_YEL);
-		}
-		if((lamp & DEBUG_LED_GRE) == DEBUG_LED_GRE)
-		{
-			GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
-			g_lampStatus = g_lampStatus & (~DEBUG_LED_GRE);
-		}
-	}
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+	IWDG_SetPrescaler( prv );
+	IWDG_SetReload( rlv );
+	IWDG_ReloadCounter();
+	IWDG_Enable();
 }
 
 //watchdog feed
@@ -567,26 +580,26 @@ void bsp_IWDG_feed(void)
 //read flash halfword 16bit
 uint16_t bsp_FLASH_ReadHalfWord(uint32_t address)
 {
-  return *(__IO uint16_t*)address; 
+	return *(__IO uint16_t*)address;
 }
 
 //read word 32bit
 uint32_t bsp_FLASH_ReadWord(uint32_t address)
 {
-  uint32_t temp1,temp2;
-  temp1=*(__IO uint16_t*)address; 
-  temp2=*(__IO uint16_t*)(address + 2); 
-  return (temp2<<16) + temp1;
+	uint32_t temp1,temp2;
+	temp1=*(__IO uint16_t*)address;
+	temp2=*(__IO uint16_t*)(address + 2);
+	return (temp2<<16) + temp1;
 }
 
 //read more data once
 void bsp_FLASH_ReadMoreData(uint32_t startAddress, uint16_t *readData, uint16_t countToRead)
 {
-  uint16_t dataIndex;
-  for(dataIndex = 0;dataIndex < countToRead;dataIndex++)
-  {
-    readData[dataIndex] = bsp_FLASH_ReadHalfWord(startAddress + dataIndex * 2);
-  }
+	uint16_t dataIndex;
+	for(dataIndex = 0;dataIndex < countToRead;dataIndex++)
+	{
+		readData[dataIndex] = bsp_FLASH_ReadHalfWord(startAddress + dataIndex * 2);
+	}
 }
 
 //write more data once
@@ -596,23 +609,23 @@ void bsp_FLASH_WriteMoreData(uint32_t startAddress, uint16_t *writeData, uint16_
 	uint32_t offsetAddress;
 	uint32_t sectorPosition;
 	uint32_t sectorStartAddress;
-	
-  if((startAddress < FLASH_BASE) ||((startAddress + countToWrite * 2) >= (FLASH_BASE + 1024 * FLASH_SIZE)))
-  {
-    return;//invalid addr
-  }
-  FLASH_Unlock();         //unlock
-  offsetAddress = startAddress - FLASH_BASE;               //calc actual offset(sub 0X08000000)
-  sectorPosition = offsetAddress / SECTOR_SIZE;            //calc address of sector
- 
-  sectorStartAddress = sectorPosition * SECTOR_SIZE + FLASH_BASE;    //the first address of sector
 
-  FLASH_ErasePage(sectorStartAddress);//erase this address
-  
-  for(dataIndex = 0;dataIndex < countToWrite;dataIndex++)
-  {
-    FLASH_ProgramHalfWord(startAddress + dataIndex * 2,writeData[dataIndex]);
-  }
-  
-  FLASH_Lock();//lock
+	if((startAddress < FLASH_BASE) ||((startAddress + countToWrite * 2) >= (FLASH_BASE + 1024 * FLASH_SIZE)))
+	{
+		return;//invalid addr
+	}
+	FLASH_Unlock();         //unlock
+	offsetAddress = startAddress - FLASH_BASE;               //calc actual offset(sub 0X08000000)
+	sectorPosition = offsetAddress / SECTOR_SIZE;            //calc address of sector
+
+	sectorStartAddress = sectorPosition * SECTOR_SIZE + FLASH_BASE;    //the first address of sector
+
+	FLASH_ErasePage(sectorStartAddress);//erase this address
+
+	for(dataIndex = 0;dataIndex < countToWrite;dataIndex++)
+	{
+		FLASH_ProgramHalfWord(startAddress + dataIndex * 2,writeData[dataIndex]);
+	}
+
+	FLASH_Lock();//lock
 }

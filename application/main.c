@@ -21,11 +21,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-#include "dbg_print.h"
-#include "user_task.h"
-
+#include "system_init.h"
 #include "FreeRTOS.h"
 #include "task.h"
+
 
 /**
   * @brief   Main program
@@ -40,77 +39,12 @@ int main(void)
 		 To reconfigure the default setting of SystemInit() function, refer to
 		 system_stm32f10x.c file
 	 */
-	BaseType_t ret;
-
 	platform_init();
-
-	//create lamp task
-	ret = xTaskCreate(lamp_task, "lamp", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_LAMP_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create led_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create led_task successful\r\n");
-	}
-
-	//create watchdog task
-	ret = xTaskCreate(watch_dog_task, "watch_dog", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_WATCH_DOG_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create watch_dog_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create watch_dog_task successful\r\n");
-	}
-
-	//create wcs485_msg task
-	ret = xTaskCreate(wcs485_msg_task, "wcs485_msg", configMINIMAL_STACK_SIZE*10, NULL, PRIORITIES_WCS485_MSG_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create wcs485_msg_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create wcs485_msg_task successful\r\n");
-	}
-
-	//create stc_msg task
-	ret = xTaskCreate(stc_msg_task, "stc_msg", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_STC_MSG_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create stc_msg_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create stc_msg_task successful\r\n");
-	}
-
-	//create uhfRFID_msg task
-	ret = xTaskCreate(uhfRFID_msg_task, "uhfRFID_msg", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_UHFRFID_MSG_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create uhfRFID_msg_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create uhfRFID_msg_task successful\r\n");
-	}
-
-	ret = xTaskCreate(chainDown_sensor_task, "chainDown_sensor", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_CHAINDOWN_SENSOR_TASK, NULL);
-	if(ret != pdPASS)
-	{
-		dbg_print(PRINT_LEVEL_ERROR, " create chainDown_sensor_task failed\r\n");
-	}
-	else
-	{
-		dbg_print(PRINT_LEVEL_INFO, "create chainDown_sensor_task successful\r\n");
-	}
+	os_task_init();
 
 	// Start the FreeRTOS scheduler
 	vTaskStartScheduler();
+
 	// Should never reach there
 	while(1);
 }

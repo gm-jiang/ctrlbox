@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 /* When Enable ODD_CODE,Set IROM1 offset to 0x8003000,and Set 0x800F000 When Disable */
+
 #define ODD_CODE
 
 #define ODD_OFFSET               (0x3000)
@@ -33,6 +34,7 @@
 #define FLASH_EVEN_BASE          ((uint32_t)0x0800F000)  //Even code zone 48Kb
 #define FLASH_STORE_BASE         ((uint32_t)0x0801B000)  //store misc param zone
 
+
 //********************Page Allocation From FLASH*********************//
 #define FLASH_PAGE_54            FLASH_STORE_BASE
 #define FLASH_PAGE_55            FLASH_STORE_BASE + 1*FLASH_PAGE_SIZE;
@@ -45,7 +47,6 @@
 
 #define OTA_PARM_ADDR            FLASH_PAGE_60
 #define OTA_BOOT_FLAG_ADDR       FLASH_PAGE_61
-
 
 typedef enum ota_reply {
     OTA_SUCCEED=1,
