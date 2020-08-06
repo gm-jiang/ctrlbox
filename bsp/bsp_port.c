@@ -29,160 +29,7 @@ void bsp_all_gpio_configuration(void)
 						             RCC_APB2Periph_GPIOE, DISABLE);
 }
 
-void bsp_releasekey_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
-
-	// Enable GPIO used as key IRQ for interrupt
-	GPIO_InitStructure.GPIO_Pin = KEYIRQ;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPD;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
-	GPIO_Init(KEYIRQ_GPIO, &GPIO_InitStructure);
-
-	/* Connect EXTI Line to GPIO Pin */
-	GPIO_EXTILineConfig(KEYIRQ_EXTI_PORT, KEYIRQ_EXTI_PIN);
-
-	/* Configure EXTI line */
-	EXTI_InitStructure.EXTI_Line = KEYIRQ_EXTI;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	//IRQ polarity is high by default
-	EXTI_InitStructure.EXTI_LineCmd = KEYIRQ_EXTI_USEIRQ;
-	EXTI_Init(&EXTI_InitStructure);
-
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = KEYIRQ_EXTI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_REALEASE_KEY;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = KEYIRQ_EXTI_USEIRQ;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
-
-void bsp_emerstopkey_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
-
-	// Enable GPIO used as key IRQ for interrupt
-	GPIO_InitStructure.GPIO_Pin = EMER_STOP_KEY_DETECTIRQ_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPD;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
-	GPIO_Init(EMER_STOP_KEY_DETECTIRQ_GPIO, &GPIO_InitStructure);
-
-	/* Connect EXTI Line to GPIO Pin */
-	GPIO_EXTILineConfig(EMER_STOP_KEY_DETECTIRQ_EXTI_PORT, EMER_STOP_KEY_DETECTIRQ_EXTI_PIN);
-
-	/* Configure EXTI line */
-	EXTI_InitStructure.EXTI_Line = EMER_STOP_KEY_DETECTIRQ_EXTI;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = EMER_STOP_KEY_DETECTIRQ_EXTI_USEIRQ;
-	EXTI_Init(&EXTI_InitStructure);
-
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = EMER_STOP_KEY_DETECTIRQ_EXTI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_EMER_STOP_KEY;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = EMER_STOP_KEY_DETECTIRQ_EXTI_USEIRQ;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
-
-void bsp_chaindown_finish_sensor_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
-
-	// Enable GPIO used as key IRQ for interrupt
-	GPIO_InitStructure.GPIO_Pin = CHAIN_DOWN_FINISH_DETECTIRQ_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPD;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
-	GPIO_Init(CHAIN_DOWN_FINISH_DETECTIRQ_GPIO, &GPIO_InitStructure);
-
-	/* Connect EXTI Line to GPIO Pin */
-	GPIO_EXTILineConfig(CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_PORT, CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_PIN);
-
-	/* Configure EXTI line */
-	EXTI_InitStructure.EXTI_Line = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	//IRQ polarity is high by default
-	EXTI_InitStructure.EXTI_LineCmd = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_USEIRQ;
-	EXTI_Init(&EXTI_InitStructure);
-
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
-
-void bsp_chaindown_finish_sensor_exit_enable(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
-
-void bsp_chaindown_finish_sensor_exit_disable(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = CHAIN_DOWN_FINISH_DETECTIRQ_EXTI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
-
-void bsp_ctrlbox_mode_pin_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT0_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
-	GPIO_Init(CTRLBOX_FUNCTION_BIT0_GPIO, &GPIO_InitStructure);
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT1_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
-	GPIO_Init(CTRLBOX_FUNCTION_BIT1_GPIO, &GPIO_InitStructure);
-
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);
-	GPIO_InitStructure.GPIO_Pin = CTRLBOX_FUNCTION_BIT2_GPIO_PIN | CTRLBOX_FUNCTION_BIT3_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;
-	GPIO_Init(CTRLBOX_FUNCTION_BIT2_GPIO, &GPIO_InitStructure);
-}
-
-uint8_t bsp_switch_4bit_value(void)
-{
-	uint8_t value = 0x00;
-	value = GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT0_GPIO, CTRLBOX_FUNCTION_BIT0_GPIO_PIN) | \
-          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT1_GPIO, CTRLBOX_FUNCTION_BIT1_GPIO_PIN) << 1 | \
-          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT2_GPIO, CTRLBOX_FUNCTION_BIT2_GPIO_PIN) << 2 | \
-          GPIO_ReadInputDataBit(CTRLBOX_FUNCTION_BIT3_GPIO, CTRLBOX_FUNCTION_BIT3_GPIO_PIN) << 3;
-	value = ~value & 0x0F;
-	return value;
-}
-
-void bsp_wcs_uart1_init(void)
+void bsp_uart1_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -220,7 +67,7 @@ void bsp_wcs_uart1_init(void)
 	USART_Cmd(USART1, ENABLE);
 }
 
-void bsp_stc_uart2_init(void)
+void bsp_uart2_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -258,7 +105,7 @@ void bsp_stc_uart2_init(void)
 	USART_Cmd(USART2, ENABLE);
 }
 
-void bsp_uhf_uart3_init(void)
+void bsp_uart3_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
@@ -334,176 +181,25 @@ void bsp_dbg_uart4_init(void)
 	USART_Cmd(UART4, ENABLE);
 }
 
-void bsp_mcu_485RE_init(void)
+void bsp_power_status_led_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
-	GPIO_InitStructure.GPIO_Pin = WCS_485_RE_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = POWER_LED_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(WCS_485_RE_GPIO, &GPIO_InitStructure);
-
-	GPIO_ResetBits(WCS_485_RE_GPIO, WCS_485_RE_GPIO_PIN);
+	GPIO_Init(POWER_LED_GPIO, &GPIO_InitStructure);
+	GPIO_ResetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
 }
 
-void bsp_status_led_init(void)
+void bsp_power_status_led_set(uint8_t status)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = DEBUG_LED_RED_GPIO_PIN | DEBUG_LED_YEL_GPIO_PIN | DEBUG_LED_GRE_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(DEBUG_LED_GPIO, &GPIO_InitStructure);
-	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
-	GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
-}
-
-void bsp_status_red_led_set(uint8_t status)
-{
-	if (status)
-		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-	else
-		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_RED_GPIO_PIN);
-}
-
-void bsp_status_gre_led_set(uint8_t status)
-{
-	if (status)
-		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
-	else
-		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_GRE_GPIO_PIN);
-}
-
-void bsp_status_yel_led_set(uint8_t status)
-{
-	if (status)
-		GPIO_ResetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
-	else
-		GPIO_SetBits(DEBUG_LED_GPIO, DEBUG_LED_YEL_GPIO_PIN);
-}
-
-void bsp_uhfrfid_detect_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = UHFRFID_DETECT_SENSOR_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	GPIO_Init(UHFRFID_DETECT_SENSOR_GPIO, &GPIO_InitStructure);
-}
-
-void bsp_lamp_led_ctrl(uint8_t lamp, uint8_t status)
-{
-	if(status == TURN_ON)
-	{
-		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
-		{
-			GPIO_ResetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-		}
-		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
-		{
-			GPIO_ResetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-		}
-		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
-		{
-			GPIO_ResetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-		}
+	if (status) {
+		GPIO_ResetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
+	} else {
+		GPIO_SetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
 	}
-	else if(status == TURN_OFF)
-	{
-		if((lamp & TRICOLOR_LAMP_RED) == TRICOLOR_LAMP_RED)
-		{
-			GPIO_SetBits(TRICOLOR_LAMP_RED_GPIO, TRICOLOR_LAMP_RED_GPIO_PIN);
-		}
-		if((lamp & TRICOLOR_LAMP_GREEN) == TRICOLOR_LAMP_GREEN)
-		{
-			GPIO_SetBits(TRICOLOR_LAMP_GREEN_GPIO, TRICOLOR_LAMP_GREEN_GPIO_PIN);
-		}
-		if((lamp & TRICOLOR_LAMP_YELLOW) == TRICOLOR_LAMP_YELLOW)
-		{
-			GPIO_SetBits(TRICOLOR_LAMP_YELLOW_GPIO, TRICOLOR_LAMP_YELLOW_GPIO_PIN);
-		}
-	}
-}
-
-void bsp_lamp_led_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOB, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_RED_GPIO_PIN | TRICOLOR_LAMP_GREEN_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(TRICOLOR_LAMP_RED_GPIO, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = TRICOLOR_LAMP_YELLOW_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(TRICOLOR_LAMP_YELLOW_GPIO, &GPIO_InitStructure);
-	bsp_lamp_led_ctrl(TRICOLOR_LAMP_RED | TRICOLOR_LAMP_GREEN | TRICOLOR_LAMP_YELLOW, TURN_OFF);
-}
-
-void bsp_chaindown_ctrl_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = CHAIN_DOWN_CTRL_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(CHAIN_DOWN_CTRL_GPIO, &GPIO_InitStructure);
-
-	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
-}
-
-void bsp_motor_ctrl_init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = CHAIN_MOTOR_CTRL_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(CHAIN_MOTOR_CTRL_GPIO, &GPIO_InitStructure);
-
-	GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
-}
-
-
-void bsp_motor_ctrl(uint8_t status)
-{
-	if(status == TURN_ON)
-	{
-		GPIO_ResetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
-	}
-	else
-	{
-		GPIO_SetBits(CHAIN_MOTOR_CTRL_GPIO, CHAIN_MOTOR_CTRL_GPIO_PIN);
-	}
-}
-
-void bsp_chain_open(void)
-{
-	GPIO_ResetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
-}
-
-void bsp_chain_close(void)
-{
-	GPIO_SetBits(CHAIN_DOWN_CTRL_GPIO, CHAIN_DOWN_CTRL_GPIO_PIN);
-}
-
-void bsp_enable_485_pin(void)
-{
-	GPIO_SetBits(WCS_485_RE_GPIO, WCS_485_RE_GPIO_PIN);
-}
-
-void bsp_disable_485_pin(void)
-{
-	GPIO_ResetBits(WCS_485_RE_GPIO, WCS_485_RE_GPIO_PIN);
 }
 
 void bsp_uart1_send(uint8_t *buf, uint16_t length)
