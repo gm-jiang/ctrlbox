@@ -427,7 +427,8 @@ static void SetSysClock(void)
 #elif defined SYSCLK_FREQ_48MHz
   SetSysClockTo48();
 #elif defined SYSCLK_FREQ_56MHz
-  SetSysClockTo56();  
+  SetSysClockTo56(); 
+#error	
 #elif defined SYSCLK_FREQ_72MHz
   SetSysClockTo72();
 #endif
@@ -1050,10 +1051,10 @@ static void SetSysClockTo72(void)
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
                             RCC_CFGR_PLLMULL9); 
 #else    
-    /*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */
+    /*  PLL configuration: PLLCLK = HSE(12) * 6 = 72 MHz */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |
                                         RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL6);
 #endif /* STM32F10X_CL */
 
     /* Enable PLL */
