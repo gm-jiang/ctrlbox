@@ -495,35 +495,15 @@
               <FileType>1</FileType>
               <FilePath>.\business\user_task.c</FilePath>
             </File>
-            <File>
-              <FileName>wcs_parser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\business\wcs_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>rfid_parser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\business\rfid_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>upgrade.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\business\upgrade.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>driver</GroupName>
           <Files>
             <File>
-              <FileName>config.c</FileName>
+              <FileName>lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\driver\config.c</FilePath>
-            </File>
-            <File>
-              <FileName>uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\driver\uart.c</FilePath>
+              <FilePath>.\driver\lcd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -549,11 +529,6 @@
               <FileName>dbg_print.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\common\dbg_print.c</FilePath>
-            </File>
-            <File>
-              <FileName>dlink.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\common\dlink.c</FilePath>
             </File>
           </Files>
         </Group>

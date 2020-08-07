@@ -31,6 +31,36 @@ void mt_sleep_us(uint32_t time_us)
 	}
 }
 
+void delay_us(uint32_t us)
+{
+    u32 temp;
+    SysTick->LOAD=9*us;
+    SysTick->CTRL=0X01;
+    SysTick->VAL=0;
+    do
+    {
+        temp=SysTick->CTRL;
+    }
+    while((temp&0x01)&&(!(temp&(1<<16))));
+    SysTick->CTRL=0;
+    SysTick->VAL=0;
+}
+
+void delay_ms(uint32_t ms)
+{
+    u32 temp;
+    SysTick->LOAD=9000*ms;
+    SysTick->CTRL=0X01;
+    SysTick->VAL=0;
+    do
+    {
+        temp=SysTick->CTRL;
+    }
+    while((temp&0x01)&&(!(temp&(1<<16))));
+    SysTick->CTRL=0;
+    SysTick->VAL=0;
+}
+
 uint8_t mt_hex2ascii(uint8_t hex)
 {
 	if((hex >= 0x30) && (hex <= 0x39))//0~9

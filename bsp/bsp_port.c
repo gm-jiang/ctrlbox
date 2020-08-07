@@ -11,8 +11,8 @@ void bsp_all_gpio_configuration(void)
 
 	// Enable GPIOs clocks
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
-												 RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD |
-						             RCC_APB2Periph_GPIOE, ENABLE);
+                           RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD |
+                           RCC_APB2Periph_GPIOE, ENABLE);
 
 	// Set all GPIO pins as analog inputs
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
@@ -27,6 +27,20 @@ void bsp_all_gpio_configuration(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
 						             RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD |
 						             RCC_APB2Periph_GPIOE, DISABLE);
+}
+
+void bsp_gpio_config(void)
+{ 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
+
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
 }
 
 void bsp_uart1_init(void)
@@ -200,6 +214,37 @@ void bsp_power_status_led_set(uint8_t status)
 	} else {
 		GPIO_SetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
 	}
+}
+
+void bsp_key_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+
+    RCC_APB2PeriphClockCmd(KEY1_GPIO_CLK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = KEY1_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(KEY1_GPIO_PORT, &GPIO_InitStructure);
+
+    RCC_APB2PeriphClockCmd(KEY2_GPIO_CLK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin =KEY2_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(KEY2_GPIO_PORT, &GPIO_InitStructure);
+
+    RCC_APB2PeriphClockCmd(KEY3_GPIO_CLK, ENABLE); 																	   
+    GPIO_InitStructure.GPIO_Pin =KEY3_GPIO_PIN;	
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;   
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 	
+    GPIO_Init(KEY3_GPIO_PORT, &GPIO_InitStructure);
+
+    RCC_APB2PeriphClockCmd(KEY4_GPIO_CLK, ENABLE); 																	   
+    GPIO_InitStructure.GPIO_Pin =KEY4_GPIO_PIN;	
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;   
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 	
+    GPIO_Init(KEY4_GPIO_PORT, &GPIO_InitStructure);
 }
 
 void bsp_uart1_send(uint8_t *buf, uint16_t length)

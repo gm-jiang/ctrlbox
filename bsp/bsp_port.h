@@ -38,7 +38,7 @@
 #define UART4_BAUDRATE             115200
 
 //flash define
-#define FLASH_SIZE                 256          //MCU flash(k)
+#define FLASH_SIZE                 256      //MCU flash(k)
 #if FLASH_SIZE < 256
   #define SECTOR_SIZE              1024    //Byte
 #else
@@ -46,23 +46,110 @@
 #endif
 
 //the define of debug gpio
-#define POWER_LED_GPIO		                    	  GPIOA
-#define POWER_LED_GPIO_PIN		                    GPIO_Pin_2
+#define POWER_LED_GPIO              GPIOA
+#define POWER_LED_GPIO_PIN          GPIO_Pin_2
 
-#define	TURN_ON                                   0x01
-#define	TURN_OFF                                  0x00
+#define	TURN_ON                     0x01
+#define	TURN_OFF                    0x00
+
+
+#define KEY1_GPIO_PORT    	GPIOB
+#define KEY1_GPIO_CLK 	    RCC_APB2Periph_GPIOB
+#define KEY1_GPIO_PIN       GPIO_Pin_1
+
+#define KEY2_GPIO_PORT    	GPIOB
+#define KEY2_GPIO_CLK 	    RCC_APB2Periph_GPIOB
+#define KEY2_GPIO_PIN       GPIO_Pin_10
+
+#define KEY3_GPIO_PORT    	GPIOB	
+#define KEY3_GPIO_CLK 	    RCC_APB2Periph_GPIOB
+#define KEY3_GPIO_PIN       GPIO_Pin_11
+
+#define KEY4_GPIO_PORT      GPIOB
+#define KEY4_GPIO_CLK       RCC_APB2Periph_GPIOB
+#define KEY4_GPIO_PIN       GPIO_Pin_12
+
+
+
+/**************************************CMT2300  ??h·418Mhz***********************************************/
+#define CMT_CSB_GPIO                GPIOC
+#define CMT_CSB_GPIO_PIN            GPIO_Pin_0
+
+#define CMT_SDIO_GPIO               GPIOC
+#define CMT_SDIO_GPIO_PIN           GPIO_Pin_1
+
+#define CMT_SCLK_GPIO               GPIOC
+#define CMT_SCLK_GPIO_PIN           GPIO_Pin_2
+
+#define CMT_GPIO3_GPIO              GPIOC
+#define CMT_GPIO3_GPIO_PIN          GPIO_Pin_3
+
+/**************************************CMT2300 315Mhz ???·***********************************************/
+#define CMT_CSB_GPIO_RF315                GPIOB
+#define CMT_CSB_GPIO_RF315_PIN            GPIO_Pin_6
+
+#define CMT_SDIO_GPIO_RF315               GPIOB
+#define CMT_SDIO_GPIO_RF315_PIN           GPIO_Pin_7
+        
+#define CMT_SCLK_GPIO_RF315               GPIOB
+#define CMT_SCLK_GPIO_RF315_PIN           GPIO_Pin_8
+
+#define CMT_GPIO3_GPIO_RF315              GPIOB
+#define CMT_GPIO3_GPIO_RF315_PIN          GPIO_Pin_9
+
+
+/**************************************CMT2300 430Mhz ????·***********************************************/
+#define CMT_CSB_GPIO_RF330                GPIOC
+#define CMT_CSB_GPIO_RF330_PIN            GPIO_Pin_9
+
+#define CMT_SDIO_GPIO_RF330               GPIOA
+#define CMT_SDIO_GPIO_RF330_PIN           GPIO_Pin_8
+        
+#define CMT_SCLK_GPIO_RF330               GPIOA
+#define CMT_SCLK_GPIO_RF330_PIN           GPIO_Pin_11
+
+#define CMT_GPIO3_GPIO_RF330              GPIOA
+#define CMT_GPIO3_GPIO_RF330_PIN          GPIO_Pin_12		
+
+/**************************************CMT2300 433.092Mhz ????·***********************************************/
+#define CMT_CSB_GPIO_RF433                GPIOB
+#define CMT_CSB_GPIO_RF433_PIN            GPIO_Pin_15
+
+#define CMT_SDIO_GPIO_RF433               GPIOC
+#define CMT_SDIO_GPIO_RF433_PIN           GPIO_Pin_6
+        
+#define CMT_SCLK_GPIO_RF433               GPIOC
+#define CMT_SCLK_GPIO_RF433_PIN           GPIO_Pin_7
+
+#define CMT_GPIO3_GPIO_RF433              GPIOC
+#define CMT_GPIO3_GPIO_RF433_PIN          GPIO_Pin_8		
+		
+
+#define BUZZER_GPIO                 GPIOA
+#define BUZZER_GPIO_PIN             GPIO_Pin_10
+
+#define SET_GPIO_OUT(x)             GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_Out_PP)
+#define SET_GPIO_IN(x)              GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING)
+#define SET_GPIO_OD(x)              GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_Out_OD)
+#define SET_GPIO_AIN(x)             GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_AIN)
+#define SET_GPIO_AFOUT(x)           GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_AF_PP)
+#define SET_GPIO_AFOD(x)            GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_AF_OD)
+#define SET_GPIO_H(x)               (x->BSRR = x##_PIN) //GPIO_SetBits(x, x##_PIN)
+#define SET_GPIO_L(x)               (x->BRR  = x##_PIN) //GPIO_ResetBits(x, x##_PIN)
+#define READ_GPIO_PIN(x)            (((x->IDR & x##_PIN)!=Bit_RESET) ?1 :0) //GPIO_ReadInputDataBit(x, x##_PIN) 
 
 
 /***************************INTTERRUPT PRIORITY DEFINE**********************************/
-#define PREEMPTION_PRIORITY_WCS485										7
-#define PREEMPTION_PRIORITY_UHFRFID										8
-#define PREEMPTION_PRIORITY_STC												9
-#define PREEMPTION_PRIORITY_DBG												10
-#define PREEMPTION_PRIORITY_EMER_STOP_KEY							13
-#define PREEMPTION_PRIORITY_REALEASE_KEY							14
+#define PREEMPTION_PRIORITY_WCS485                      7
+#define PREEMPTION_PRIORITY_UHFRFID                     8
+#define PREEMPTION_PRIORITY_STC                         9
+#define PREEMPTION_PRIORITY_DBG                         10
+#define PREEMPTION_PRIORITY_EMER_STOP_KEY               13
+#define PREEMPTION_PRIORITY_REALEASE_KEY                14
 #define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR	15
 
 void bsp_all_gpio_configuration(void);
+void bsp_gpio_config(void);
 void bsp_uart1_init(void);
 void bsp_uart2_init(void);
 void bsp_uart3_init(void);
@@ -73,6 +160,7 @@ void bsp_uart3_send(uint8_t *buf, uint16_t length);
 void bsp_uart4_send(uint8_t *buf, uint16_t length);
 void bsp_power_status_led_init(void);
 void bsp_power_status_led_set(uint8_t status);
+void bsp_key_init(void);
 void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
 void bsp_IWDG_feed(void);
 

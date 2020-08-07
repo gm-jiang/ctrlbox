@@ -428,7 +428,6 @@ static void SetSysClock(void)
   SetSysClockTo48();
 #elif defined SYSCLK_FREQ_56MHz
   SetSysClockTo56(); 
-#error	
 #elif defined SYSCLK_FREQ_72MHz
   SetSysClockTo72();
 #endif
