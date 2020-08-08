@@ -234,16 +234,16 @@ void bsp_key_init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(KEY2_GPIO_PORT, &GPIO_InitStructure);
 
-    RCC_APB2PeriphClockCmd(KEY3_GPIO_CLK, ENABLE);                                                                        
-    GPIO_InitStructure.GPIO_Pin =KEY3_GPIO_PIN;    
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;   
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;     
+    RCC_APB2PeriphClockCmd(KEY3_GPIO_CLK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin =KEY3_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(KEY3_GPIO_PORT, &GPIO_InitStructure);
 
-    RCC_APB2PeriphClockCmd(KEY4_GPIO_CLK, ENABLE);                                                                        
-    GPIO_InitStructure.GPIO_Pin =KEY4_GPIO_PIN;    
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;   
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;     
+    RCC_APB2PeriphClockCmd(KEY4_GPIO_CLK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin =KEY4_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(KEY4_GPIO_PORT, &GPIO_InitStructure);
 }
 
