@@ -39,14 +39,14 @@ int main(void)
 		 To reconfigure the default setting of SystemInit() function, refer to
 		 system_stm32f10x.c file
 	 */
-	platform_init();
-	os_task_init();
+    platform_init();
+    os_task_init();
 
-	// Start the FreeRTOS scheduler
-	vTaskStartScheduler();
+    // Start the FreeRTOS scheduler
+    vTaskStartScheduler();
 
-	// Should never reach there
-	while(1);
+    // Should never reach there
+    while(1);
 }
 
 

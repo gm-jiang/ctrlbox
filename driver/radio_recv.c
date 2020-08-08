@@ -15,6 +15,7 @@ unsigned char key_d;
 unsigned char jmnx ;
 unsigned char RF_data[31];
 
+#define PIN_RFIN   RFIN_RF315
 
 unsigned char ii = 0;
 
@@ -29,12 +30,12 @@ void RF315_IN(void)
   	if (rf_en==0)
     {
         short_k = 0;
-        while (RFIN_RF315 && j < 252)
+        while (PIN_RFIN && j < 252)
         {
             Delay_us(5);
             short_k++;
         }
-	  	while(!RFIN_RF315)
+	  	while(!PIN_RFIN)
         {
 		  	Delay_us(5);
 		  	head_k++;
@@ -46,7 +47,7 @@ void RF315_IN(void)
                 for(k=0;k<8;k++)									//????8?
                 {        	 	  	   
                     j = 0;
-                    while(RFIN_RF315  && j<245) 
+                    while(PIN_RFIN  && j<245) 
                     {
                         Delay_us(5);								//16us(6mhz:2~5)
                         j++;
@@ -61,7 +62,7 @@ void RF315_IN(void)
                         return;
                     }	
                     head_k = 0; 
-                    while(!RFIN_RF315  && j<255)	   		//?????
+                    while(!PIN_RFIN  && j<255)	   		//?????
                     {
                         Delay_us(5);
                         head_k++;
@@ -85,7 +86,7 @@ void RF315_IN(void)
                     for(k=0;k<8;k++)									//????8?
                     {        	 	  	   
                         j = 0;
-                        while(RFIN_RF315  && j<245) 
+                        while(PIN_RFIN  && j<245) 
                         {
                             Delay_us(5);								//16us(6mhz:2~5)
                             j++;
@@ -100,7 +101,7 @@ void RF315_IN(void)
                             return;
                         }
                         head_k = 0;
-                        while(!RFIN_RF315  && j<255)	   		//?????
+                        while(!PIN_RFIN  && j<255)	   		//?????
                         {
                             Delay_us(5);
                             head_k++;
@@ -121,14 +122,14 @@ void RF315_IN(void)
 	        	}
             }	
             j=0;
-            while(RFIN_RF315  && (j<200))					//???????????
+            while(PIN_RFIN  && (j<200))					//???????????
             {
                 Delay_us(5);
                 j++;
                 //j1++;
             }            			   
             head_k = 0;
-            while(!RFIN_RF315 ) 						   //???????????
+            while(!PIN_RFIN ) 						   //???????????
             {
                 Delay_us(5);
                 head_k++;
@@ -140,13 +141,13 @@ void RF315_IN(void)
                     for(k=0;k<8;k++)									//????8?
                     {        	 	  	   
                         j = 0;
-                        while(RFIN_RF315  && j<245) 
+                        while(PIN_RFIN  && j<245) 
                         {
                             Delay_us(5);								//16us(6mhz:2~5)
                             j++;
                         } 	
                         head_k = 0;
-                        while(!RFIN_RF315  && j<255)	   		//?????
+                        while(!PIN_RFIN  && j<255)	   		//?????
                         {
                             Delay_us(5);
                             head_k++;
@@ -180,7 +181,7 @@ void RF315_IN(void)
                 for(k=1;k<8;k++)									//????8?
                 {        	 	  	   
                     j = 0;
-                    while(RFIN_RF315  && j<245) 
+                    while(PIN_RFIN  && j<245) 
                     {
                         Delay_us(5);								//16us(6mhz:2~5)
                         j++;
@@ -195,7 +196,7 @@ void RF315_IN(void)
                         return;
                     }
                     head_k = 0;
-                    while(!RFIN_RF315  && j<255)	   		//?????
+                    while(!PIN_RFIN  && j<255)	   		//?????
                     {
                         Delay_us(5);
                         head_k++;
@@ -220,7 +221,7 @@ void RF315_IN(void)
 	        		   for(k=0;k<8;k++)									//????8?
 	        		   {        	 	  	   
                             j = 0;
-                            while(RFIN_RF315  && j<245) 
+                            while(PIN_RFIN  && j<245) 
                             {
                                 Delay_us(5);								//16us(6mhz:2~5)
                                 j++;
@@ -235,7 +236,7 @@ void RF315_IN(void)
                                 return;
                             }									
                             head_k = 0;
-                            while(!RFIN_RF315  && j<255)	   		//?????
+                            while(!PIN_RFIN  && j<255)	   		//?????
                             {
                                 Delay_us(5);
                                 head_k++;
