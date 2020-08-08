@@ -4,21 +4,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void mt_sleep_ms(uint16_t time)
+void delay_ms(uint32_t ms)
 {    
 	uint16_t i=0;
 
-	while(time--)
+	while(ms--)
 	{
 		i=8500;
 		while(i--); 
 	}
 }
 
-void mt_sleep_us(uint32_t time_us)
+void delay_us(uint32_t us)
 {
 	uint32_t i = 0;
-	for(i = 0;i < time_us;i++)
+	for(i = 0;i < us;i++)
 	{
 		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
 		__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
@@ -31,6 +31,7 @@ void mt_sleep_us(uint32_t time_us)
 	}
 }
 
+#if 0
 void delay_us(uint32_t us)
 {
     u32 temp;
@@ -60,6 +61,7 @@ void delay_ms(uint32_t ms)
     SysTick->CTRL=0;
     SysTick->VAL=0;
 }
+#endif
 
 uint8_t mt_hex2ascii(uint8_t hex)
 {
