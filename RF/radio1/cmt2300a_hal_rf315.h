@@ -38,7 +38,7 @@ extern "C" {
 #define CMT2300A_ReadGpio1_RF315()            READ_GPIO_PIN(CMT_GPIO1_GPIO_RF315)
 #define CMT2300A_ReadGpio2_RF315()            READ_GPIO_PIN(CMT_GPIO2_GPIO_RF315)
 #define CMT2300A_ReadGpio3_RF315()            READ_GPIO_PIN(CMT_GPIO3_GPIO_RF315)
-	#define RFIN_RF315            READ_GPIO_PIN(CMT_GPIO3_GPIO_RF315)
+#define RFIN_RF315            READ_GPIO_PIN(CMT_GPIO3_GPIO_RF315)
 //#define      RFIN	       GPIO_ReadInputDataBit ( GPIOC, GPIO_Pin_12 )
 #define CMT2300A_DelayMs_RF315(ms)            delay_ms(ms)
 #define CMT2300A_DelayUs_RF315(us)            delay_us(us)

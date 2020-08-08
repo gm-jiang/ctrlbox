@@ -293,7 +293,8 @@ void bsp_uart1_send(uint8_t *buf, uint16_t length)
 	{
 		USART_SendData(USART1, buf[i]);
 		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-  }
+        
+    }
 }
 
 void bsp_uart2_send(uint8_t *buf, uint16_t length)
@@ -325,6 +326,7 @@ void bsp_uart4_send(uint8_t *buf, uint16_t length)
 		while(USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET);
   }
 }
+
 
 /*  IWDG init
  * Tout = prv/40 * rlv (s)

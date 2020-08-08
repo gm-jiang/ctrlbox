@@ -6,6 +6,7 @@
 #include <string.h>
 #include "user_task.h"
 #include "lcd.h"
+#include "radio_init.h"
 
 /************Notice !!!**************
 ***All global variable define here***
@@ -19,9 +20,12 @@ void platform_init(void)
 	//disable interrupts
 	portDISABLE_INTERRUPTS();
     bsp_gpio_config();
+    bsp_uart1_init();
 	bsp_power_status_led_init();
     bsp_key_init();
-    LCD_Init();
+    //LCD_Init();
+    radio_init();
+
 	bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
 	//enable interrupts
 	portENABLE_INTERRUPTS();

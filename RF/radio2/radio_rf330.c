@@ -41,8 +41,8 @@ void RF330_Init(void)
 {
     u8 tmp;
     
-		CMT2300A_InitGpio_RF330();
-		CMT2300A_Init_RF330();
+    CMT2300A_InitGpio_RF330();
+    CMT2300A_Init_RF330();
     
     /* Config registers */
     CMT2300A_ConfigRegBank_RF330(CMT2300A_CMT_BANK_ADDR       , g_cmt2300aCmtBank_RF330       , CMT2300A_CMT_BANK_SIZE       );
@@ -55,8 +55,8 @@ void RF330_Init(void)
     // xosc_aac_code[2:0] = 2
     tmp = (~0x07) & CMT2300A_ReadReg_RF330(CMT2300A_CUS_CMT10);
     CMT2300A_WriteReg_RF330(CMT2300A_CUS_CMT10, tmp|0x02);
-    
-	  RF330_Config();
+
+    RF330_Config();
 }
 
 void RF330_Config(void)

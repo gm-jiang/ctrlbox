@@ -505,6 +505,16 @@
               <FileType>1</FileType>
               <FilePath>.\driver\lcd.c</FilePath>
             </File>
+            <File>
+              <FileName>radio_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\radio_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>radio_recv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\radio_recv.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

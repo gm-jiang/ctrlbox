@@ -22,6 +22,8 @@
 #define __RADIO_H
 
 #include "typedefs.h"
+#include "cmt2300a.h"
+
 #ifdef __cplusplus 
 extern "C" { 
 #endif
