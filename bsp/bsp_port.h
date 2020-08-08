@@ -128,6 +128,7 @@
 #define BUZZER_GPIO                 GPIOA
 #define BUZZER_GPIO_PIN             GPIO_Pin_10
 
+
 #define SET_GPIO_OUT(x)             GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_Out_PP)
 #define SET_GPIO_IN(x)              GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING)
 #define SET_GPIO_OD(x)              GPIO_Pin_Setting(x, x##_PIN, GPIO_Speed_50MHz, GPIO_Mode_Out_OD)
@@ -154,6 +155,7 @@ void bsp_uart1_init(void);
 void bsp_uart2_init(void);
 void bsp_uart3_init(void);
 void bsp_dbg_uart4_init(void);
+void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed, GPIOMode_TypeDef mode);
 void bsp_uart1_send(uint8_t *buf, uint16_t length);
 void bsp_uart2_send(uint8_t *buf, uint16_t length);
 void bsp_uart3_send(uint8_t *buf, uint16_t length);

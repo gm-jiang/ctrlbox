@@ -247,6 +247,45 @@ void bsp_key_init(void)
     GPIO_Init(KEY4_GPIO_PORT, &GPIO_InitStructure);
 }
 
+void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed, GPIOMode_TypeDef mode)
+{
+    u16 i;
+    u32 nCfg, nMask = 0x0F;
+    
+    nCfg  = (mode&0x10) ?speed :0;
+    nCfg |= mode & 0x0C;
+    
+    if(nPin == 0)
+        return;
+    
+    if(nPin < 0x0100)
+    {
+        for(i=nPin; (0x01&i)==0; i >>= 1) {
+            nCfg <<= 4;
+            nMask <<= 4;
+        }
+        
+        gpio->CRL &= ~nMask;
+        gpio->CRL |= nCfg;
+    }
+    else
+    {
+        for(i=(nPin>>8); (0x01&i)==0; i >>= 1) {
+            nCfg <<= 4;
+            nMask <<= 4;
+        }
+        
+        gpio->CRH &= ~nMask;
+        gpio->CRH |= nCfg;
+    }
+    
+    if(GPIO_Mode_IPD==mode)
+        gpio->BRR = nPin;
+    
+    else if(GPIO_Mode_IPU==mode)
+        gpio->BSRR = nPin;
+}
+
 void bsp_uart1_send(uint8_t *buf, uint16_t length)
 {
 	uint16_t i;

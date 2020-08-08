@@ -362,7 +362,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_HD</Define>
               <Undefine></Undefine>
-              <IncludePath>.\FreeRTOS\include;.\FreeRTOS\portable\RVDS\ARM_CM3;.\Libraries\CMSIS\CM3\CoreSupport;.\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\application;.\business;.\driver;.\bsp;.\common</IncludePath>
+              <IncludePath>.\FreeRTOS\include;.\FreeRTOS\portable\RVDS\ARM_CM3;.\Libraries\CMSIS\CM3\CoreSupport;.\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\application;.\business;.\driver;.\bsp;.\common;.\RF\radio;.\RF\radio1;.\RF\radio2;.\RF\radio3</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -654,6 +654,106 @@
               <FileName>stm32f10x_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RF0</GroupName>
+          <Files>
+            <File>
+              <FileName>cmt_spi3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio\cmt_spi3.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio\cmt2300a.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio\cmt2300a_hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>radio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio\radio.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RF1</GroupName>
+          <Files>
+            <File>
+              <FileName>cmt_spi3_rf315.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio1\cmt_spi3_rf315.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_hal_rf315.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio1\cmt2300a_hal_rf315.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_rf315.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio1\cmt2300a_rf315.c</FilePath>
+            </File>
+            <File>
+              <FileName>radio_rf315.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio1\radio_rf315.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RF2</GroupName>
+          <Files>
+            <File>
+              <FileName>cmt_spi3_rf330.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio2\cmt_spi3_rf330.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_hal_rf330.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio2\cmt2300a_hal_rf330.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_rf330.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio2\cmt2300a_rf330.c</FilePath>
+            </File>
+            <File>
+              <FileName>radio_rf330.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio2\radio_rf330.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RF3</GroupName>
+          <Files>
+            <File>
+              <FileName>cmt_spi3_rf433.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio3\cmt_spi3_rf433.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_hal_rf433.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio3\cmt2300a_hal_rf433.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmt2300a_rf433.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio3\cmt2300a_rf433.c</FilePath>
+            </File>
+            <File>
+              <FileName>radio_rf433.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RF\radio3\radio_rf433.c</FilePath>
             </File>
           </Files>
         </Group>
