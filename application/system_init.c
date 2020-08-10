@@ -11,11 +11,14 @@
 /************Notice !!!**************
 ***All global variable define here***
 *************************************/
+RCC_ClocksTypeDef rcc_clocks;
 
 void platform_init(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0);
+    
+    RCC_GetClocksFreq(&rcc_clocks);
 
     //disable interrupts
     portDISABLE_INTERRUPTS();
@@ -34,20 +37,30 @@ void platform_init(void)
 void os_task_init(void)
 {
     BaseType_t ret;
-#if 1
+
+#if 0
     //controlbox run RF task
     ret = xTaskCreate(task_rf315, "rf315", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
         //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
+
     ret = xTaskCreate(task_rf330, "rf330", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
         //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
+#endif
     ret = xTaskCreate(task_rf433, "rf433", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
         //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
+#if 0
+    ret = xTaskCreate(task_rf4xx, "rf4xx", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+#endif
+#if 0
     ret = xTaskCreate(task_led_status, "led", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
         //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");

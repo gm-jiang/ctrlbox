@@ -8,6 +8,7 @@
 void RF315_IN(void);
 void RF330_IN(void);
 void RF433_IN(void);
+void RF4XX_IN(void);
 
 #ifdef __cplusplus
 }

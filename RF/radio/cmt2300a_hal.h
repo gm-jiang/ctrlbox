@@ -34,18 +34,15 @@ extern "C" {
 /* ************************************************************************
 *  The following need to be modified by user
 *  ************************************************************************ */
-#define CMT2300A_SetGpio1out()           SET_GPIO_OUT(CMT_GPIO1_GPIO)
-
-
-
-#define CMT2300A_SetGpio3out()           SET_GPIO_OUT(CMT_GPIO3_GPIO)  //2020-5-25
+#define CMT2300A_SetGpio1out()          SET_GPIO_OUT(CMT_GPIO1_GPIO)
+#define CMT2300A_SetGpio3out()          SET_GPIO_OUT(CMT_GPIO3_GPIO)  //2020-5-25
 //#define CMT2300A_SetGpio1In()           SET_GPIO_IN(CMT_GPIO1_GPIO)	
 //#define CMT2300A_SetGpio2In()           SET_GPIO_IN(CMT_GPIO2_GPIO)
 #define CMT2300A_SetGpio3In()           SET_GPIO_IN(CMT_GPIO3_GPIO)
 //#define CMT2300A_ReadGpio1()            READ_GPIO_PIN(CMT_GPIO1_GPIO)
 //#define CMT2300A_ReadGpio2()            READ_GPIO_PIN(CMT_GPIO2_GPIO)
 #define CMT2300A_ReadGpio3()            READ_GPIO_PIN(CMT_GPIO3_GPIO)
-#define RFIN                            READ_GPIO_PIN(CMT_GPIO3_GPIO)
+#define RFIN_RF4XX                      READ_GPIO_PIN(CMT_GPIO3_GPIO)
 //#define      RFIN	       GPIO_ReadInputDataBit ( GPIOC, GPIO_Pin_12 )
 #define CMT2300A_DelayMs(ms)            delay_ms(ms)
 #define CMT2300A_DelayUs(us)            delay_us(us)

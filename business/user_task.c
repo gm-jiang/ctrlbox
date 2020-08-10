@@ -11,6 +11,7 @@
 extern unsigned char rf315_en;
 extern unsigned char rf330_en;
 extern unsigned char rf433_en;
+extern unsigned char rf4xx_en;
 
 #if 1
 void task_led_status(void *pvParameters)
@@ -62,6 +63,21 @@ void task_rf433(void *pvParameters)
         RF433_IN();
         if (rf433_en == 4) {
             rf433_en = 0;
+            bsp_power_status_led_set(0);
+            delay_us(100);
+            bsp_power_status_led_set(1);
+        }
+        //vTaskDelay(1);
+    }
+}
+
+void task_rf4xx(void *pvParameters)
+{
+    while(1)
+    {
+        RF4XX_IN();
+        if (rf4xx_en == 4) {
+            rf4xx_en = 0;
             bsp_power_status_led_set(0);
             delay_us(100);
             bsp_power_status_led_set(1);
