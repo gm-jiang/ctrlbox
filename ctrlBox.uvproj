@@ -362,7 +362,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_HD</Define>
               <Undefine></Undefine>
-              <IncludePath>.\FreeRTOS\include;.\FreeRTOS\portable\RVDS\ARM_CM3;.\Libraries\CMSIS\CM3\CoreSupport;.\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\application;.\business;.\driver;.\bsp;.\common;.\RF\radio;.\RF\radio1;.\RF\radio2;.\RF\radio3</IncludePath>
+              <IncludePath>.\FreeRTOS\include;.\FreeRTOS\portable\RVDS\ARM_CM3;.\Libraries\CMSIS\CM3\CoreSupport;.\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\application;.\business;.\lcd;.\driver;.\bsp;.\common;.\RF\radio;.\RF\radio1;.\RF\radio2;.\RF\radio3</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -498,13 +498,23 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>driver</GroupName>
+          <GroupName>lcd</GroupName>
           <Files>
             <File>
               <FileName>lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\driver\lcd.c</FilePath>
+              <FilePath>.\lcd\lcd.c</FilePath>
             </File>
+            <File>
+              <FileName>gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lcd\gui.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>driver</GroupName>
+          <Files>
             <File>
               <FileName>radio_init.c</FileName>
               <FileType>1</FileType>

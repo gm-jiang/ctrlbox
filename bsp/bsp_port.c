@@ -47,7 +47,7 @@ void bsp_uart1_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
-    NVIC_InitTypeDef NVIC_InitStructure;
+    //NVIC_InitTypeDef NVIC_InitStructure;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -67,17 +67,17 @@ void bsp_uart1_init(void)
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    USART_InitStructure.USART_Mode = USART_Mode_Tx;
     USART_Init(USART1, &USART_InitStructure);
 
-    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-
+    USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
+#if 0
     NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_WCS485;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
-
+#endif
     USART_Cmd(USART1, ENABLE);
 }
 
@@ -216,6 +216,7 @@ void bsp_power_status_led_set(uint8_t status)
     }
 }
 
+#if 0
 void bsp_key_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -246,6 +247,136 @@ void bsp_key_init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(KEY4_GPIO_PORT, &GPIO_InitStructure);
 }
+#endif
+
+void bsp_key1_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+
+    // Enable GPIO used as key IRQ for interrupt
+    GPIO_InitStructure.GPIO_Pin = KEY1_DETECTIRQ_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_Init(KEY1_DETECTIRQ_GPIO, &GPIO_InitStructure);
+
+    /* Connect EXTI Line to GPIO Pin */
+    GPIO_EXTILineConfig(KEY1_DETECTIRQ_EXTI_PORT, KEY1_DETECTIRQ_EXTI_PIN);
+
+    /* Configure EXTI line */
+    EXTI_InitStructure.EXTI_Line = KEY1_DETECTIRQ_EXTI;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = KEY1_DETECTIRQ_EXTI_USEIRQ;
+    EXTI_Init(&EXTI_InitStructure);
+
+    /* Enable and set EXTI Interrupt to the lowest priority */
+    NVIC_InitStructure.NVIC_IRQChannel = KEY1_DETECTIRQ_EXTI_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_KEY;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = KEY1_DETECTIRQ_EXTI_USEIRQ;
+
+    NVIC_Init(&NVIC_InitStructure);
+}
+
+void bsp_key2_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+
+    // Enable GPIO used as key IRQ for interrupt
+    GPIO_InitStructure.GPIO_Pin = KEY2_DETECTIRQ_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_Init(KEY2_DETECTIRQ_GPIO, &GPIO_InitStructure);
+
+    /* Connect EXTI Line to GPIO Pin */
+    GPIO_EXTILineConfig(KEY2_DETECTIRQ_EXTI_PORT, KEY2_DETECTIRQ_EXTI_PIN);
+
+    /* Configure EXTI line */
+    EXTI_InitStructure.EXTI_Line = KEY2_DETECTIRQ_EXTI;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = KEY2_DETECTIRQ_EXTI_USEIRQ;
+    EXTI_Init(&EXTI_InitStructure);
+
+    /* Enable and set EXTI Interrupt to the lowest priority */
+    NVIC_InitStructure.NVIC_IRQChannel = KEY2_DETECTIRQ_EXTI_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_KEY;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = KEY2_DETECTIRQ_EXTI_USEIRQ;
+
+    NVIC_Init(&NVIC_InitStructure);
+}
+
+void bsp_key3_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+
+    // Enable GPIO used as key IRQ for interrupt
+    GPIO_InitStructure.GPIO_Pin = KEY3_DETECTIRQ_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_Init(KEY3_DETECTIRQ_GPIO, &GPIO_InitStructure);
+
+    /* Connect EXTI Line to GPIO Pin */
+    GPIO_EXTILineConfig(KEY3_DETECTIRQ_EXTI_PORT, KEY3_DETECTIRQ_EXTI_PIN);
+
+    /* Configure EXTI line */
+    EXTI_InitStructure.EXTI_Line = KEY3_DETECTIRQ_EXTI;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = KEY3_DETECTIRQ_EXTI_USEIRQ;
+    EXTI_Init(&EXTI_InitStructure);
+
+    /* Enable and set EXTI Interrupt to the lowest priority */
+    NVIC_InitStructure.NVIC_IRQChannel = KEY3_DETECTIRQ_EXTI_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_KEY;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = KEY3_DETECTIRQ_EXTI_USEIRQ;
+
+    NVIC_Init(&NVIC_InitStructure);
+}
+
+void bsp_key4_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+
+    // Enable GPIO used as key IRQ for interrupt
+    GPIO_InitStructure.GPIO_Pin = KEY4_DETECTIRQ_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_Init(KEY4_DETECTIRQ_GPIO, &GPIO_InitStructure);
+
+    /* Connect EXTI Line to GPIO Pin */
+    GPIO_EXTILineConfig(KEY4_DETECTIRQ_EXTI_PORT, KEY4_DETECTIRQ_EXTI_PIN);
+
+    /* Configure EXTI line */
+    EXTI_InitStructure.EXTI_Line = KEY4_DETECTIRQ_EXTI;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = KEY4_DETECTIRQ_EXTI_USEIRQ;
+    EXTI_Init(&EXTI_InitStructure);
+
+    /* Enable and set EXTI Interrupt to the lowest priority */
+    NVIC_InitStructure.NVIC_IRQChannel = KEY4_DETECTIRQ_EXTI_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_KEY;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = KEY4_DETECTIRQ_EXTI_USEIRQ;
+
+    NVIC_Init(&NVIC_InitStructure);
+}
+
 
 void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed, GPIOMode_TypeDef mode)
 {
@@ -325,6 +456,26 @@ void bsp_uart4_send(uint8_t *buf, uint16_t length)
         USART_SendData(UART4, buf[i]);
         while(USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET);
   }
+}
+
+#include "mt_common.h"
+
+uint8_t item_buff[7] = {0x7E, 0x05, 0xA0, 0x00, 0x01, 0xA6, 0xEF};
+
+
+void USART1_Send(void)
+{
+    int i1;	
+    delay_us(20);
+
+    for(i1=0;i1<7;i1++)
+    {			
+        USART_SendData(USART1, item_buff[i1]);
+        while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+        delay_us(5);		
+    }
+
+    delay_us(20);
 }
 
 

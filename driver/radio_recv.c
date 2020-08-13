@@ -49,13 +49,13 @@ void RF315_IN(void)
             for(ii=0;ii<3;ii++)										//3??
             {
                 for(k=0;k<8;k++)									//????8?
-                {        	 	  	   
+                {
                     j = 0;
                     while(RFIN_RF315  && j<245) 
                     {
                         Delay_us(5);								//16us(6mhz:2~5)
                         j++;
-                    } 		 
+                    }
                     if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
                         rf315_buf[0][ii]&=~(1<<((7-k)));	                            
                     else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?

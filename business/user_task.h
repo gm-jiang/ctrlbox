@@ -5,7 +5,7 @@
 	extern "C" {
 #endif
 
-void task_led_status(void *pvParameters);
+void task_key_detect(void *pvParameters);
 
 void task_rf315(void *pvParameters);
 void task_rf330(void *pvParameters);

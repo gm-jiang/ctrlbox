@@ -69,6 +69,86 @@
 #define KEY4_GPIO_CLK       RCC_APB2Periph_GPIOB
 #define KEY4_GPIO_PIN       GPIO_Pin_12
 
+//key1
+#define KEY1_DETECTIRQ_GPIO                 GPIOB
+#define KEY1_DETECTIRQ_GPIO_PIN             GPIO_Pin_1
+#define KEY1_DETECTIRQ_EXTI                 EXTI_Line1
+#define KEY1_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
+#define KEY1_DETECTIRQ_EXTI_PIN             GPIO_PinSource1
+#define KEY1_DETECTIRQ_EXTI_IRQn            EXTI1_IRQn
+#define KEY1_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY1_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey1EXT_IRQStatus()         EXTI_GetITStatus(KEY1_DETECTIRQ_EXTI)
+#define port_DisableKey1EXT_IRQ()           NVIC_DisableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey1EXT_IRQ()            NVIC_EnableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey1EXT_IRQ()             GPIO_ReadInputDataBit(KEY1_DETECTIRQ_GPIO, KEY1_DETECTIRQ_GPIO_PIN)
+
+//key1
+#define KEY1_DETECTIRQ_GPIO                 GPIOB
+#define KEY1_DETECTIRQ_GPIO_PIN             GPIO_Pin_1
+#define KEY1_DETECTIRQ_EXTI                 EXTI_Line1
+#define KEY1_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
+#define KEY1_DETECTIRQ_EXTI_PIN             GPIO_PinSource1
+#define KEY1_DETECTIRQ_EXTI_IRQn            EXTI1_IRQn
+#define KEY1_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY1_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey1EXT_IRQStatus()         EXTI_GetITStatus(KEY1_DETECTIRQ_EXTI)
+#define port_DisableKey1EXT_IRQ()           NVIC_DisableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey1EXT_IRQ()            NVIC_EnableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey1EXT_IRQ()             GPIO_ReadInputDataBit(KEY1_DETECTIRQ_GPIO, KEY1_DETECTIRQ_GPIO_PIN)
+
+//key2
+#define KEY2_DETECTIRQ_GPIO                 GPIOB
+#define KEY2_DETECTIRQ_GPIO_PIN             GPIO_Pin_10
+#define KEY2_DETECTIRQ_EXTI                 EXTI_Line10
+#define KEY2_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
+#define KEY2_DETECTIRQ_EXTI_PIN             GPIO_PinSource10
+#define KEY2_DETECTIRQ_EXTI_IRQn            EXTI15_10_IRQn
+#define KEY2_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY2_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey2EXT_IRQStatus()         EXTI_GetITStatus(KEY2_DETECTIRQ_EXTI)
+#define port_DisableKey2EXT_IRQ()           NVIC_DisableIRQ(KEY2_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey2EXT_IRQ()            NVIC_EnableIRQ(KEY2_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey2EXT_IRQ()             GPIO_ReadInputDataBit(KEY2_DETECTIRQ_GPIO, KEY2_DETECTIRQ_GPIO_PIN)
+
+//key3
+#define KEY3_DETECTIRQ_GPIO                 GPIOB
+#define KEY3_DETECTIRQ_GPIO_PIN             GPIO_Pin_11
+#define KEY3_DETECTIRQ_EXTI                 EXTI_Line11
+#define KEY3_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
+#define KEY3_DETECTIRQ_EXTI_PIN             GPIO_PinSource11
+#define KEY3_DETECTIRQ_EXTI_IRQn            EXTI15_10_IRQn
+#define KEY3_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY3_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey3EXT_IRQStatus()         EXTI_GetITStatus(KEY3_DETECTIRQ_EXTI)
+#define port_DisableKey3EXT_IRQ()           NVIC_DisableIRQ(KEY3_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey3EXT_IRQ()            NVIC_EnableIRQ(KEY3_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey3EXT_IRQ()             GPIO_ReadInputDataBit(KEY3_DETECTIRQ_GPIO, KEY3_DETECTIRQ_GPIO_PIN)
+
+//key4
+#define KEY4_DETECTIRQ_GPIO                 GPIOB
+#define KEY4_DETECTIRQ_GPIO_PIN             GPIO_Pin_12
+#define KEY4_DETECTIRQ_EXTI                 EXTI_Line12
+#define KEY4_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
+#define KEY4_DETECTIRQ_EXTI_PIN             GPIO_PinSource12
+#define KEY4_DETECTIRQ_EXTI_IRQn            EXTI15_10_IRQn
+#define KEY4_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY4_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey4EXT_IRQStatus()         EXTI_GetITStatus(KEY4_DETECTIRQ_EXTI)
+#define port_DisableKey4EXT_IRQ()           NVIC_DisableIRQ(KEY4_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey4EXT_IRQ()            NVIC_EnableIRQ(KEY4_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey4EXT_IRQ()             GPIO_ReadInputDataBit(KEY4_DETECTIRQ_GPIO, KEY4_DETECTIRQ_GPIO_PIN)
+
+/***************************INTTERRUPT PRIORITY DEFINE**********************************/
+#define PREEMPTION_PRIORITY_WCS485                      7
+#define PREEMPTION_PRIORITY_UHFRFID                     8
+#define PREEMPTION_PRIORITY_STC                         9
+#define PREEMPTION_PRIORITY_DBG                         10
+#define PREEMPTION_PRIORITY_KEY                         13
+#define PREEMPTION_PRIORITY_REALEASE_KEY                14
+#define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR    15
+
+
 
 
 /**************************************CMT2300  ??h·418Mhz***********************************************/
@@ -160,9 +240,14 @@ void bsp_uart1_send(uint8_t *buf, uint16_t length);
 void bsp_uart2_send(uint8_t *buf, uint16_t length);
 void bsp_uart3_send(uint8_t *buf, uint16_t length);
 void bsp_uart4_send(uint8_t *buf, uint16_t length);
+void USART1_Send(void);
 void bsp_power_status_led_init(void);
 void bsp_power_status_led_set(uint8_t status);
-void bsp_key_init(void);
+//void bsp_key_init(void);
+void bsp_key1_init(void);
+void bsp_key2_init(void);
+void bsp_key3_init(void);
+void bsp_key4_init(void);
 void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
 void bsp_IWDG_feed(void);
 

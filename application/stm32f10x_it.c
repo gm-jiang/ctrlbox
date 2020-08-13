@@ -24,6 +24,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
 
+#include "bsp_port.h"
+#include "system_init.h"
+#include "mt_common.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
@@ -138,19 +144,75 @@ void SysTick_Handler(void)
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
 
-//emergency stop key detect
-void EXTI0_IRQHandler(void)
+//key1 detect
+void EXTI1_IRQHandler(void)
 {
+    //BaseType_t ret;
+    BaseType_t xHigherPriorityTaskWoken;
+    eventMsgType_e eventMsg;
+    
+    if(port_GetKey1EXT_IRQStatus() != RESET)
+    {
+        delay_us(5*10);
+        if(port_CheckKey1EXT_IRQ() == 0)
+        {
+            eventMsg = EVENT_MSG_KEY2;
+            xQueueSendFromISR(KeyEventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        EXTI_ClearITPendingBit(KEY1_DETECTIRQ_EXTI);
+    }
 }
 
-//chain down finished detect sensor
 void EXTI4_IRQHandler(void)
 {
 }
 
-//release packet key
 void EXTI9_5_IRQHandler(void)
 {
+}
+
+void EXTI15_10_IRQHandler(void)
+{
+    BaseType_t xHigherPriorityTaskWoken;
+    eventMsgType_e eventMsg;
+    
+    if(port_GetKey2EXT_IRQStatus() != RESET)
+    {
+        delay_us(5*10);
+        if(port_CheckKey2EXT_IRQ() == 0)
+        {
+            eventMsg = EVENT_MSG_KEY1;
+            xQueueSendFromISR(KeyEventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        EXTI_ClearITPendingBit(KEY2_DETECTIRQ_EXTI);
+    }
+
+    if(port_GetKey3EXT_IRQStatus() != RESET)
+    {
+        delay_us(5*10);
+        if(port_CheckKey3EXT_IRQ() == 0)
+        {
+            eventMsg = EVENT_MSG_KEY4;
+            xQueueSendFromISR(KeyEventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        EXTI_ClearITPendingBit(KEY3_DETECTIRQ_EXTI);
+    }
+#if 1
+    if(port_GetKey4EXT_IRQStatus() != RESET)
+    {
+        delay_us(5*10);
+        if(port_CheckKey4EXT_IRQ() == 0)
+        {
+            eventMsg = EVENT_MSG_KEY3;
+            xQueueSendFromISR(KeyEventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        EXTI_ClearITPendingBit(KEY4_DETECTIRQ_EXTI);
+    }
+#endif
 }
 
 /******************************************************************************/
