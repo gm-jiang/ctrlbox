@@ -20,6 +20,14 @@ static void sys_msg_queue_init(void)
 	KeyEventMsgQueue = xQueueCreate(KEY_EVENT_QUEUE_NUM, KEY_EVENT_QUEUE_LEN);
 }
 
+static void key_board_init(void)
+{
+    bsp_key1_init();
+    bsp_key2_init();
+    bsp_key3_init();
+    bsp_key4_init();
+}
+
 void platform_init(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
@@ -29,11 +37,8 @@ void platform_init(void)
     portDISABLE_INTERRUPTS();
     bsp_gpio_config();
     bsp_uart1_init();
+    key_board_init();
     bsp_power_status_led_init();
-    bsp_key1_init();
-    bsp_key2_init();
-    bsp_key3_init();
-    bsp_key4_init();
     sys_msg_queue_init();
     LCD_Init();
     radio_init();
