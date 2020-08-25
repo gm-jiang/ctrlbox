@@ -15,7 +15,7 @@ enum
     PRINT_LEVEL_VERBOSE
 };
 
-#define PRINT_LEVEL PRINT_LEVEL_WARNING
+#define PRINT_LEVEL PRINT_LEVEL_DEBUG
 
 void dbg_print(int printf_level, char *fmt, ...);
 void dbg_print_msg(int print_level, uint8_t *preMsg, uint8_t len, uint8_t *msg);

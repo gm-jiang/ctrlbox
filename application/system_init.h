@@ -13,6 +13,7 @@
 #define KEY_EVENT_QUEUE_LEN         4
 
 extern QueueHandle_t KeyEventMsgQueue;
+extern SemaphoreHandle_t printMutex;
 
 //event type
 typedef enum {
@@ -29,6 +30,9 @@ typedef enum {
 #define PRIORITIES_UART2_RCV_TASK             configMAX_PRIORITIES - 2
 #define PRIORITIES_UART1_RCV_TASK             configMAX_PRIORITIES - 1
 #define PRIORITIES_RF_RCV_TASK                configMAX_PRIORITIES - 1
+
+void sys_mutex_lock(SemaphoreHandle_t xMutex);
+void sys_mutex_unlock(SemaphoreHandle_t xMutex);
 
 void platform_init(void);
 void os_task_init(void);

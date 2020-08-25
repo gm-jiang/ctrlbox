@@ -7,17 +7,52 @@
 #include "user_task.h"
 #include "lcd.h"
 #include "radio_init.h"
+#include "dbg_print.h"
+
+#define SW_V    "1.00"
+#define HW_V    "1.00"
+#define SN      "20200800"
 
 /************Notice !!!**************
 ***All global variable define here***
 *************************************/
 
 QueueHandle_t KeyEventMsgQueue = NULL;
-
+SemaphoreHandle_t printMutex = NULL;
 
 static void sys_msg_queue_init(void)
 {
 	KeyEventMsgQueue = xQueueCreate(KEY_EVENT_QUEUE_NUM, KEY_EVENT_QUEUE_LEN);
+}
+
+static void sys_mutex_init(void)
+{
+	printMutex = xSemaphoreCreateMutex();
+}
+
+void sys_mutex_lock(SemaphoreHandle_t xMutex)
+{
+	xSemaphoreTake(xMutex, portMAX_DELAY);
+}
+
+void sys_mutex_unlock(SemaphoreHandle_t xMutex)
+{
+	xSemaphoreGive(xMutex);
+}
+
+static void sys_init_completed(void)
+{
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n************************Start Run Application*************************");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n======================================================================");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=              (C) COPYRIGHT 2020 AHU XXXXXXXXXXXXX                  =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=                                                                    =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=     RF-Decode-Controlbox Application  (Version 1.0.1)              =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=                                                                    =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=     System Initialize completed...SW: %s HW: %s SN: %s   =", SW_V, HW_V, SN);
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=                                                                    =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n=                                      By AHU Application Team       =");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n======================================================================");
+	dbg_print(PRINT_LEVEL_DEBUG, "\r\n\r\n");
 }
 
 static void key_board_init(void)
@@ -40,12 +75,14 @@ void platform_init(void)
     key_board_init();
     bsp_power_status_led_init();
     sys_msg_queue_init();
+    sys_mutex_init();
     LCD_Init();
     radio_init();
 
     //bsp_IWDG_init(IWDG_Prescaler_64, 3125); //5s
     //enable interrupts
     portENABLE_INTERRUPTS();
+    sys_init_completed();
 }
 
 void os_task_init(void)
@@ -56,28 +93,28 @@ void os_task_init(void)
     //controlbox run RF task
     ret = xTaskCreate(task_rf315, "rf315", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
-        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 
     ret = xTaskCreate(task_rf330, "rf330", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
-        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 
     ret = xTaskCreate(task_rf433, "rf433", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
-        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 
     ret = xTaskCreate(task_rf4xx, "rf4xx", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
-        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 #endif
 #if 1
     ret = xTaskCreate(task_key_detect, "lcd", configMINIMAL_STACK_SIZE, NULL, configMAX_PRIORITIES, NULL);
     if (ret != pdPASS) {
-        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 #endif
 }

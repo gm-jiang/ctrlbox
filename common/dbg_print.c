@@ -5,14 +5,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-//#include "system_init.h" //just use sys_mutex_lock unlock function
+#include "system_init.h" //just use sys_mutex_lock unlock function
 
 static char buffer[PRINT_BUFFER_LEN];
 
 void dbg_print(int print_level, char *fmt, ...)
 {
 	uint16_t len = 0;
-	//sys_mutex_lock(printMutex);
+	sys_mutex_lock(printMutex);
 	if (print_level > PRINT_LEVEL) 
 	{
 		//sys_mutex_unlock(printMutex);
@@ -24,10 +24,10 @@ void dbg_print(int print_level, char *fmt, ...)
 		va_start(argp, fmt);
 		vsprintf(buffer, fmt, argp);
 		len = strlen(buffer);
-		bsp_uart4_send((uint8_t *)&buffer, len);
+		bsp_uart1_send((uint8_t *)&buffer, len);
 		va_end(argp);
 	}
-	//sys_mutex_unlock(printMutex);
+	sys_mutex_unlock(printMutex);
 }
 
 void dbg_print_msg(int print_level, uint8_t *preMsg, uint8_t len, uint8_t *msg)

@@ -9,6 +9,7 @@
 #include "radio_recv.h"
 #include "mt_common.h"
 #include "system_init.h"
+#include "dbg_print.h"
 #include "menu.h"
 #include "menuinit.h"
 
@@ -24,6 +25,11 @@ extern unsigned char rf315_buf[2][4];
 extern unsigned char rf330_buf[2][4];
 extern unsigned char rf433_buf[2][4];
 extern unsigned char rf4xx_buf[2][4];
+
+extern unsigned char rf315_key_id;
+extern unsigned char rf330_key_id;
+extern unsigned char rf433_key_id;
+extern unsigned char rf4xx_key_id;
 
 void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi);
 
@@ -74,9 +80,7 @@ void task_rf315(void *pvParameters)
         RF315_IN();
         if (rf315_en == 4) {
             rf315_en = 0;
-            LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
-            Show_Str(70+48+32,30,WHITE,BLACK,"433.092Mhz",16,0);
-            RF_Display(rf315_buf[1][0],rf315_buf[1][1],rf315_buf[1][2],rf315_buf[1][3], 0, 0, 0);
+            dbg_print(PRINT_LEVEL_DEBUG, "%08d\r\n", rf315_key_id);
         }
     }
 }
@@ -88,9 +92,7 @@ void task_rf330(void *pvParameters)
         RF330_IN();
         if (rf330_en == 4) {
             rf330_en = 0;
-            bsp_power_status_led_set(0);
-            delay_us(100);
-            bsp_power_status_led_set(1);
+            dbg_print(PRINT_LEVEL_DEBUG, "%08d\r\n", rf330_key_id);
         }
     }
 }
@@ -102,9 +104,7 @@ void task_rf433(void *pvParameters)
         RF433_IN();
         if (rf433_en == 4) {
             rf433_en = 0;
-            bsp_power_status_led_set(0);
-            delay_us(100);
-            bsp_power_status_led_set(1);
+            dbg_print(PRINT_LEVEL_DEBUG, "%08d\r\n", rf433_key_id);
         }
     }
 }
@@ -116,9 +116,7 @@ void task_rf4xx(void *pvParameters)
         RF4XX_IN();
         if (rf4xx_en == 4) {
             rf4xx_en = 0;
-            bsp_power_status_led_set(0);
-            delay_us(100);
-            bsp_power_status_led_set(1);
+            dbg_print(PRINT_LEVEL_DEBUG, "%08d\r\n", rf4xx_key_id);
         }
     }
 }

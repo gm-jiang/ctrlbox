@@ -16,6 +16,11 @@ unsigned char rf330_buf[2][4];
 unsigned char rf433_buf[2][4];
 unsigned char rf4xx_buf[2][4];
 
+unsigned char rf315_key_id = 0;
+unsigned char rf330_key_id = 0;
+unsigned char rf433_key_id = 0;
+unsigned char rf4xx_key_id = 0;
+
 #define Delay_us(x) delay_us(x)
 
 void RF315_IN(void)
@@ -27,7 +32,6 @@ void RF315_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
-    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -280,7 +284,7 @@ void RF315_IN(void)
                 {
                     // key_d=rf315_buf[1][2] & 0x0f;      //??1527????
                     //rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
-                    key_d=rf315_buf[1][2] & 0x0f;      //??1527????
+                    rf315_key_id=rf315_buf[1][2] & 0x0f;      //??1527????
                     rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -293,9 +297,9 @@ void RF315_IN(void)
             }
 			else if(T19_L==1)
 			{
-                key_d=rf315_buf[1][2]>>1;      //??1527????
-                key_d=key_d&0x0f;
-                key_d=key_d<<4;
+                rf315_key_id=rf315_buf[1][2]>>1;      //??1527????
+                rf315_key_id=rf315_key_id&0x0f;
+                rf315_key_id=rf315_key_id<<4;
                 //rf315_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -316,17 +320,17 @@ void RF315_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    key_d=rf315_buf[1][2] & 0x0f;      //??1527????
+                    rf315_key_id=rf315_buf[1][2] & 0x0f;      //??1527????
                     rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    key_d=0;
+                    rf315_key_id=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf315_buf[0][2]>>(i*2))&3)==3) 
-					         key_d|=1<<i;
+					         rf315_key_id|=1<<i;
                     }                                 
                     rf315_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -346,7 +350,6 @@ void RF330_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
-    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -599,7 +602,7 @@ void RF330_IN(void)
                 {
                     // key_d=rf330_buf[1][2] & 0x0f;      //??1527????
                     //rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
-                    key_d=rf330_buf[1][2] & 0x0f;      //??1527????
+                    rf330_key_id=rf330_buf[1][2] & 0x0f;      //??1527????
                     rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -612,9 +615,9 @@ void RF330_IN(void)
             }
 			else if(T19_L==1)
 			{
-                key_d=rf330_buf[1][2]>>1;      //??1527????
-                key_d=key_d&0x0f;
-                key_d=key_d<<4;
+                rf330_key_id=rf330_buf[1][2]>>1;      //??1527????
+                rf330_key_id=rf330_key_id&0x0f;
+                rf330_key_id=rf330_key_id<<4;
                 //rf330_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -635,17 +638,17 @@ void RF330_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    key_d=rf330_buf[1][2] & 0x0f;      //??1527????
+                    rf330_key_id=rf330_buf[1][2] & 0x0f;      //??1527????
                     rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    key_d=0;
+                    rf330_key_id=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf330_buf[0][2]>>(i*2))&3)==3) 
-					         key_d|=1<<i;
+					         rf330_key_id|=1<<i;
                     }                                 
                     rf330_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -665,7 +668,6 @@ void RF433_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
-    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -918,7 +920,7 @@ void RF433_IN(void)
                 {
                     // key_d=rf433_buf[1][2] & 0x0f;      //??1527????
                     //rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
-                    key_d=rf433_buf[1][2] & 0x0f;      //??1527????
+                    rf433_key_id=rf433_buf[1][2] & 0x0f;      //??1527????
                     rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -931,9 +933,9 @@ void RF433_IN(void)
             }
 			else if(T19_L==1)
 			{
-                key_d=rf433_buf[1][2]>>1;      //??1527????
-                key_d=key_d&0x0f;
-                key_d=key_d<<4;
+                rf433_key_id=rf433_buf[1][2]>>1;      //??1527????
+                rf433_key_id=rf433_key_id&0x0f;
+                rf433_key_id=rf433_key_id<<4;
                 //rf433_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -954,17 +956,17 @@ void RF433_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    key_d=rf433_buf[1][2] & 0x0f;      //??1527????
+                    rf433_key_id=rf433_buf[1][2] & 0x0f;      //??1527????
                     rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    key_d=0;
+                    rf433_key_id=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf433_buf[0][2]>>(i*2))&3)==3) 
-					         key_d|=1<<i;
+					         rf433_key_id|=1<<i;
                     }                                 
                     rf433_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -984,7 +986,6 @@ void RF4XX_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
-    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -1237,7 +1238,7 @@ void RF4XX_IN(void)
                 {
                     // key_d=rf4xx_buf[1][2] & 0x0f;      //??1527????
                     //rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
-                    key_d=rf4xx_buf[1][2] & 0x0f;      //??1527????
+                    rf4xx_key_id=rf4xx_buf[1][2] & 0x0f;      //??1527????
                     rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -1250,9 +1251,9 @@ void RF4XX_IN(void)
             }
 			else if(T19_L==1)
 			{
-                key_d=rf4xx_buf[1][2]>>1;      //??1527????
-                key_d=key_d&0x0f;
-                key_d=key_d<<4;
+                rf4xx_key_id=rf4xx_buf[1][2]>>1;      //??1527????
+                rf4xx_key_id=rf4xx_key_id&0x0f;
+                rf4xx_key_id=rf4xx_key_id<<4;
                 //rf4xx_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -1273,18 +1274,18 @@ void RF4XX_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    key_d=rf4xx_buf[1][2] & 0x0f;      //??1527????
+                    rf4xx_key_id=rf4xx_buf[1][2] & 0x0f;      //??1527????
                     rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    key_d=0;
+                    rf4xx_key_id=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf4xx_buf[0][2]>>(i*2))&3)==3) 
-					         key_d|=1<<i;
-                    }                                 
+					         rf4xx_key_id|=1<<i;
+                    }
                     rf4xx_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
                 }
