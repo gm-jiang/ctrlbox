@@ -492,7 +492,7 @@ void LCD_Init(void)
 	LCD_WR_REG(0x29);	
 	
 	LCD_Display_Dir(1);		 	//I???????
-	LCD_Clear(BLUE);
+	LCD_Clear(BLACK);
 }
 
 /*************************************************
