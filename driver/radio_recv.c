@@ -1059,7 +1059,7 @@ void RF4XX_IN(void)
                             rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
                         else 											//????
                         {	
-                            rf315_en = 0;
+                            rf4xx_en = 0;
                             return;
                         }
                         head_k = 0;
@@ -1120,7 +1120,7 @@ void RF4XX_IN(void)
                             rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
                         else 											//????
                         {	
-                            rf315_en = 0;
+                            rf4xx_en = 0;
                             return;
                         }									   		   	
                     }
@@ -1137,7 +1137,7 @@ void RF4XX_IN(void)
                     rf4xx_buf[0][3]|=(1<<(7-k)); 				        			        
                 else 											//????
                 {	
-                    rf315_en = 0;
+                    rf4xx_en = 0;
                     return;
                 }									
                 for(k=1;k<8;k++)									//????8?
@@ -1154,7 +1154,7 @@ void RF4XX_IN(void)
                         rf4xx_buf[0][3]|=(1<<(7-k)); 				        			        
                     else 											//????
                     {	
-                        rf315_en = 0;
+                        rf4xx_en = 0;
                         return;
                     }
                     head_k = 0;
@@ -1194,7 +1194,7 @@ void RF4XX_IN(void)
                                 rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
                             else 											//????
                             {	
-                                rf315_en = 0;
+                                rf4xx_en = 0;
                                 return;
                             }									
                             head_k = 0;
@@ -1246,7 +1246,7 @@ void RF4XX_IN(void)
                 {
                     jmnx = 0;			
                 }	
-                rf315_en = 4;                			//????
+                rf4xx_en = 4;                			//????
                 //jmnx = 0;	
             }
 			else if(T19_L==1)
@@ -1257,7 +1257,7 @@ void RF4XX_IN(void)
                 //rf4xx_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
-                rf315_en = 4;                			//????
+                rf4xx_en = 4;                			//????
             }
             else if((rf4xx_buf[0][0]==rf4xx_buf[1][0]) && (rf4xx_buf[0][1]==rf4xx_buf[1][1]) && (rf4xx_buf[0][2]==rf4xx_buf[1][2]))	//?????????????
             {	       
@@ -1289,7 +1289,7 @@ void RF4XX_IN(void)
                     rf4xx_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
                 }
-                rf315_en = 4;                			//????		
+                rf4xx_en = 4;
             }
         }       	  
     }  
