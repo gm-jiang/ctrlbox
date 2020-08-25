@@ -153,7 +153,7 @@ void EXTI1_IRQHandler(void)
     
     if(port_GetKey1EXT_IRQStatus() != RESET)
     {
-        delay_us(5*10);
+        delay_ms(5*10);
         if(port_CheckKey1EXT_IRQ() == 0)
         {
             eventMsg = EVENT_MSG_KEY2;
@@ -179,7 +179,7 @@ void EXTI15_10_IRQHandler(void)
     
     if(port_GetKey2EXT_IRQStatus() != RESET)
     {
-        delay_us(5*10);
+        delay_ms(5*10);
         if(port_CheckKey2EXT_IRQ() == 0)
         {
             eventMsg = EVENT_MSG_KEY1;
@@ -191,7 +191,7 @@ void EXTI15_10_IRQHandler(void)
 
     if(port_GetKey3EXT_IRQStatus() != RESET)
     {
-        delay_us(5*10);
+        delay_ms(5*10);
         if(port_CheckKey3EXT_IRQ() == 0)
         {
             eventMsg = EVENT_MSG_KEY4;
@@ -203,7 +203,7 @@ void EXTI15_10_IRQHandler(void)
 #if 1
     if(port_GetKey4EXT_IRQStatus() != RESET)
     {
-        delay_us(5*10);
+        delay_ms(5*10);
         if(port_CheckKey4EXT_IRQ() == 0)
         {
             eventMsg = EVENT_MSG_KEY3;
