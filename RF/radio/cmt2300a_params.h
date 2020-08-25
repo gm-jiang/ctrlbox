@@ -7,7 +7,7 @@
 //;---------------------------------------
 //; Mode                      = Advanced
 //; Part Number               = CMT2300A
-//; Frequency                 = 418.000 MHz
+//; Frequency                 = 430.000 MHz
 //; Xtal Frequency            = 26.0000 MHz
 //; Demodulation              = OOK
 //; AGC                       = On
@@ -111,7 +111,7 @@ const u8 g_cmt2300aCmtBank[CMT2300A_CMT_BANK_SIZE] = {
 const u8 g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
 /*0x0C*/  0xAE,
 /*0x0D*/  0xE0,
-/*0x0E*/  0x30,
+/*0x0E*/  0x35,
 /*0x0F*/  0x00,
 /*0x10*/  0x00,
 /*0x11*/  0xF4,
@@ -125,14 +125,14 @@ const u8 g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
 
 /* [Frequency Bank] */
 const u8 g_cmt2300aFrequencyBank[CMT2300A_FREQUENCY_BANK_SIZE] = {
-/*0x18*/  0x40,
-/*0x19*/  0x64,
-/*0x1A*/  0x9E,
-/*0x1B*/  0x15,
-/*0x1C*/  0x40,
-/*0x1D*/  0x4E,
-/*0x1E*/  0xEC,
-/*0x1F*/  0x64,
+/*0x18*/  0x42,
+/*0x19*/  0x51,
+/*0x1A*/  0x63,
+/*0x1B*/  0x14,
+/*0x1C*/  0x42,
+/*0x1D*/  0x3B,
+/*0x1E*/  0xB1,
+/*0x1F*/  0x13,
 };
 
 /* [Data Rate Bank] */
