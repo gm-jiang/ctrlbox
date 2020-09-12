@@ -377,6 +377,38 @@ void bsp_key4_init(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
+void bsp_key5_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+
+    // Enable GPIO used as key IRQ for interrupt
+    GPIO_InitStructure.GPIO_Pin = KEY5_DETECTIRQ_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_Init(KEY5_DETECTIRQ_GPIO, &GPIO_InitStructure);
+
+    /* Connect EXTI Line to GPIO Pin */
+    GPIO_EXTILineConfig(KEY5_DETECTIRQ_EXTI_PORT, KEY5_DETECTIRQ_EXTI_PIN);
+
+    /* Configure EXTI line */
+    EXTI_InitStructure.EXTI_Line = KEY5_DETECTIRQ_EXTI;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = KEY5_DETECTIRQ_EXTI_USEIRQ;
+    EXTI_Init(&EXTI_InitStructure);
+
+    /* Enable and set EXTI Interrupt to the lowest priority */
+    NVIC_InitStructure.NVIC_IRQChannel = KEY5_DETECTIRQ_EXTI_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTION_PRIORITY_KEY;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = KEY5_DETECTIRQ_EXTI_USEIRQ;
+
+    NVIC_Init(&NVIC_InitStructure);
+}
+
 
 void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed, GPIOMode_TypeDef mode)
 {

@@ -21,6 +21,7 @@ typedef enum {
 	EVENT_MSG_KEY2,
 	EVENT_MSG_KEY3,
 	EVENT_MSG_KEY4,
+	EVENT_MSG_KEY5,
     EVENT_MSG_MAX
 } eventMsgType_e;
 

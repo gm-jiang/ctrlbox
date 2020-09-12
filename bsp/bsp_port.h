@@ -69,19 +69,9 @@
 #define KEY4_GPIO_CLK       RCC_APB2Periph_GPIOB
 #define KEY4_GPIO_PIN       GPIO_Pin_12
 
-//key1
-#define KEY1_DETECTIRQ_GPIO                 GPIOB
-#define KEY1_DETECTIRQ_GPIO_PIN             GPIO_Pin_1
-#define KEY1_DETECTIRQ_EXTI                 EXTI_Line1
-#define KEY1_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOB
-#define KEY1_DETECTIRQ_EXTI_PIN             GPIO_PinSource1
-#define KEY1_DETECTIRQ_EXTI_IRQn            EXTI1_IRQn
-#define KEY1_DETECTIRQ_EXTI_USEIRQ          ENABLE
-#define KEY1_DETECTIRQ_EXTI_NOIRQ           DISABLE
-#define port_GetKey1EXT_IRQStatus()         EXTI_GetITStatus(KEY1_DETECTIRQ_EXTI)
-#define port_DisableKey1EXT_IRQ()           NVIC_DisableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
-#define port_EnableKey1EXT_IRQ()            NVIC_EnableIRQ(KEY1_DETECTIRQ_EXTI_IRQn)
-#define port_CheckKey1EXT_IRQ()             GPIO_ReadInputDataBit(KEY1_DETECTIRQ_GPIO, KEY1_DETECTIRQ_GPIO_PIN)
+#define KEY5_GPIO_PORT      GPIOA
+#define KEY5_GPIO_CLK       RCC_APB2Periph_GPIOA
+#define KEY5_GPIO_PIN       GPIO_Pin_3
 
 //key1
 #define KEY1_DETECTIRQ_GPIO                 GPIOB
@@ -139,6 +129,21 @@
 #define port_EnableKey4EXT_IRQ()            NVIC_EnableIRQ(KEY4_DETECTIRQ_EXTI_IRQn)
 #define port_CheckKey4EXT_IRQ()             GPIO_ReadInputDataBit(KEY4_DETECTIRQ_GPIO, KEY4_DETECTIRQ_GPIO_PIN)
 
+//key5
+#define KEY5_DETECTIRQ_GPIO                 GPIOA
+#define KEY5_DETECTIRQ_GPIO_PIN             GPIO_Pin_3
+#define KEY5_DETECTIRQ_EXTI                 EXTI_Line3
+#define KEY5_DETECTIRQ_EXTI_PORT            GPIO_PortSourceGPIOA
+#define KEY5_DETECTIRQ_EXTI_PIN             GPIO_PinSource3
+#define KEY5_DETECTIRQ_EXTI_IRQn            EXTI3_IRQn
+#define KEY5_DETECTIRQ_EXTI_USEIRQ          ENABLE
+#define KEY5_DETECTIRQ_EXTI_NOIRQ           DISABLE
+#define port_GetKey5EXT_IRQStatus()         EXTI_GetITStatus(KEY5_DETECTIRQ_EXTI)
+#define port_DisableKey5EXT_IRQ()           NVIC_DisableIRQ(KEY5_DETECTIRQ_EXTI_IRQn)
+#define port_EnableKey5EXT_IRQ()            NVIC_EnableIRQ(KEY5_DETECTIRQ_EXTI_IRQn)
+#define port_CheckKey5EXT_IRQ()             GPIO_ReadInputDataBit(KEY5_DETECTIRQ_GPIO, KEY5_DETECTIRQ_GPIO_PIN)
+
+
 /***************************INTTERRUPT PRIORITY DEFINE**********************************/
 #define PREEMPTION_PRIORITY_WCS485                      7
 #define PREEMPTION_PRIORITY_UHFRFID                     8
@@ -151,7 +156,7 @@
 
 
 
-/**************************************CMT2300  ??h·418Mhz***********************************************/
+/**************************************CMT2300  430Mhz***********************************************/
 #define CMT_CSB_GPIO                GPIOC
 #define CMT_CSB_GPIO_PIN            GPIO_Pin_0
 
@@ -164,7 +169,7 @@
 #define CMT_GPIO3_GPIO              GPIOC
 #define CMT_GPIO3_GPIO_PIN          GPIO_Pin_3
 
-/**************************************CMT2300 315Mhz ???·***********************************************/
+/**************************************CMT2300  315Mhz**********************************************/
 #define CMT_CSB_GPIO_RF315                GPIOB
 #define CMT_CSB_GPIO_RF315_PIN            GPIO_Pin_6
 
@@ -178,7 +183,7 @@
 #define CMT_GPIO3_GPIO_RF315_PIN          GPIO_Pin_9
 
 
-/**************************************CMT2300 430Mhz ????·***********************************************/
+/**************************************CMT2300 430Mhz **********************************************/
 #define CMT_CSB_GPIO_RF330                GPIOC
 #define CMT_CSB_GPIO_RF330_PIN            GPIO_Pin_9
 
@@ -191,7 +196,7 @@
 #define CMT_GPIO3_GPIO_RF330              GPIOA
 #define CMT_GPIO3_GPIO_RF330_PIN          GPIO_Pin_12		
 
-/**************************************CMT2300 433.092Mhz ????·***********************************************/
+/**************************************CMT2300 433.092Mhz **********************************************/
 #define CMT_CSB_GPIO_RF433                GPIOB
 #define CMT_CSB_GPIO_RF433_PIN            GPIO_Pin_15
 
@@ -248,6 +253,7 @@ void bsp_key1_init(void);
 void bsp_key2_init(void);
 void bsp_key3_init(void);
 void bsp_key4_init(void);
+void bsp_key5_init(void);
 void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
 void bsp_IWDG_feed(void);
 

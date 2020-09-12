@@ -164,6 +164,26 @@ void EXTI1_IRQHandler(void)
     }
 }
 
+void EXTI3_IRQHandler(void)
+{
+	BaseType_t xHigherPriorityTaskWoken;
+    eventMsgType_e eventMsg;
+	
+	#if 1
+    if(port_GetKey5EXT_IRQStatus() != RESET)
+    {
+        delay_ms(5*10);
+        if(port_CheckKey5EXT_IRQ() == 0)
+        {
+            eventMsg = EVENT_MSG_KEY5;
+            xQueueSendFromISR(KeyEventMsgQueue, &eventMsg, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        EXTI_ClearITPendingBit(KEY5_DETECTIRQ_EXTI);
+    }
+   #endif
+}
+
 void EXTI4_IRQHandler(void)
 {
 }

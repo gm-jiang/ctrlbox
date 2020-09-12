@@ -42,7 +42,7 @@ extern unsigned char Rec433_jmnx;
 extern unsigned char Rec433_key_d;
 extern unsigned char Rec433_short_k;
 
-void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi);
+static void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi);
 
 
 #if 1
@@ -148,7 +148,7 @@ void task_rf430(void *pvParameters)
     }
 }
 
-void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi)
+static void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi)
 {
     uint8_t i,flag;
     uint8_t f=0;
