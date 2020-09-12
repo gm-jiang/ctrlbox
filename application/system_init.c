@@ -106,7 +106,7 @@ void os_task_init(void)
         dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 
-    ret = xTaskCreate(task_rf4xx, "rf4xx", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    ret = xTaskCreate(task_rf430, "rf430", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
     if (ret != pdPASS) {
         dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }

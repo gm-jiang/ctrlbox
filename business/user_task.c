@@ -19,17 +19,28 @@
 extern unsigned char rf315_en;
 extern unsigned char rf330_en;
 extern unsigned char rf433_en;
-extern unsigned char rf4xx_en;
+extern unsigned char rf430_en;
 
 extern unsigned char rf315_buf[2][4];
 extern unsigned char rf330_buf[2][4];
 extern unsigned char rf433_buf[2][4];
-extern unsigned char rf4xx_buf[2][4];
+extern unsigned char rf430_buf[2][4];
 
-extern unsigned char rf315_key_id;
-extern unsigned char rf330_key_id;
-extern unsigned char rf433_key_id;
-extern unsigned char rf4xx_key_id;
+extern unsigned char Rec315_jmnx;
+extern unsigned char Rec315_key_d;
+extern unsigned char Rec315_short_k;
+
+extern unsigned char Rec330_jmnx;
+extern unsigned char Rec330_key_d;
+extern unsigned char Rec330_short_k;
+
+extern unsigned char Rec430_jmnx;
+extern unsigned char Rec430_key_d;
+extern unsigned char Rec430_short_k;
+
+extern unsigned char Rec433_jmnx;
+extern unsigned char Rec433_key_d;
+extern unsigned char Rec433_short_k;
 
 void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi);
 
@@ -45,7 +56,7 @@ void task_key_detect(void *pvParameters)
 	while(1)
 	{
         ret = xQueueReceive(KeyEventMsgQueue, &eventMsg, portMAX_DELAY);
-		if (ret == pdTRUE) {
+        if (ret == pdTRUE) {
             switch (eventMsg)
             {
                 case EVENT_MSG_KEY1:     //·µ»Ø
@@ -78,7 +89,10 @@ void task_rf315(void *pvParameters)
             rf315_en = 0;
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"315Mhz",16,0);
-            RF_Display(rf315_buf[1][0],rf315_buf[1][1],rf315_buf[1][2],rf315_buf[1][3], 0, rf315_key_id, 0);
+            RF_Display(rf315_buf[1][0],rf315_buf[1][1],rf315_buf[1][2],rf315_buf[1][3],Rec315_jmnx, Rec315_key_d,Rec315_short_k);
+            Rec315_jmnx=0;
+            Rec315_key_d=0;
+            Rec315_short_k=0;
         }
     }
 }
@@ -92,7 +106,10 @@ void task_rf330(void *pvParameters)
             rf330_en = 0;
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"330Mhz",16,0);
-            RF_Display(rf330_buf[1][0],rf330_buf[1][1],rf330_buf[1][2],rf330_buf[1][3], 0, rf330_key_id, 0);
+            RF_Display(rf330_buf[1][0],rf330_buf[1][1],rf330_buf[1][2],rf330_buf[1][3],Rec330_jmnx, Rec330_key_d,Rec330_short_k);
+            Rec330_jmnx=0;
+            Rec330_key_d=0;
+            Rec330_short_k=0;
         }
     }
 }
@@ -106,22 +123,28 @@ void task_rf433(void *pvParameters)
             rf433_en = 0;
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"433Mhz",16,0);
-            RF_Display(rf433_buf[1][0],rf433_buf[1][1],rf433_buf[1][2],rf433_buf[1][3], 0, rf433_key_id, 0);
+            RF_Display(rf433_buf[1][0],rf433_buf[1][1],rf433_buf[1][2],rf433_buf[1][3],Rec433_jmnx, Rec433_key_d,Rec433_short_k);
+            Rec433_jmnx=0;
+            Rec433_key_d=0;
+            Rec433_short_k=0;
         }
     }
 }
 
-void task_rf4xx(void *pvParameters)
+void task_rf430(void *pvParameters)
 {
     while(1)
     {
-        RF4XX_IN();
-        if (rf4xx_en == 4) {
-            rf4xx_en = 0;
+        RF430_IN();
+        if (rf430_en == 4) {
+            rf430_en = 0;
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"430Mhz",16,0);
-            RF_Display(rf4xx_buf[1][0],rf4xx_buf[1][1],rf4xx_buf[1][2],rf4xx_buf[1][3], 0, rf4xx_key_id, 0);
-        }
+            RF_Display(rf430_buf[1][0],rf430_buf[1][1],rf430_buf[1][2],rf430_buf[1][3],Rec430_jmnx, Rec430_key_d,Rec430_short_k);
+            Rec430_jmnx=0;
+            Rec430_key_d=0;
+            Rec430_short_k=0;
+		}
     }
 }
 

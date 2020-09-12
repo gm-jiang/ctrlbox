@@ -8,20 +8,31 @@
 
 unsigned char rf315_en = 0;
 unsigned char rf330_en = 0;
+unsigned char rf430_en = 0;
 unsigned char rf433_en = 0;
-unsigned char rf4xx_en = 0;
 
 unsigned char rf315_buf[2][4];
 unsigned char rf330_buf[2][4];
+unsigned char rf430_buf[2][4];
 unsigned char rf433_buf[2][4];
-unsigned char rf4xx_buf[2][4];
-
-unsigned char rf315_key_id = 0;
-unsigned char rf330_key_id = 0;
-unsigned char rf433_key_id = 0;
-unsigned char rf4xx_key_id = 0;
 
 #define Delay_us(x) delay_us(x)
+
+unsigned char Rec315_jmnx;
+unsigned char Rec315_key_d;
+unsigned char Rec315_short_k;
+
+unsigned char Rec330_jmnx;
+unsigned char Rec330_key_d;
+unsigned char Rec330_short_k;
+
+unsigned char Rec430_jmnx;
+unsigned char Rec430_key_d;
+unsigned char Rec430_short_k;
+
+unsigned char Rec433_jmnx;
+unsigned char Rec433_key_d;
+unsigned char Rec433_short_k;
 
 void RF315_IN(void)
 {
@@ -32,6 +43,7 @@ void RF315_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
+    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -284,7 +296,7 @@ void RF315_IN(void)
                 {
                     // key_d=rf315_buf[1][2] & 0x0f;      //??1527????
                     //rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
-                    rf315_key_id=rf315_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf315_buf[1][2] & 0x0f;      //??1527????
                     rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -297,9 +309,9 @@ void RF315_IN(void)
             }
 			else if(T19_L==1)
 			{
-                rf315_key_id=rf315_buf[1][2]>>1;      //??1527????
-                rf315_key_id=rf315_key_id&0x0f;
-                rf315_key_id=rf315_key_id<<4;
+                key_d=rf315_buf[1][2]>>1;      //??1527????
+                key_d=key_d&0x0f;
+                key_d=key_d<<4;
                 //rf315_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -320,17 +332,17 @@ void RF315_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    rf315_key_id=rf315_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf315_buf[1][2] & 0x0f;      //??1527????
                     rf315_buf[0][2]=rf315_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    rf315_key_id=0;
+                    key_d=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf315_buf[0][2]>>(i*2))&3)==3) 
-					         rf315_key_id|=1<<i;
+					         key_d|=1<<i;
                     }                                 
                     rf315_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -339,6 +351,9 @@ void RF315_IN(void)
             }
         }       	  
     }  
+    Rec315_short_k=short_k;
+    Rec315_jmnx =jmnx;
+    Rec315_key_d=key_d;
 }
 
 void RF330_IN(void)
@@ -350,6 +365,7 @@ void RF330_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
+    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -602,7 +618,7 @@ void RF330_IN(void)
                 {
                     // key_d=rf330_buf[1][2] & 0x0f;      //??1527????
                     //rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
-                    rf330_key_id=rf330_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf330_buf[1][2] & 0x0f;      //??1527????
                     rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -615,9 +631,9 @@ void RF330_IN(void)
             }
 			else if(T19_L==1)
 			{
-                rf330_key_id=rf330_buf[1][2]>>1;      //??1527????
-                rf330_key_id=rf330_key_id&0x0f;
-                rf330_key_id=rf330_key_id<<4;
+                key_d=rf330_buf[1][2]>>1;      //??1527????
+                key_d=key_d&0x0f;
+                key_d=key_d<<4;
                 //rf330_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -638,17 +654,17 @@ void RF330_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    rf330_key_id=rf330_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf330_buf[1][2] & 0x0f;      //??1527????
                     rf330_buf[0][2]=rf330_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    rf330_key_id=0;
+                    key_d=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf330_buf[0][2]>>(i*2))&3)==3) 
-					         rf330_key_id|=1<<i;
+					         key_d|=1<<i;
                     }                                 
                     rf330_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -657,6 +673,9 @@ void RF330_IN(void)
             }
         }       	  
     }  
+    Rec330_short_k=short_k;
+    Rec330_jmnx =jmnx;
+    Rec330_key_d=key_d;
 }
 
 void RF433_IN(void)
@@ -668,6 +687,7 @@ void RF433_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
+    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
@@ -920,7 +940,7 @@ void RF433_IN(void)
                 {
                     // key_d=rf433_buf[1][2] & 0x0f;      //??1527????
                     //rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
-                    rf433_key_id=rf433_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf433_buf[1][2] & 0x0f;      //??1527????
                     rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
                 } 
@@ -933,9 +953,9 @@ void RF433_IN(void)
             }
 			else if(T19_L==1)
 			{
-                rf433_key_id=rf433_buf[1][2]>>1;      //??1527????
-                rf433_key_id=rf433_key_id&0x0f;
-                rf433_key_id=rf433_key_id<<4;
+                key_d=rf433_buf[1][2]>>1;      //??1527????
+                key_d=key_d&0x0f;
+                key_d=key_d<<4;
                 //rf433_buf[0][2]=key_d; 	//??1527??4???
 				
                 jmnx = 3;//T19_L
@@ -956,17 +976,17 @@ void RF433_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    rf433_key_id=rf433_buf[1][2] & 0x0f;      //??1527????
+                    key_d=rf433_buf[1][2] & 0x0f;      //??1527????
                     rf433_buf[0][2]=rf433_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
                 }     
                 else      							//2262
                 {
-                    rf433_key_id=0;
+                    key_d=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
                         if(((rf433_buf[0][2]>>(i*2))&3)==3) 
-					         rf433_key_id|=1<<i;
+					         key_d|=1<<i;
                     }                                 
                     rf433_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
@@ -975,9 +995,12 @@ void RF433_IN(void)
             }
         }       	  
     }  
+    Rec433_short_k=short_k;
+    Rec433_jmnx =jmnx;
+    Rec433_key_d=key_d;
 }
 
-void RF4XX_IN(void)
+void RF430_IN(void)
 {
 	unsigned char j = 0;
 	unsigned char k = 0;
@@ -986,18 +1009,19 @@ void RF4XX_IN(void)
     unsigned int short_k = 0;
     unsigned char T19_S ;
     unsigned char T19_L ;
+    unsigned char key_d;
     unsigned char jmnx;
     unsigned char ii = 0;
 
-  	if (rf4xx_en==0)
+    if (rf430_en==0)
     {
         short_k = 0;
-        while (RFIN_RF4XX && j < 252)
+        while (RFIN_RF430 && j < 252)
         {
             Delay_us(5);
             short_k++;
         }
-	  	while(!RFIN_RF4XX)
+        while(!RFIN_RF430)
         {
 		  	Delay_us(5);
 		  	head_k++;
@@ -1009,26 +1033,26 @@ void RF4XX_IN(void)
                 for(k=0;k<8;k++)									//????8?
                 {        	 	  	   
                     j = 0;
-                    while(RFIN_RF4XX  && j<245) 
+                    while(RFIN_RF430  && j<245)
                     {
                         Delay_us(5);								//16us(6mhz:2~5)
                         j++;
-                    } 		 
+                    }
                     if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                        rf4xx_buf[0][ii]&=~(1<<((7-k)));	                            
+                        rf430_buf[0][ii]&=~(1<<((7-k)));
                     else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                        rf4xx_buf[0][ii]|=(1<<(7-k)); 				        			        
+                        rf430_buf[0][ii]|=(1<<(7-k));
                     else 											//????
                     {
                         rf315_en = 0;
                         return;
                     }	
-                    head_k = 0; 
-                    while(!RFIN_RF4XX  && j<255)	   		//?????
+                    head_k = 0;
+                    while(!RFIN_RF430  && j<255)	   		//?????
                     {
                         Delay_us(5);
                         head_k++;
-                    }   
+                    }
                     if((head_k>(short_k*22)) && (head_k<(short_k*38)))    //23?,T19S
                     {
                         //rf4xx_buf[0][2]|=(1<<(0));
@@ -1038,7 +1062,7 @@ void RF4XX_IN(void)
                     else
                     {
                         T19_S=0;		 
-                    }									 			
+                    }
                 }
             }
             if(T19_S==1)
@@ -1048,22 +1072,22 @@ void RF4XX_IN(void)
                     for(k=0;k<8;k++)									//????8?
                     {        	 	  	   
                         j = 0;
-                        while(RFIN_RF4XX  && j<245) 
+                        while(RFIN_RF430  && j<245)
                         {
                             Delay_us(5);								//16us(6mhz:2~5)
                             j++;
                         } 	
-                        if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                            rf4xx_buf[1][ii]&=~(1<<((7-k)));	                            
+                        if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96))
+                            rf430_buf[1][ii]&=~(1<<((7-k)));
                         else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                            rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
+                            rf430_buf[1][ii]|=(1<<(7-k));
                         else 											//????
-                        {	
-                            rf4xx_en = 0;
+                        {
+                            rf430_en = 0;
                             return;
                         }
                         head_k = 0;
-                        while(!RFIN_RF4XX  && j<255)	   		//?????
+                        while(!RFIN_RF430  && j<255)	   		//?????
                         {
                             Delay_us(5);
                             head_k++;
@@ -1072,8 +1096,8 @@ void RF4XX_IN(void)
                         {
                             //rf4xx_buf[1][2]|=(1<<(0));
                             T19_S=1;
-                            rf4xx_buf[0][3]=0;
-                            rf4xx_buf[1][3]=0;
+                            rf430_buf[0][3]=0;
+                            rf430_buf[1][3]=0;
                             break;
                         }
                         else
@@ -1084,14 +1108,14 @@ void RF4XX_IN(void)
 	        	}
             }	
             j=0;
-            while(RFIN_RF4XX  && (j<200))					//???????????
+            while(RFIN_RF430  && (j<200))					//???????????
             {
                 Delay_us(5);
                 j++;
                 //j1++;
             }            			   
             head_k = 0;
-            while(!RFIN_RF4XX ) 						   //???????????
+            while(!RFIN_RF430 ) 						   //???????????
             {
                 Delay_us(5);
                 head_k++;
@@ -1103,106 +1127,106 @@ void RF4XX_IN(void)
                     for(k=0;k<8;k++)									//????8?
                     {        	 	  	   
                         j = 0;
-                        while(RFIN_RF4XX  && j<245) 
+                        while(RFIN_RF430  && j<245)
                         {
                             Delay_us(5);								//16us(6mhz:2~5)
                             j++;
-                        } 	
+                        }
                         head_k = 0;
-                        while(!RFIN_RF4XX  && j<255)	   		//?????
+                        while(!RFIN_RF430  && j<255)	   		//?????
                         {
                             Delay_us(5);
                             head_k++;
                         }   
-                        if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                            rf4xx_buf[1][ii]&=~(1<<((7-k)));	                            
+                        if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96))
+                            rf430_buf[1][ii]&=~(1<<((7-k)));
                         else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                            rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
+                            rf430_buf[1][ii]|=(1<<(7-k));
                         else 											//????
-                        {	
-                            rf4xx_en = 0;
+                        {
+                            rf430_en = 0;
                             return;
-                        }									   		   	
+                        }
                     }
 	        	} 
-                rf4xx_buf[0][3]=0;
-                rf4xx_buf[1][3]=0;
+                rf430_buf[0][3]=0;
+                rf430_buf[1][3]=0;
             }
             else  if((j<(short_k*5))&&(T19_S==0))//T19_L
             {
                 k=0;
-                if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                    rf4xx_buf[0][3]&=~(1<<((7-k)));	                            
+                if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96))
+                    rf430_buf[0][3]&=~(1<<((7-k)));
                 else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                    rf4xx_buf[0][3]|=(1<<(7-k)); 				        			        
+                    rf430_buf[0][3]|=(1<<(7-k));
                 else 											//????
                 {	
-                    rf4xx_en = 0;
+                    rf430_en = 0;
                     return;
                 }									
                 for(k=1;k<8;k++)									//????8?
                 {        	 	  	   
                     j = 0;
-                    while(RFIN_RF4XX  && j<245) 
+                    while(RFIN_RF430  && j<245)
                     {
                         Delay_us(5);								//16us(6mhz:2~5)
                         j++;
                     }							
-                    if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                        rf4xx_buf[0][3]&=~(1<<((7-k)));	                            
+                    if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96))
+                        rf430_buf[0][3]&=~(1<<((7-k)));
                     else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                        rf4xx_buf[0][3]|=(1<<(7-k)); 				        			        
+                        rf430_buf[0][3]|=(1<<(7-k));
                     else 											//????
-                    {	
-                        rf4xx_en = 0;
+                    {
+                        rf430_en = 0;
                         return;
                     }
                     head_k = 0;
-                    while(!RFIN_RF4XX  && j<255)	   		//?????
+                    while(!RFIN_RF430  && j<255)	   		//?????
                     {
                         Delay_us(5);
                         head_k++;
-                    } 
+                    }
                     if((head_k>(short_k*22)) && (head_k<(short_k*38)))    //23?,T19S
                     {
-                        //rf4xx_buf[1][2]|=(1<<(0));
+                        //rf430_buf[1][2]|=(1<<(0));
                         T19_L=1;
-                        // rf4xx_buf[0][3]=0;
-                        //rf4xx_buf[1][3]=0;
+                        // rf430_buf[0][3]=0;
+                        //rf430_buf[1][3]=0;
                         break;
                     }
                     else
                     {
-                        T19_L=0;		 
+                        T19_L=0;
                     }						
                 }
 				if(T19_L==1)
 				{
                     for(ii=0;ii<4;ii++)										//4??
                     {
-	        		   for(k=0;k<8;k++)									//????8?
-	        		   {        	 	  	   
+                        for(k=0;k<8;k++)									//????8?
+                        {
                             j = 0;
-                            while(RFIN_RF4XX  && j<245) 
+                            while(RFIN_RF430  && j<245)
                             {
                                 Delay_us(5);								//16us(6mhz:2~5)
                                 j++;
-                            } 	
-                            if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96)) 
-                                rf4xx_buf[1][ii]&=~(1<<((7-k)));	                            
+                            }
+                            if(j>(short_k-short_k/2-short_k/3)&&j<(short_k*1.96))
+                                rf430_buf[1][ii]&=~(1<<((7-k)));
                             else if(j>(short_k*1.96)&&j<(short_k*5))		//%25 ?????????3?
-                                rf4xx_buf[1][ii]|=(1<<(7-k)); 				        			        
+                                rf430_buf[1][ii]|=(1<<(7-k));
                             else 											//????
-                            {	
-                                rf4xx_en = 0;
+                            {
+                                rf430_en = 0;
                                 return;
-                            }									
+                            }
                             head_k = 0;
-                            while(!RFIN_RF4XX  && j<255)	   		//?????
+                            while(!RFIN_RF430  && j<255)	   		//?????
                             {
                                 Delay_us(5);
                                 head_k++;
-                            } 
+                            }
                             if((head_k>(short_k*22)) && (head_k<(short_k*38)))    //23?,T19S
                             {
                                 //rf4xx_buf[1][2]|=(1<<(0));
@@ -1213,11 +1237,11 @@ void RF4XX_IN(void)
                             }
                             else
                             {
-                                T19_L=0;		 
-                            }					
+                                T19_L=0;
+                            }
                         }
-                    }										
-                }	
+                    }
+                }
             }
 
         	//+++++++++++++++++++++++++2262?1527??????++++++++++++++++++++++++++++++++++++++++ 
@@ -1225,9 +1249,9 @@ void RF4XX_IN(void)
 			{
                 for(i=0;i<3;i++)  			//??2262?T19S
                 {
-                    for(u=0;u<4;u++) 
+                    for(u=0;u<4;u++)
                     {
-                        if(((rf4xx_buf[0][i]>>(u*2)) & 3)==2) 
+                        if(((rf430_buf[0][i]>>(u*2)) & 3)==2)
                         {
                             i=80; break;
                         }
@@ -1238,34 +1262,33 @@ void RF4XX_IN(void)
                 {
                     // key_d=rf4xx_buf[1][2] & 0x0f;      //??1527????
                     //rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
-                    rf4xx_key_id=rf4xx_buf[1][2] & 0x0f;      //??1527????
-                    rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
+                    key_d=rf430_buf[1][2] & 0x0f;      //??1527????
+                    rf430_buf[0][2]=rf430_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 2;         				//?0??2262 ,1?T19S
-                } 
+                }
                 else
                 {
-                    jmnx = 0;			
-                }	
-                rf4xx_en = 4;                			//????
-                //jmnx = 0;	
+                    jmnx = 0;
+                }
+                rf430_en = 4;                			//????
+                //jmnx = 0;
             }
 			else if(T19_L==1)
 			{
-                rf4xx_key_id=rf4xx_buf[1][2]>>1;      //??1527????
-                rf4xx_key_id=rf4xx_key_id&0x0f;
-                rf4xx_key_id=rf4xx_key_id<<4;
+                key_d=rf430_buf[1][2]>>1;      //??1527????
+                key_d=key_d&0x0f;
+                key_d=key_d<<4;
                 //rf4xx_buf[0][2]=key_d; 	//??1527??4???
-				
                 jmnx = 3;//T19_L
-                rf4xx_en = 4;                			//????
+                rf430_en = 4;                			//????
             }
-            else if((rf4xx_buf[0][0]==rf4xx_buf[1][0]) && (rf4xx_buf[0][1]==rf4xx_buf[1][1]) && (rf4xx_buf[0][2]==rf4xx_buf[1][2]))	//?????????????
-            {	       
+            else if((rf430_buf[0][0]==rf430_buf[1][0]) && (rf430_buf[0][1]==rf430_buf[1][1]) && (rf430_buf[0][2]==rf430_buf[1][2]))	//?????????????
+            {
                 for(i=0;i<4;i++)  			//??2262?1527
                 {
-                    for(u=0;u<4;u++) 
+                    for(u=0;u<4;u++)
                     {
-                        if(((rf4xx_buf[0][i]>>(u*2)) & 3)==2) 
+                        if(((rf430_buf[0][i]>>(u*2)) & 3)==2)
                         {
                             i=80; break;
                         }
@@ -1274,23 +1297,26 @@ void RF4XX_IN(void)
                 }
                 if(i==80)  					//1527
                 {
-                    rf4xx_key_id=rf4xx_buf[1][2] & 0x0f;      //??1527????
-                    rf4xx_buf[0][2]=rf4xx_buf[1][2]>>4; 	//??1527??4???
+                    key_d=rf430_buf[1][2] & 0x0f;      //??1527????
+                    rf430_buf[0][2]=rf430_buf[1][2]>>4; 	//??1527??4???
                     jmnx = 1;         				//?0??2262 ,1?1527
-                }     
+                }
                 else      							//2262
                 {
-                    rf4xx_key_id=0;
+                    key_d=0;
                     for(i=0;i<4;i++)	  			//???? 2262?? ?????
                     {
-                        if(((rf4xx_buf[0][2]>>(i*2))&3)==3) 
-					         rf4xx_key_id|=1<<i;
+                        if(((rf430_buf[0][2]>>(i*2))&3)==3)
+					         key_d|=1<<i;
                     }
-                    rf4xx_buf[0][2] = 0; 				//2262??4???,??0
+                    rf430_buf[0][2] = 0; 				//2262??4???,??0
                     jmnx = 0;         				//?0?2262,1?1527
                 }
-                rf4xx_en = 4;
+                rf430_en = 4;
             }
-        }       	  
-    }  
+        }
+    }
+    Rec430_short_k=short_k;
+    Rec430_jmnx =jmnx;
+    Rec430_key_d=key_d;
 }
