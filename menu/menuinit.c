@@ -4,6 +4,14 @@
 #include "gui.h"
 #include "pic.h"
 
+#include "radio.h"
+#include "radio_rf315.h"
+#include "radio_rf330.h"
+#include "radio_rf433.h"
+
+#include "mt_common.h"
+#include "system_init.h" // for os_task_create/delete
+
 WND g_topdeskwnd;
 WND g_mainwnd;
 WND g_meanwnd[3];
@@ -89,7 +97,8 @@ void mainwndkey(PWND pwnd,unsigned char key)
 {
     unsigned char s;
     if(key==0x15)//返回键
-    { pwnd->buf=0;
+    {
+        pwnd->buf=0;
         exitcurrent();
         return;
     }
@@ -129,33 +138,13 @@ void mainwndkey(PWND pwnd,unsigned char key)
     }
 }
 
+extern uint8_t g_rf_recv_run;
+#include "radio_init.h"
 void kuozhanload(PWND pwnd)
 {
-#if 0
-    CMT2300A_GoSleep_RF315();
-    CMT2300A_GoStby_RF315();
-    CMT2300A_InitGpio_RF315();
-    CMT2300A_ConfigGpio_RF315( CMT2300A_GPIO3_SEL_DIN);
-    CMT2300A_GoRx_RF315();
-
-    CMT2300A_GoSleep();
-    CMT2300A_GoStby();	 
-    CMT2300A_InitGpio_RX();
-    CMT2300A_ConfigGpio(CMT2300A_GPIO3_SEL_DIN);
-    CMT2300A_GoRx();
-
-    CMT2300A_GoSleep_RF330();
-    CMT2300A_GoStby_RF330();
-    CMT2300A_InitGpio_RF330();
-    CMT2300A_ConfigGpio_RF330( CMT2300A_GPIO3_SEL_DIN);
-    CMT2300A_GoRx_RF330();
-
-    CMT2300A_GoSleep_RF433();
-    CMT2300A_GoStby_RF433();
-    CMT2300A_InitGpio_RF433();
-    CMT2300A_ConfigGpio_RF433( CMT2300A_GPIO3_SEL_DIN);
-    CMT2300A_GoRx_RF433();
-#endif
+    radio_init();
+    g_rf_recv_run = 1;
+    os_rf_recv_task_create();
 
     LCD_Clear(BLACK);	
     Show_Str(70,30,WHITE,BLACK,"频    率",16,0);
@@ -188,23 +177,24 @@ void kuozhankey(PWND pwnd,unsigned char key)
 {
     if (key==0x15)//返回键
     {
+        g_rf_recv_run = 0;
         setcurrent(&g_mainwnd);
     }
     else if(key==0x14)//确认键
     {
-		 pwnd->buf=0;
-        setcurrent(&g_meanwnd[2]);
+        //pwnd->buf=0;
+        //setcurrent(&g_meanwnd[2]);
         return;
-    }		
+    }
 }
 
+extern uint8_t g_rf_send_run;
 void pingbiload(PWND pwnd)
 {
 	//  LCD_Clear_slow(BLACK);	//开机画面逐渐消失
-    LCD_Clear(BLACK);	
+    LCD_Clear(BLACK);
     Show_Str(110,100,WHITE,BLACK,"屏蔽中",24,0);
-#if 0
-    //配置433.92mhz
+
     RF_Init_TX();
     CMT2300A_GoSleep();
     CMT2300A_GoStby();
@@ -215,37 +205,25 @@ void pingbiload(PWND pwnd)
     CMT2300A_EnableTxDin(TRUE);
     CMT2300A_ConfigTxDin(CMT2300A_TX_DIN_SEL_GPIO3);
     CMT2300A_EnableTxDinInvert(FALSE);
-    //CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_RX_FIFO_TH, // /* Config INT1 */
-    //												CMT2300A_INT_SEL_PKT_OK); //  /* Config INT2 */
-    //    /* Must clear FIFO after enable SPI to read or write the FIFO */
-    // CMT2300A_EnableReadFifo();
-    // CMT2300A_ClearInterruptFlags();
-    // CMT2300A_ClearRxFifo();
-    //CMT2300A_EnableReadFifo();
-														 
-    //----------------------------------------------------//
-    //CMT2300A_ClearInterruptFlags();
     CMT2300A_GoTx();
-    //////////////////////////////////////////////////////////////////////////
 
-    RX_flag=0x01;
-#endif
-}	
+    g_rf_send_run = 1;
+    os_rf_send_task_create();
+}
 
 void pingbikey(PWND pwnd,unsigned char key)
 {
     if (key==0x15)//返回键
     {
-        //RX_flag=0x02;		
+        g_rf_send_run = 0;	
         setcurrent(&g_mainwnd);
-    }// x_flag=1;
+    }
     else if(key==0x14)//确认键
-    { 
-        //RX_flag=0x01;
+    {
         pwnd->buf=0;
         setcurrent(&g_meanwnd[1]);
         return;
-    }		
+    }
 }
 
 #define whitewnd_ITEM   2
@@ -432,7 +410,7 @@ void remote_codekey(PWND pwnd,unsigned char key)
             pwnd->buf=0;
             remote_code_itemselet(pwnd->buf);
         }
-        else if(pwnd->buf<(remote_code_ITEM-1))
+        else if(pwnd->buf < (remote_code_ITEM-1))
         {
             ++(pwnd->buf);
             remote_code_itemselet(pwnd->buf);

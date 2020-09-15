@@ -12,6 +12,7 @@
 #include "dbg_print.h"
 #include "menu.h"
 #include "menuinit.h"
+#include "radio_send.h"
 
 #include "lcd.h"
 #include "gui.h"
@@ -42,6 +43,9 @@ extern unsigned char Rec433_jmnx;
 extern unsigned char Rec433_key_d;
 extern unsigned char Rec433_short_k;
 
+uint8_t g_rf_recv_run;
+uint8_t g_rf_send_run;
+
 static void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi);
 
 
@@ -51,25 +55,38 @@ void task_key_detect(void *pvParameters)
     BaseType_t ret;
     uint8_t key_value = 0;
     eventMsgType_e eventMsg;
-    UIINIT();
 
+    UIINIT();
 	while(1)
 	{
         ret = xQueueReceive(KeyEventMsgQueue, &eventMsg, portMAX_DELAY);
         if (ret == pdTRUE) {
             switch (eventMsg)
             {
-                case EVENT_MSG_KEY1:     //·µ»Ø
+                case EVENT_MSG_KEY1:     //è¿”å›ž
                     key_value = 0x15;
                     break;
-                case EVENT_MSG_KEY2:      //ok»òÕßÈ·¶¨ 
+                case EVENT_MSG_KEY2:      //okæˆ–è€…ç¡®å®š 
                     key_value = 0x14;
                     break;
-                case EVENT_MSG_KEY3:      //ÏÂ·­
+                case EVENT_MSG_KEY3:      //ä¸‹ç¿»
                     key_value = 0x16;
                     break;
-                case EVENT_MSG_KEY4:      //ÉÏ·µ 
+                case EVENT_MSG_KEY4:      //ä¸Šè¿” 
                     key_value = 0x17;
+                    break;
+                case EVENT_MSG_KEY5:
+#if 0 //TODO
+                    if(on_flag==0){
+                        setcurrent(&g_topdeskwnd);
+                        bsp_power_status_led_set(1);
+                        on_flag=1;
+                    } else {
+                        setcurrent(&g_topdeskwnd);
+                        bsp_power_status_led_set(0);
+                        on_flag=0;
+                    }
+#endif
                     break;
                 default:
                     break;
@@ -82,7 +99,7 @@ void task_key_detect(void *pvParameters)
 
 void task_rf315(void *pvParameters)
 {
-    while(1)
+    while(g_rf_recv_run)
     {
         RF315_IN();
         if (rf315_en == 4) {
@@ -95,11 +112,12 @@ void task_rf315(void *pvParameters)
             Rec315_short_k=0;
         }
     }
+    vTaskDelete(NULL);
 }
 
 void task_rf330(void *pvParameters)
 {
-    while(1)
+    while(g_rf_recv_run)
     {
         RF330_IN();
         if (rf330_en == 4) {
@@ -112,11 +130,12 @@ void task_rf330(void *pvParameters)
             Rec330_short_k=0;
         }
     }
+    vTaskDelete(NULL);
 }
 
 void task_rf433(void *pvParameters)
 {
-    while(1)
+    while(g_rf_recv_run)
     {
         RF433_IN();
         if (rf433_en == 4) {
@@ -129,11 +148,12 @@ void task_rf433(void *pvParameters)
             Rec433_short_k=0;
         }
     }
+    vTaskDelete(NULL);
 }
 
 void task_rf430(void *pvParameters)
 {
-    while(1)
+    while(g_rf_recv_run)
     {
         RF430_IN();
         if (rf430_en == 4) {
@@ -146,6 +166,16 @@ void task_rf430(void *pvParameters)
             Rec430_short_k=0;
 		}
     }
+    vTaskDelete(NULL);
+}
+
+void task_rf430_send(void *pvParameters)
+{
+    while (g_rf_send_run) {
+        send_rf(0xff,0xff,0xff,0x08,30);
+        vTaskDelay(20*50*20); //1tick = 20us
+    }
+    vTaskDelete(NULL);
 }
 
 static void RF_Display(uint8_t address1,uint8_t address2,uint8_t address3,uint8_t address4,uint8_t chip_ID,uint8_t key_value,uint8_t zhouqi)

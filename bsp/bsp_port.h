@@ -234,6 +234,8 @@
 #define PREEMPTION_PRIORITY_REALEASE_KEY                14
 #define PREEMPTION_PRIORITY_CHAIN_DOWN_FINISH_SENSOR	15
 
+void GPIO_Config(void);
+
 void bsp_all_gpio_configuration(void);
 void bsp_gpio_config(void);
 void bsp_uart1_init(void);
@@ -256,6 +258,8 @@ void bsp_key4_init(void);
 void bsp_key5_init(void);
 void bsp_IWDG_init(uint8_t prv ,uint16_t rlv);
 void bsp_IWDG_feed(void);
+\
+void bsp_RF430_Tx_set(uint8_t status);
 
 //flash operate function
 uint16_t bsp_FLASH_ReadHalfWord(uint32_t address);

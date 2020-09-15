@@ -79,6 +79,7 @@ void platform_init(void)
         bsp_power_status_led_set(0);                       //按键开机
     while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3)==0);//按键等待松开
 #endif
+    GPIO_Config();
     bsp_power_status_led_set(0);
     bsp_uart1_init();
     key_board_init();
@@ -98,32 +99,52 @@ void os_task_init(void)
 {
     BaseType_t ret;
 
-#if 1
-    //controlbox run RF task
-    ret = xTaskCreate(task_rf315, "rf315", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
-    if (ret != pdPASS) {
-        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
-    }
 
-    ret = xTaskCreate(task_rf330, "rf330", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
-    if (ret != pdPASS) {
-        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
-    }
-
-    ret = xTaskCreate(task_rf433, "rf433", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
-    if (ret != pdPASS) {
-        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
-    }
-
-    ret = xTaskCreate(task_rf430, "rf430", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
-    if (ret != pdPASS) {
-        dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
-    }
-#endif
 #if 1
     ret = xTaskCreate(task_key_detect, "lcd", configMINIMAL_STACK_SIZE, NULL, configMAX_PRIORITIES, NULL);
     if (ret != pdPASS) {
         dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
     }
 #endif
+}
+
+void os_rf_recv_task_create(void)
+{
+    BaseType_t ret;
+
+    //controlbox run RF task
+    ret = xTaskCreate(task_rf315, "rf315", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+
+    ret = xTaskCreate(task_rf330, "rf330", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+
+    ret = xTaskCreate(task_rf433, "rf433", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+
+    ret = xTaskCreate(task_rf430, "rf430", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_RCV_TASK, NULL);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+}
+
+TaskHandle_t handle_rf_send;
+void os_rf_send_task_create(void)
+{
+    BaseType_t ret;
+    ret = xTaskCreate(task_rf430_send, "rf_send", configMINIMAL_STACK_SIZE, NULL, PRIORITIES_RF_SEND_TASK, handle_rf_send);
+    if (ret != pdPASS) {
+        //dbg_print(PRINT_LEVEL_ERROR, "create failed\r\n");
+    }
+}
+
+void os_rf_send_task_delete(void)
+{
+    vTaskDelete(handle_rf_send);
 }

@@ -216,6 +216,31 @@ void bsp_power_status_led_set(uint8_t status)
     }
 }
 
+void GPIO_Config(void)
+{ 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
+
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+    
+//    SET_GPIO_IN(KEY1_GPIO);
+//    SET_GPIO_IN(KEY2_GPIO);
+//    SET_GPIO_IN(KEY3_GPIO);
+//    SET_GPIO_IN(KEY4_GPIO);
+//    SET_GPIO_IN(KEY5_GPIO);
+    
+//    SET_GPIO_IN(CMT_GPIO1_GPIO);
+//    SET_GPIO_IN(CMT_GPIO2_GPIO);
+    SET_GPIO_IN(CMT_GPIO3_GPIO);
+//    SET_GPIO_IN(CMT_GPIO4_GPIO);
+}
+
 #if 0
 void bsp_key_init(void)
 {
@@ -409,6 +434,14 @@ void bsp_key5_init(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
+void bsp_RF430_Tx_set(uint8_t status)
+{
+    if (status) {
+        GPIO_ResetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN);  //?0
+    } else {
+        GPIO_SetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN);  //?1
+    }
+}
 
 void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed, GPIOMode_TypeDef mode)
 {

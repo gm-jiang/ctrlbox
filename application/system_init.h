@@ -25,6 +25,7 @@ typedef enum {
     EVENT_MSG_MAX
 } eventMsgType_e;
 
+#define PRIORITIES_RF_SEND_TASK               configMAX_PRIORITIES - 6
 #define PRIORITIES_LED_STATUS_TASK            configMAX_PRIORITIES - 5
 #define PRIORITIES_WDT_TASK                   configMAX_PRIORITIES - 4
 #define PRIORITIES_UART3_RCV_TASK             configMAX_PRIORITIES - 3
@@ -37,5 +38,8 @@ void sys_mutex_unlock(SemaphoreHandle_t xMutex);
 
 void platform_init(void);
 void os_task_init(void);
+void os_rf_recv_task_create(void);
+void os_rf_send_task_create(void);
+void os_rf_send_task_delete(void);
 
 #endif
