@@ -104,9 +104,11 @@ void task_rf315(void *pvParameters)
         RF315_IN();
         if (rf315_en == 4) {
             rf315_en = 0;
+            vPortEnterCritical();
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"315Mhz",16,0);
             RF_Display(rf315_buf[1][0],rf315_buf[1][1],rf315_buf[1][2],rf315_buf[1][3],Rec315_jmnx, Rec315_key_d,Rec315_short_k);
+            vPortExitCritical();
             Rec315_jmnx=0;
             Rec315_key_d=0;
             Rec315_short_k=0;
@@ -122,9 +124,11 @@ void task_rf330(void *pvParameters)
         RF330_IN();
         if (rf330_en == 4) {
             rf330_en = 0;
+            vPortEnterCritical();
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"330Mhz",16,0);
             RF_Display(rf330_buf[1][0],rf330_buf[1][1],rf330_buf[1][2],rf330_buf[1][3],Rec330_jmnx, Rec330_key_d,Rec330_short_k);
+            vPortExitCritical();
             Rec330_jmnx=0;
             Rec330_key_d=0;
             Rec330_short_k=0;
@@ -140,9 +144,11 @@ void task_rf433(void *pvParameters)
         RF433_IN();
         if (rf433_en == 4) {
             rf433_en = 0;
+            vPortEnterCritical();
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"433Mhz",16,0);
             RF_Display(rf433_buf[1][0],rf433_buf[1][1],rf433_buf[1][2],rf433_buf[1][3],Rec433_jmnx, Rec433_key_d,Rec433_short_k);
+            vPortExitCritical();
             Rec433_jmnx=0;
             Rec433_key_d=0;
             Rec433_short_k=0;
@@ -158,9 +164,11 @@ void task_rf430(void *pvParameters)
         RF430_IN();
         if (rf430_en == 4) {
             rf430_en = 0;
+            vPortEnterCritical();
             LCD_Clear_Rectangle(150,32,150+80,32+16,BLACK);
             Show_Str(70+48+32,30,WHITE,BLACK,"430Mhz",16,0);
             RF_Display(rf430_buf[1][0],rf430_buf[1][1],rf430_buf[1][2],rf430_buf[1][3],Rec430_jmnx, Rec430_key_d,Rec430_short_k);
+            vPortExitCritical();
             Rec430_jmnx=0;
             Rec430_key_d=0;
             Rec430_short_k=0;
