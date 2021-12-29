@@ -540,6 +540,11 @@
               <FileType>1</FileType>
               <FilePath>.\driver\radio_recv.c</FilePath>
             </File>
+            <File>
+              <FileName>radio_send.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\radio_send.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
