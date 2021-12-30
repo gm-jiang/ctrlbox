@@ -45,9 +45,13 @@
   #define SECTOR_SIZE              2048    //Byte
 #endif
 
-//the define of debug gpio
-#define POWER_LED_GPIO              GPIOA
-#define POWER_LED_GPIO_PIN          GPIO_Pin_2
+//the define of power control gpio
+#define POWER_CTRL_GPIO              GPIOA
+#define POWER_CTRL_GPIO_PIN          GPIO_Pin_2
+
+//the define of power test gpio
+#define POWER_TEST_GPIO              GPIOA
+#define POWER_TEST_GPIO_PIN          GPIO_Pin_3
 
 #define	TURN_ON                     0x01
 #define	TURN_OFF                    0x00
@@ -248,8 +252,10 @@ void bsp_uart2_send(uint8_t *buf, uint16_t length);
 void bsp_uart3_send(uint8_t *buf, uint16_t length);
 void bsp_uart4_send(uint8_t *buf, uint16_t length);
 void USART1_Send(void);
-void bsp_power_status_led_init(void);
-void bsp_power_status_led_set(uint8_t status);
+void bsp_power_test_init(void);
+void bsp_power_ctrl_init(void);
+void bsp_power_ctrl_set(uint8_t status);
+uint8_t bsp_power_test_read(void);
 //void bsp_key_init(void);
 void bsp_key1_init(void);
 void bsp_key2_init(void);

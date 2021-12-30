@@ -71,19 +71,18 @@ void platform_init(void)
     //disable interrupts
     portDISABLE_INTERRUPTS();
     bsp_gpio_config();
-    bsp_power_status_led_init();
-    bsp_power_status_led_set(1);
-#if 0 //TODO:
-    while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3)==1);//待机等待按键
-    if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3)==0)
-        bsp_power_status_led_set(0);                       //按键开机
-    while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3)==0);//按键等待松开
-#endif
-    GPIO_Config();
-    bsp_power_status_led_set(0);
+    bsp_power_test_init();
+    bsp_power_ctrl_init();
+    
+    while(bsp_power_test_read() == 1);
+    if (bsp_power_test_read() == 0) {
+        bsp_power_ctrl_set(0);
+    }
+    while(bsp_power_test_read() == 0);
+
+    //GPIO_Config();
     bsp_uart1_init();
     key_board_init();
-    bsp_power_status_led_init();
     sys_msg_queue_init();
     sys_mutex_init();
     LCD_Init();

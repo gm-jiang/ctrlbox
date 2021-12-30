@@ -195,25 +195,42 @@ void bsp_dbg_uart4_init(void)
     USART_Cmd(UART4, ENABLE);
 }
 
-void bsp_power_status_led_init(void)
+void bsp_power_test_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
-    GPIO_InitStructure.GPIO_Pin = POWER_LED_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Pin = POWER_TEST_GPIO_PIN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(POWER_LED_GPIO, &GPIO_InitStructure);
-    GPIO_ResetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_Init(POWER_TEST_GPIO, &GPIO_InitStructure);
+    GPIO_ResetBits(POWER_TEST_GPIO, POWER_TEST_GPIO_PIN);
 }
 
-void bsp_power_status_led_set(uint8_t status)
+void bsp_power_ctrl_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = POWER_CTRL_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(POWER_CTRL_GPIO, &GPIO_InitStructure);
+    GPIO_ResetBits(POWER_CTRL_GPIO, POWER_CTRL_GPIO_PIN);
+}
+
+void bsp_power_ctrl_set(uint8_t status)
 {
     if (status) {
-        GPIO_ResetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
+        GPIO_ResetBits(POWER_CTRL_GPIO, POWER_CTRL_GPIO_PIN);
     } else {
-        GPIO_SetBits(POWER_LED_GPIO, POWER_LED_GPIO_PIN);
+        GPIO_SetBits(POWER_CTRL_GPIO, POWER_CTRL_GPIO_PIN);
     }
+}
+
+uint8_t bsp_power_test_read(void)
+{
+    return GPIO_ReadInputDataBit(POWER_TEST_GPIO, POWER_TEST_GPIO_PIN);
 }
 
 void GPIO_Config(void)
