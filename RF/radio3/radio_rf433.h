@@ -17,15 +17,15 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
- 
+
 #ifndef __RADIO_RF433_H
 #define __RADIO_RF433_H
 
 #include "typedefs.h"
 #include "cmt2300a_rf433.h"
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* RF state machine */
@@ -65,12 +65,10 @@ u8 RF433_GetInterruptFlags(void);
 void RF433_StartRx(u8 buf[], u16 len, u32 timeout);
 void RF433_StartTx(u8 buf[], u16 len, u32 timeout);
 
-
-
 EnumRF433Result RF433_Process(void);
 
-#ifdef __cplusplus 
-} 
+#ifdef __cplusplus
+}
 #endif
 
 #endif

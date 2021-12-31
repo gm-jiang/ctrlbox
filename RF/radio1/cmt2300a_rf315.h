@@ -25,11 +25,11 @@
 #include "cmt2300a_defs.h"
 #include "cmt2300a_hal_rf315.h"
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#define ENABLE_AUTO_SWITCH_CHIP_STATUS_RF315   /* Enable the auto switch chip status */
+#define ENABLE_AUTO_SWITCH_CHIP_STATUS_RF315 /* Enable the auto switch chip status */
 
 /* ************************************************************************
    The following are for chip status controls.
@@ -43,7 +43,6 @@ BOOL CMT2300A_GoTFS_RF315(void);
 BOOL CMT2300A_GoRFS_RF315(void);
 BOOL CMT2300A_GoTx_RF315(void);
 BOOL CMT2300A_GoRx_RF315(void);
-
 
 /* ************************************************************************
 *  The following are for chip interrupts, GPIO, FIFO operations.
@@ -63,14 +62,12 @@ u8 CMT2300A_ClearTxFifo_RF315(void);
 u8 CMT2300A_ClearRxFifo_RF315(void);
 u8 CMT2300A_ClearInterruptFlags_RF315(void);
 
-
 /* ************************************************************************
 *  The following are for Tx DIN operations in direct mode.
 *  ************************************************************************ */
 void CMT2300A_ConfigTxDin_RF315(u8 nDinSel);
 void CMT2300A_EnableTxDin_RF315(BOOL bEnable);
 void CMT2300A_EnableTxDinInvert_RF315(BOOL bEnable);
-
 
 /* ************************************************************************
 *  The following are general operations.
@@ -86,7 +83,6 @@ void CMT2300A_EnableLfoscOutput_RF315(BOOL bEnable);
 void CMT2300A_EnableAfc_RF315(BOOL bEnable);
 void CMT2300A_SetAfcOvfTh_RF315(u8 afcOvfTh);
 
-
 /* ************************************************************************
 *  The following are for chip initializes.
 *  ************************************************************************ */
@@ -94,7 +90,7 @@ void CMT2300A_Init_RF315(void);
 BOOL CMT2300A_ConfigRegBank_RF315(u8 base_addr, const u8 bank[], u8 len);
 
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

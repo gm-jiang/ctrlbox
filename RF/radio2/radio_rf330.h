@@ -17,15 +17,15 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
- 
+
 #ifndef __RADIO_RF330_H
 #define __RADIO_RF330_H
 
 #include "typedefs.h"
 #include "cmt2300a_rf330.h"
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* RF state machine */
@@ -65,12 +65,10 @@ u8 RF330_GetInterruptFlags(void);
 void RF330_StartRx(u8 buf[], u16 len, u32 timeout);
 void RF330_StartTx(u8 buf[], u16 len, u32 timeout);
 
-
-
 EnumRF330Result RF330_Process(void);
 
-#ifdef __cplusplus 
-} 
+#ifdef __cplusplus
+}
 #endif
 
 #endif

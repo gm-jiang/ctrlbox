@@ -10,9 +10,8 @@ void bsp_all_gpio_configuration(void)
     * immunity against EMI/EMC */
 
     // Enable GPIOs clocks
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
-                           RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD |
-                           RCC_APB2Periph_GPIOE, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE,
+                           ENABLE);
 
     // Set all GPIO pins as analog inputs
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
@@ -24,13 +23,12 @@ void bsp_all_gpio_configuration(void)
     GPIO_Init(GPIOE, &GPIO_InitStructure);
 
     // Disable GPIOs clocks
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
-                                     RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD |
-                                     RCC_APB2Periph_GPIOE, DISABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE,
+                           DISABLE);
 }
 
 void bsp_gpio_config(void)
-{ 
+{
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
@@ -234,7 +232,7 @@ uint8_t bsp_power_test_read(void)
 }
 
 void GPIO_Config(void)
-{ 
+{
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
@@ -245,17 +243,17 @@ void GPIO_Config(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-    
-//    SET_GPIO_IN(KEY1_GPIO);
-//    SET_GPIO_IN(KEY2_GPIO);
-//    SET_GPIO_IN(KEY3_GPIO);
-//    SET_GPIO_IN(KEY4_GPIO);
-//    SET_GPIO_IN(KEY5_GPIO);
-    
-//    SET_GPIO_IN(CMT_GPIO1_GPIO);
-//    SET_GPIO_IN(CMT_GPIO2_GPIO);
+
+    //    SET_GPIO_IN(KEY1_GPIO);
+    //    SET_GPIO_IN(KEY2_GPIO);
+    //    SET_GPIO_IN(KEY3_GPIO);
+    //    SET_GPIO_IN(KEY4_GPIO);
+    //    SET_GPIO_IN(KEY5_GPIO);
+
+    //    SET_GPIO_IN(CMT_GPIO1_GPIO);
+    //    SET_GPIO_IN(CMT_GPIO2_GPIO);
     SET_GPIO_IN(CMT_GPIO3_GPIO);
-//    SET_GPIO_IN(CMT_GPIO4_GPIO);
+    //    SET_GPIO_IN(CMT_GPIO4_GPIO);
 }
 
 #if 0
@@ -301,7 +299,7 @@ void bsp_key1_init(void)
 
     // Enable GPIO used as key IRQ for interrupt
     GPIO_InitStructure.GPIO_Pin = KEY1_DETECTIRQ_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
     GPIO_Init(KEY1_DETECTIRQ_GPIO, &GPIO_InitStructure);
 
     /* Connect EXTI Line to GPIO Pin */
@@ -333,7 +331,7 @@ void bsp_key2_init(void)
 
     // Enable GPIO used as key IRQ for interrupt
     GPIO_InitStructure.GPIO_Pin = KEY2_DETECTIRQ_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
     GPIO_Init(KEY2_DETECTIRQ_GPIO, &GPIO_InitStructure);
 
     /* Connect EXTI Line to GPIO Pin */
@@ -365,7 +363,7 @@ void bsp_key3_init(void)
 
     // Enable GPIO used as key IRQ for interrupt
     GPIO_InitStructure.GPIO_Pin = KEY3_DETECTIRQ_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
     GPIO_Init(KEY3_DETECTIRQ_GPIO, &GPIO_InitStructure);
 
     /* Connect EXTI Line to GPIO Pin */
@@ -397,7 +395,7 @@ void bsp_key4_init(void)
 
     // Enable GPIO used as key IRQ for interrupt
     GPIO_InitStructure.GPIO_Pin = KEY4_DETECTIRQ_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
     GPIO_Init(KEY4_DETECTIRQ_GPIO, &GPIO_InitStructure);
 
     /* Connect EXTI Line to GPIO Pin */
@@ -429,7 +427,7 @@ void bsp_key5_init(void)
 
     // Enable GPIO used as key IRQ for interrupt
     GPIO_InitStructure.GPIO_Pin = KEY5_DETECTIRQ_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; //IRQ pin should be Pull Down to prevent unnecessary EXT IRQ
     GPIO_Init(KEY5_DETECTIRQ_GPIO, &GPIO_InitStructure);
 
     /* Connect EXTI Line to GPIO Pin */
@@ -454,9 +452,9 @@ void bsp_key5_init(void)
 void bsp_RF430_Tx_set(uint8_t status)
 {
     if (status) {
-        GPIO_ResetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN);  //?0
+        GPIO_ResetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN); //?0
     } else {
-        GPIO_SetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN);  //?1
+        GPIO_SetBits(CMT_GPIO3_GPIO, CMT_GPIO3_GPIO_PIN); //?1
     }
 }
 
@@ -464,102 +462,96 @@ void GPIO_Pin_Setting(GPIO_TypeDef *gpio, uint16_t nPin, GPIOSpeed_TypeDef speed
 {
     u16 i;
     u32 nCfg, nMask = 0x0F;
-    
-    nCfg  = (mode&0x10) ?speed :0;
+
+    nCfg = (mode & 0x10) ? speed : 0;
     nCfg |= mode & 0x0C;
-    
-    if(nPin == 0)
+
+    if (nPin == 0)
         return;
-    
-    if(nPin < 0x0100)
-    {
-        for(i=nPin; (0x01&i)==0; i >>= 1) {
+
+    if (nPin < 0x0100) {
+        for (i = nPin; (0x01 & i) == 0; i >>= 1) {
             nCfg <<= 4;
             nMask <<= 4;
         }
-        
+
         gpio->CRL &= ~nMask;
         gpio->CRL |= nCfg;
-    }
-    else
-    {
-        for(i=(nPin>>8); (0x01&i)==0; i >>= 1) {
+    } else {
+        for (i = (nPin >> 8); (0x01 & i) == 0; i >>= 1) {
             nCfg <<= 4;
             nMask <<= 4;
         }
-        
+
         gpio->CRH &= ~nMask;
         gpio->CRH |= nCfg;
     }
-    
-    if(GPIO_Mode_IPD==mode)
+
+    if (GPIO_Mode_IPD == mode)
         gpio->BRR = nPin;
-    
-    else if(GPIO_Mode_IPU==mode)
+
+    else if (GPIO_Mode_IPU == mode)
         gpio->BSRR = nPin;
 }
 
 void bsp_uart1_send(uint8_t *buf, uint16_t length)
 {
     uint16_t i;
-    for(i = 0; i < length; i++)
-    {
+    for (i = 0; i < length; i++) {
         USART_SendData(USART1, buf[i]);
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-        
+        while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+            ;
     }
 }
 
 void bsp_uart2_send(uint8_t *buf, uint16_t length)
 {
     uint16_t i;
-    for(i = 0; i < length; i++)
-    {
+    for (i = 0; i < length; i++) {
         USART_SendData(USART2, buf[i]);
-        while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
-  }
+        while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
+            ;
+    }
 }
 
 void bsp_uart3_send(uint8_t *buf, uint16_t length)
 {
     uint16_t i;
-    for(i = 0; i < length; i++)
-    {
+    for (i = 0; i < length; i++) {
         USART_SendData(USART3, buf[i]);
-        while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-  }
+        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET)
+            ;
+    }
 }
 
 void bsp_uart4_send(uint8_t *buf, uint16_t length)
 {
     uint16_t i;
-    for(i = 0; i < length; i++)
-    {
+    for (i = 0; i < length; i++) {
         USART_SendData(UART4, buf[i]);
-        while(USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET);
-  }
+        while (USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET)
+            ;
+    }
 }
 
 #include "mt_common.h"
 
-uint8_t item_buff[7] = {0x7E, 0x05, 0xA0, 0x00, 0x01, 0xA6, 0xEF};
-
+uint8_t item_buff[7] = { 0x7E, 0x05, 0xA0, 0x00, 0x01, 0xA6, 0xEF };
 
 void USART1_Send(void)
 {
-    int i1;	
+    int i1;
     delay_us(20);
 
-    for(i1=0;i1<7;i1++)
-    {			
+    for (i1 = 0; i1 < 7; i1++) {
         USART_SendData(USART1, item_buff[i1]);
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-        delay_us(5);		
+        while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+            ;
+        delay_us(5);
     }
 
     delay_us(20);
 }
-
 
 /*  IWDG init
  * Tout = prv/40 * rlv (s)
@@ -577,11 +569,11 @@ void USART1_Send(void)
  * IWDG_Init(IWDG_Prescaler_64 ,625);  // IWDG 1s
  *                        (64/40)*625 = 1s
  */
-void bsp_IWDG_init(uint8_t prv ,uint16_t rlv)
+void bsp_IWDG_init(uint8_t prv, uint16_t rlv)
 {
     IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-    IWDG_SetPrescaler( prv );
-    IWDG_SetReload( rlv );
+    IWDG_SetPrescaler(prv);
+    IWDG_SetReload(rlv);
     IWDG_ReloadCounter();
     IWDG_Enable();
 }
@@ -595,24 +587,23 @@ void bsp_IWDG_feed(void)
 //read flash halfword 16bit
 uint16_t bsp_FLASH_ReadHalfWord(uint32_t address)
 {
-    return *(__IO uint16_t*)address;
+    return *(__IO uint16_t *)address;
 }
 
 //read word 32bit
 uint32_t bsp_FLASH_ReadWord(uint32_t address)
 {
-    uint32_t temp1,temp2;
-    temp1=*(__IO uint16_t*)address;
-    temp2=*(__IO uint16_t*)(address + 2);
-    return (temp2<<16) + temp1;
+    uint32_t temp1, temp2;
+    temp1 = *(__IO uint16_t *)address;
+    temp2 = *(__IO uint16_t *)(address + 2);
+    return (temp2 << 16) + temp1;
 }
 
 //read more data once
 void bsp_FLASH_ReadMoreData(uint32_t startAddress, uint16_t *readData, uint16_t countToRead)
 {
     uint16_t dataIndex;
-    for(dataIndex = 0;dataIndex < countToRead;dataIndex++)
-    {
+    for (dataIndex = 0; dataIndex < countToRead; dataIndex++) {
         readData[dataIndex] = bsp_FLASH_ReadHalfWord(startAddress + dataIndex * 2);
     }
 }
@@ -625,22 +616,20 @@ void bsp_FLASH_WriteMoreData(uint32_t startAddress, uint16_t *writeData, uint16_
     uint32_t sectorPosition;
     uint32_t sectorStartAddress;
 
-    if((startAddress < FLASH_BASE) ||((startAddress + countToWrite * 2) >= (FLASH_BASE + 1024 * FLASH_SIZE)))
-    {
-        return;//invalid addr
+    if ((startAddress < FLASH_BASE) || ((startAddress + countToWrite * 2) >= (FLASH_BASE + 1024 * FLASH_SIZE))) {
+        return; //invalid addr
     }
-    FLASH_Unlock();         //unlock
-    offsetAddress = startAddress - FLASH_BASE;               //calc actual offset(sub 0X08000000)
-    sectorPosition = offsetAddress / SECTOR_SIZE;            //calc address of sector
+    FLASH_Unlock();                               //unlock
+    offsetAddress = startAddress - FLASH_BASE;    //calc actual offset(sub 0X08000000)
+    sectorPosition = offsetAddress / SECTOR_SIZE; //calc address of sector
 
-    sectorStartAddress = sectorPosition * SECTOR_SIZE + FLASH_BASE;    //the first address of sector
+    sectorStartAddress = sectorPosition * SECTOR_SIZE + FLASH_BASE; //the first address of sector
 
-    FLASH_ErasePage(sectorStartAddress);//erase this address
+    FLASH_ErasePage(sectorStartAddress); //erase this address
 
-    for(dataIndex = 0;dataIndex < countToWrite;dataIndex++)
-    {
-        FLASH_ProgramHalfWord(startAddress + dataIndex * 2,writeData[dataIndex]);
+    for (dataIndex = 0; dataIndex < countToWrite; dataIndex++) {
+        FLASH_ProgramHalfWord(startAddress + dataIndex * 2, writeData[dataIndex]);
     }
 
-    FLASH_Lock();//lock
+    FLASH_Lock(); //lock
 }

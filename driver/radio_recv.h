@@ -2,9 +2,9 @@
 #define _RADIO_RECV_H_
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
-      
+
 void RF315_IN(void);
 void RF330_IN(void);
 void RF433_IN(void);

@@ -14,7 +14,7 @@ extern "C" {
 #define NOP() __NOP()
 
 #ifndef u8
-#define u8  unsigned char
+#define u8 unsigned char
 #endif
 
 #ifndef u16
@@ -26,11 +26,11 @@ extern "C" {
 #endif
 
 #ifndef U8
-#define U8  unsigned char
+#define U8 unsigned char
 #endif
 
 #ifndef S8
-#define S8  char
+#define S8 char
 #endif
 
 #ifndef U16
@@ -46,11 +46,11 @@ extern "C" {
 #endif
 
 #ifndef TRUE
-#define TRUE (BOOL)SET
+#define TRUE (BOOL) SET
 #endif
 
 #ifndef FALSE
-#define FALSE (BOOL)RESET
+#define FALSE (BOOL) RESET
 #endif
 
 #define INFINITE 0xFFFFFFFF
@@ -58,7 +58,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif

@@ -25,11 +25,11 @@
 #include "cmt2300a_defs.h"
 #include "cmt2300a_hal.h"
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#define ENABLE_AUTO_SWITCH_CHIP_STATUS   /* Enable the auto switch chip status */
+#define ENABLE_AUTO_SWITCH_CHIP_STATUS /* Enable the auto switch chip status */
 
 /* ************************************************************************
    The following are for chip status controls.
@@ -43,7 +43,6 @@ BOOL CMT2300A_GoTFS(void);
 BOOL CMT2300A_GoRFS(void);
 BOOL CMT2300A_GoTx(void);
 BOOL CMT2300A_GoRx(void);
-
 
 /* ************************************************************************
 *  The following are for chip interrupts, GPIO, FIFO operations.
@@ -63,14 +62,12 @@ u8 CMT2300A_ClearTxFifo(void);
 u8 CMT2300A_ClearRxFifo(void);
 u8 CMT2300A_ClearInterruptFlags(void);
 
-
 /* ************************************************************************
 *  The following are for Tx DIN operations in direct mode.
 *  ************************************************************************ */
 void CMT2300A_ConfigTxDin(u8 nDinSel);
 void CMT2300A_EnableTxDin(BOOL bEnable);
 void CMT2300A_EnableTxDinInvert(BOOL bEnable);
-
 
 /* ************************************************************************
 *  The following are general operations.
@@ -86,7 +83,6 @@ void CMT2300A_EnableLfoscOutput(BOOL bEnable);
 void CMT2300A_EnableAfc(BOOL bEnable);
 void CMT2300A_SetAfcOvfTh(u8 afcOvfTh);
 
-
 /* ************************************************************************
 *  The following are for chip initializes.
 *  ************************************************************************ */
@@ -94,7 +90,7 @@ void CMT2300A_Init(void);
 BOOL CMT2300A_ConfigRegBank(u8 base_addr, const u8 bank[], u8 len);
 
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

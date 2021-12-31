@@ -17,49 +17,44 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
- 
-#include "cmt2300a_hal.h"
 
+#include "cmt2300a_hal.h"
 
 /*! ********************************************************
 * @name    CMT2300A_InitGpio
 * @desc    Initializes the CMT2300A interface GPIOs.
 * *********************************************************/
 
-
 void CMT2300A_GPIO(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE); 
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); 
-	
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_3);
+    GPIO_ResetBits(GPIOC, GPIO_Pin_3);
 }
 void CMT2300A_InitGpio_TX(void)
 {
-	CMT2300A_SetGpio3out();  //CMT2300A_SetGpio1In();
-    //CMT2300A_SetGpio2In();
-    //CMT2300A_SetGpio3In();
-	CMT2300A_GPIO();
+    CMT2300A_SetGpio3out(); //CMT2300A_SetGpio1In();
+                            //CMT2300A_SetGpio2In();
+                            //CMT2300A_SetGpio3In();
+    CMT2300A_GPIO();
     cmt_spi3_init();
 }
 
 void CMT2300A_InitGpio_RX(void)
 {
-//   	CMT2300A_SetGpio1In();
-//    CMT2300A_SetGpio2In();
+    //   	CMT2300A_SetGpio1In();
+    //    CMT2300A_SetGpio2In();
     CMT2300A_SetGpio3In();
-	  //CMT2300A_GPIO();
+    //CMT2300A_GPIO();
     cmt_spi3_init();
 }
-
-
-
 
 /*! ********************************************************
 * @name    CMT2300A_ReadReg
@@ -71,7 +66,7 @@ u8 CMT2300A_ReadReg(u8 addr)
 {
     u8 dat = 0xFF;
     cmt_spi3_read(addr, &dat);
-	
+
     return dat;
 }
 

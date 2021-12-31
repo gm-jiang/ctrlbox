@@ -1,8 +1,8 @@
 #include "menu.h"
 
-static PWND g_currentwnd=0;
+static PWND g_currentwnd = 0;
 
-void creatwnd(PWND pwnd,void (*kf)(PWND,unsigned char key),PWND parwnd,unsigned char buf_size)
+void creatwnd(PWND pwnd, void (*kf)(PWND, unsigned char key), PWND parwnd, unsigned char buf_size)
 {
     pwnd->keyevent = kf;
     pwnd->buf = buf_size;
@@ -11,7 +11,7 @@ void creatwnd(PWND pwnd,void (*kf)(PWND,unsigned char key),PWND parwnd,unsigned 
     pwnd->unload = 0;
 }
 
-void setcallback(PWND pwnd ,void(*load)(PWND),void(*unload)(PWND))
+void setcallback(PWND pwnd, void (*load)(PWND), void (*unload)(PWND))
 {
     pwnd->load = load;
     pwnd->unload = unload;

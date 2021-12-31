@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#define SW_V            "1.04"
-#define HW_V            "1.00"
-#define VER_INFO_LEN     4
+#define SW_V         "1.04"
+#define HW_V         "1.00"
+#define VER_INFO_LEN 4
 
-#define FIFO_TH  32
+#define FIFO_TH 32
 
 void mt_sleep_ms(uint16_t time);
 void mt_sleep_us(uint32_t time_us);

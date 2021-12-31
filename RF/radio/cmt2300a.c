@@ -46,7 +46,7 @@ void CMT2300A_SoftReset(void)
 * *********************************************************/
 u8 CMT2300A_GetChipStatus(void)
 {
-    return  CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA) & CMT2300A_MASK_CHIP_MODE_STA;
+    return CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA) & CMT2300A_MASK_CHIP_MODE_STA;
 }
 
 /*! ********************************************************
@@ -57,46 +57,56 @@ u8 CMT2300A_GetChipStatus(void)
 * *********************************************************/
 BOOL CMT2300A_AutoSwitchStatus(u8 nGoCmd)
 {
-    #ifdef ENABLE_AUTO_SWITCH_CHIP_STATUS
+#ifdef ENABLE_AUTO_SWITCH_CHIP_STATUS
     u32 nBegTick = CMT2300A_GetTickCount();
-    u8  nWaitStatus;
-    
-    switch(nGoCmd)
-    {
-    case CMT2300A_GO_SLEEP: nWaitStatus = CMT2300A_STA_SLEEP; break;
-    case CMT2300A_GO_STBY : nWaitStatus = CMT2300A_STA_STBY ; break;
-    case CMT2300A_GO_TFS  : nWaitStatus = CMT2300A_STA_TFS  ; break;
-    case CMT2300A_GO_TX   : nWaitStatus = CMT2300A_STA_TX   ; break;
-    case CMT2300A_GO_RFS  : nWaitStatus = CMT2300A_STA_RFS  ; break;
-    case CMT2300A_GO_RX   : nWaitStatus = CMT2300A_STA_RX   ; break;
+    u8 nWaitStatus;
+
+    switch (nGoCmd) {
+        case CMT2300A_GO_SLEEP:
+            nWaitStatus = CMT2300A_STA_SLEEP;
+            break;
+        case CMT2300A_GO_STBY:
+            nWaitStatus = CMT2300A_STA_STBY;
+            break;
+        case CMT2300A_GO_TFS:
+            nWaitStatus = CMT2300A_STA_TFS;
+            break;
+        case CMT2300A_GO_TX:
+            nWaitStatus = CMT2300A_STA_TX;
+            break;
+        case CMT2300A_GO_RFS:
+            nWaitStatus = CMT2300A_STA_RFS;
+            break;
+        case CMT2300A_GO_RX:
+            nWaitStatus = CMT2300A_STA_RX;
+            break;
     }
-    
+
     CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, nGoCmd);
-    
-    while(CMT2300A_GetTickCount()-nBegTick < 10)
-    {
+
+    while (CMT2300A_GetTickCount() - nBegTick < 10) {
         CMT2300A_DelayUs(100);
-        
-        if(nWaitStatus==CMT2300A_GetChipStatus())
+
+        if (nWaitStatus == CMT2300A_GetChipStatus())
             return TRUE;
-        
-        if(CMT2300A_GO_TX==nGoCmd) {
+
+        if (CMT2300A_GO_TX == nGoCmd) {
             CMT2300A_DelayUs(100);
-            
-            if(CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1))
+
+            if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1))
                 return TRUE;
         }
-        
-        if(CMT2300A_GO_RX==nGoCmd) {
+
+        if (CMT2300A_GO_RX == nGoCmd) {
             CMT2300A_DelayUs(100);
-            
-            if(CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG))
+
+            if (CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG))
                 return TRUE;
         }
     }
-    
+
     return FALSE;
-    
+
 #else
     CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, nGoCmd);
     return TRUE;
@@ -248,7 +258,7 @@ void CMT2300A_SetInterruptPolar(BOOL bActiveHigh)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
 
-    if(bActiveHigh)
+    if (bActiveHigh)
         tmp &= ~CMT2300A_MASK_INT_POLAR;
     else
         tmp |= CMT2300A_MASK_INT_POLAR;
@@ -262,12 +272,12 @@ void CMT2300A_SetInterruptPolar(BOOL bActiveHigh)
 * @param   nFifoThreshold
 * *********************************************************/
 void CMT2300A_SetFifoThreshold(u8 nFifoThreshold)
-{ 
+{
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT29);
-    
+
     tmp &= ~CMT2300A_MASK_FIFO_TH;
     tmp |= nFifoThreshold & CMT2300A_MASK_FIFO_TH;
-    
+
     CMT2300A_WriteReg(CMT2300A_CUS_PKT29, tmp);
 }
 
@@ -285,11 +295,10 @@ void CMT2300A_EnableAntennaSwitch(u8 nMode)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
 
-    if(0 == nMode) {
+    if (0 == nMode) {
         tmp |= CMT2300A_MASK_RF_SWT1_EN;
         tmp &= ~CMT2300A_MASK_RF_SWT2_EN;
-    }
-    else if(1 == nMode) {
+    } else if (1 == nMode) {
         tmp &= ~CMT2300A_MASK_RF_SWT1_EN;
         tmp |= CMT2300A_MASK_RF_SWT2_EN;
     }
@@ -325,7 +334,7 @@ void CMT2300A_EnableRxFifoAutoClear(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
-    if(bEnable)
+    if (bEnable)
         tmp &= ~CMT2300A_MASK_FIFO_AUTO_CLR_DIS;
     else
         tmp |= CMT2300A_MASK_FIFO_AUTO_CLR_DIS;
@@ -343,7 +352,7 @@ void CMT2300A_EnableFifoMerge(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
-    if(bEnable)
+    if (bEnable)
         tmp |= CMT2300A_MASK_FIFO_MERGE_EN;
     else
         tmp &= ~CMT2300A_MASK_FIFO_MERGE_EN;
@@ -358,7 +367,7 @@ void CMT2300A_EnableFifoMerge(BOOL bEnable)
 void CMT2300A_EnableReadFifo(void)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
-    tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL; 
+    tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL;
     tmp &= ~CMT2300A_MASK_FIFO_RX_TX_SEL;
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CTL, tmp);
 }
@@ -440,77 +449,77 @@ u8 CMT2300A_ClearInterruptFlags(void)
     u8 nFlag1, nFlag2;
     u8 nClr1 = 0;
     u8 nClr2 = 0;
-    u8 nRet  = 0;
+    u8 nRet = 0;
     u8 nIntPolar;
-    
+
     nIntPolar = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
-    nIntPolar = (nIntPolar & CMT2300A_MASK_INT_POLAR) ?1 :0;
+    nIntPolar = (nIntPolar & CMT2300A_MASK_INT_POLAR) ? 1 : 0;
 
     nFlag1 = CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
     nFlag2 = CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1);
-    
-    if(nIntPolar) {
+
+    if (nIntPolar) {
         /* Interrupt flag active-low */
         nFlag1 = ~nFlag1;
         nFlag2 = ~nFlag2;
     }
 
-    if(CMT2300A_MASK_LBD_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_LBD_CLR;         /* Clear LBD_FLG */
+    if (CMT2300A_MASK_LBD_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_LBD_CLR; /* Clear LBD_FLG */
     }
 
-    if(CMT2300A_MASK_COL_ERR_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR;    /* Clear COL_ERR_FLG by PKT_DONE_CLR */
+    if (CMT2300A_MASK_COL_ERR_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR; /* Clear COL_ERR_FLG by PKT_DONE_CLR */
     }
 
-    if(CMT2300A_MASK_PKT_ERR_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR;    /* Clear PKT_ERR_FLG by PKT_DONE_CLR */
+    if (CMT2300A_MASK_PKT_ERR_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR; /* Clear PKT_ERR_FLG by PKT_DONE_CLR */
     }
 
-    if(CMT2300A_MASK_PREAM_OK_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_PREAM_OK_CLR;    /* Clear PREAM_OK_FLG */
-        nRet  |= CMT2300A_MASK_PREAM_OK_FLG;    /* Return PREAM_OK_FLG */
+    if (CMT2300A_MASK_PREAM_OK_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_PREAM_OK_CLR; /* Clear PREAM_OK_FLG */
+        nRet |= CMT2300A_MASK_PREAM_OK_FLG;  /* Return PREAM_OK_FLG */
     }
 
-    if(CMT2300A_MASK_SYNC_OK_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_SYNC_OK_CLR;    /* Clear SYNC_OK_FLG */
-        nRet  |= CMT2300A_MASK_SYNC_OK_FLG;    /* Return SYNC_OK_FLG */
+    if (CMT2300A_MASK_SYNC_OK_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_SYNC_OK_CLR; /* Clear SYNC_OK_FLG */
+        nRet |= CMT2300A_MASK_SYNC_OK_FLG;  /* Return SYNC_OK_FLG */
     }
 
-    if(CMT2300A_MASK_NODE_OK_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_NODE_OK_CLR;    /* Clear NODE_OK_FLG */
-        nRet  |= CMT2300A_MASK_NODE_OK_FLG;    /* Return NODE_OK_FLG */
+    if (CMT2300A_MASK_NODE_OK_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_NODE_OK_CLR; /* Clear NODE_OK_FLG */
+        nRet |= CMT2300A_MASK_NODE_OK_FLG;  /* Return NODE_OK_FLG */
     }
 
-    if(CMT2300A_MASK_CRC_OK_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_CRC_OK_CLR;    /* Clear CRC_OK_FLG */
-        nRet  |= CMT2300A_MASK_CRC_OK_FLG;    /* Return CRC_OK_FLG */
+    if (CMT2300A_MASK_CRC_OK_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_CRC_OK_CLR; /* Clear CRC_OK_FLG */
+        nRet |= CMT2300A_MASK_CRC_OK_FLG;  /* Return CRC_OK_FLG */
     }
 
-    if(CMT2300A_MASK_PKT_OK_FLG & nFlag1) {
-        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR;  /* Clear PKT_OK_FLG */
-        nRet  |= CMT2300A_MASK_PKT_OK_FLG;    /* Return PKT_OK_FLG */
-    }    
-
-    if(CMT2300A_MASK_SL_TMO_FLG & nFlag2) {
-        nClr1 |= CMT2300A_MASK_SL_TMO_CLR;    /* Clear SL_TMO_FLG */
-        nRet  |= CMT2300A_MASK_SL_TMO_EN;     /* Return SL_TMO_FLG by SL_TMO_EN */
+    if (CMT2300A_MASK_PKT_OK_FLG & nFlag1) {
+        nClr2 |= CMT2300A_MASK_PKT_DONE_CLR; /* Clear PKT_OK_FLG */
+        nRet |= CMT2300A_MASK_PKT_OK_FLG;    /* Return PKT_OK_FLG */
     }
 
-    if(CMT2300A_MASK_RX_TMO_FLG & nFlag2) {
-        nClr1 |= CMT2300A_MASK_RX_TMO_CLR;    /* Clear RX_TMO_FLG */
-        nRet  |= CMT2300A_MASK_RX_TMO_EN;     /* Return RX_TMO_FLG by RX_TMO_EN */
+    if (CMT2300A_MASK_SL_TMO_FLG & nFlag2) {
+        nClr1 |= CMT2300A_MASK_SL_TMO_CLR; /* Clear SL_TMO_FLG */
+        nRet |= CMT2300A_MASK_SL_TMO_EN;   /* Return SL_TMO_FLG by SL_TMO_EN */
     }
 
-    if(CMT2300A_MASK_TX_DONE_FLG & nFlag2) {
-        nClr1 |= CMT2300A_MASK_TX_DONE_CLR;   /* Clear TX_DONE_FLG */
-        nRet  |= CMT2300A_MASK_TX_DONE_EN;    /* Return TX_DONE_FLG by TX_DONE_EN */
+    if (CMT2300A_MASK_RX_TMO_FLG & nFlag2) {
+        nClr1 |= CMT2300A_MASK_RX_TMO_CLR; /* Clear RX_TMO_FLG */
+        nRet |= CMT2300A_MASK_RX_TMO_EN;   /* Return RX_TMO_FLG by RX_TMO_EN */
     }
-    
+
+    if (CMT2300A_MASK_TX_DONE_FLG & nFlag2) {
+        nClr1 |= CMT2300A_MASK_TX_DONE_CLR; /* Clear TX_DONE_FLG */
+        nRet |= CMT2300A_MASK_TX_DONE_EN;   /* Return TX_DONE_FLG by TX_DONE_EN */
+    }
+
     CMT2300A_WriteReg(CMT2300A_CUS_INT_CLR1, nClr1);
     CMT2300A_WriteReg(CMT2300A_CUS_INT_CLR2, nClr2);
 
-    if(nIntPolar) {
+    if (nIntPolar) {
         /* Interrupt flag active-low */
         nRet = ~nRet;
     }
@@ -546,7 +555,7 @@ void CMT2300A_EnableTxDin(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
-    if(bEnable)
+    if (bEnable)
         tmp |= CMT2300A_MASK_TX_DIN_EN;
     else
         tmp &= ~CMT2300A_MASK_TX_DIN_EN;
@@ -564,7 +573,7 @@ void CMT2300A_EnableTxDinInvert(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
 
-    if(bEnable)
+    if (bEnable)
         tmp |= CMT2300A_MASK_TX_DIN_INV;
     else
         tmp &= ~CMT2300A_MASK_TX_DIN_INV;
@@ -587,7 +596,7 @@ BOOL CMT2300A_IsExist(void)
     dat = CMT2300A_ReadReg(CMT2300A_CUS_PKT17);
     CMT2300A_WriteReg(CMT2300A_CUS_PKT17, back);
 
-    if(0xAA==dat)
+    if (0xAA == dat)
         return TRUE;
     else
         return FALSE;
@@ -642,13 +651,13 @@ void CMT2300A_SetFrequencyStep(u8 nOffset)
 * @param   nLength
 * *********************************************************/
 void CMT2300A_SetPayloadLength(u16 nLength)
-{ 
+{
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT14);
-    
+
     tmp &= ~CMT2300A_MASK_PAYLOAD_LENG_10_8;
     tmp |= (nLength >> 4) & CMT2300A_MASK_PAYLOAD_LENG_10_8;
     CMT2300A_WriteReg(CMT2300A_CUS_PKT14, tmp);
-    
+
     tmp = nLength & CMT2300A_MASK_PAYLOAD_LENG_7_0;
     CMT2300A_WriteReg(CMT2300A_CUS_PKT15, tmp);
 }
@@ -662,18 +671,17 @@ void CMT2300A_SetPayloadLength(u16 nLength)
 void CMT2300A_EnableLfosc(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_SYS2);
-    
-    if(bEnable) {
+
+    if (bEnable) {
         tmp |= CMT2300A_MASK_LFOSC_RECAL_EN;
         tmp |= CMT2300A_MASK_LFOSC_CAL1_EN;
         tmp |= CMT2300A_MASK_LFOSC_CAL2_EN;
-    }
-    else {
+    } else {
         tmp &= ~CMT2300A_MASK_LFOSC_RECAL_EN;
         tmp &= ~CMT2300A_MASK_LFOSC_CAL1_EN;
         tmp &= ~CMT2300A_MASK_LFOSC_CAL2_EN;
     }
-    
+
     CMT2300A_WriteReg(CMT2300A_CUS_SYS2, tmp);
 }
 
@@ -686,12 +694,12 @@ void CMT2300A_EnableLfosc(BOOL bEnable)
 void CMT2300A_EnableLfoscOutput(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
-    
-    if(bEnable)
+
+    if (bEnable)
         tmp |= CMT2300A_MASK_LFOSC_OUT_EN;
     else
         tmp &= ~CMT2300A_MASK_LFOSC_OUT_EN;
-    
+
     CMT2300A_WriteReg(CMT2300A_CUS_INT2_CTL, tmp);
 }
 
@@ -704,12 +712,12 @@ void CMT2300A_EnableLfoscOutput(BOOL bEnable)
 void CMT2300A_EnableAfc(BOOL bEnable)
 {
     u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FSK5);
-    
-    if(bEnable)
+
+    if (bEnable)
         tmp |= 0x10;
     else
         tmp &= ~0x10;
-    
+
     CMT2300A_WriteReg(CMT2300A_CUS_FSK5, tmp);
 }
 
@@ -733,19 +741,19 @@ void CMT2300A_Init(void)
 
     CMT2300A_SoftReset();
     CMT2300A_DelayMs(10);
-    
+
     CMT2300A_GoStby();
 
-    tmp  = CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA);
-    tmp |= CMT2300A_MASK_CFG_RETAIN;         /* Enable CFG_RETAIN */
-    tmp &= ~CMT2300A_MASK_RSTN_IN_EN;        /* Disable RSTN_IN */
+    tmp = CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA);
+    tmp |= CMT2300A_MASK_CFG_RETAIN;  /* Enable CFG_RETAIN */
+    tmp &= ~CMT2300A_MASK_RSTN_IN_EN; /* Disable RSTN_IN */
     CMT2300A_WriteReg(CMT2300A_CUS_MODE_STA, tmp);
 
-    tmp  = CMT2300A_ReadReg(CMT2300A_CUS_EN_CTL);
-    tmp |= CMT2300A_MASK_LOCKING_EN;         /* Enable LOCKING_EN */
+    tmp = CMT2300A_ReadReg(CMT2300A_CUS_EN_CTL);
+    tmp |= CMT2300A_MASK_LOCKING_EN; /* Enable LOCKING_EN */
     CMT2300A_WriteReg(CMT2300A_CUS_EN_CTL, tmp);
-    
-    CMT2300A_EnableLfosc(FALSE);             /* Diable LFOSC */
+
+    CMT2300A_EnableLfosc(FALSE); /* Diable LFOSC */
 
     CMT2300A_ClearInterruptFlags();
 }
@@ -757,8 +765,8 @@ void CMT2300A_Init(void)
 BOOL CMT2300A_ConfigRegBank(u8 base_addr, const u8 bank[], u8 len)
 {
     u8 i;
-    for(i=0; i<len; i++)
-        CMT2300A_WriteReg(i+base_addr, bank[i]);
+    for (i = 0; i < len; i++)
+        CMT2300A_WriteReg(i + base_addr, bank[i]);
 
     return TRUE;
 }

@@ -17,15 +17,15 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
- 
+
 #ifndef __RADIO_H
 #define __RADIO_H
 
 #include "typedefs.h"
 #include "cmt2300a.h"
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* RF state machine */
@@ -61,7 +61,6 @@ void RF_Config_RX(void);
 void RF_Init_TX(void);
 void RF_Config_TX(void);
 
-
 void RF_SetStatus(EnumRFStatus nStatus);
 EnumRFStatus RF_GetStatus(void);
 u8 RF_GetInterruptFlags(void);
@@ -69,14 +68,13 @@ u8 RF_GetInterruptFlags(void);
 void RF_StartRx(u8 buf[], u16 len, u32 timeout);
 void RF_StartTx(u8 buf[], u16 len, u32 timeout);
 
-
 // void RF_433();
 
 // void RF_418();
 EnumRFResult RF_Process(void);
 
-#ifdef __cplusplus 
-} 
+#ifdef __cplusplus
+}
 #endif
 
 #endif

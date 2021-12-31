@@ -17,7 +17,7 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
- 
+
 #include "cmt2300a_hal_rf433.h"
 #include "cmt_spi3_rf433.h"
 
@@ -27,34 +27,31 @@
 *
 * *********************************************************/
 
-
 void CMT2300A_GPIO_RF433(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE); 
-  GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); 
-	
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOA,GPIO_Pin_1);
-	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_2);
-	
-	
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_ResetBits(GPIOA, GPIO_Pin_1);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    GPIO_ResetBits(GPIOC, GPIO_Pin_2);
 }
 void CMT2300A_InitGpio_RF433(void)
 {
-//	 CMT2300A_SetGpio1In_RF433();
-//    CMT2300A_SetGpio2In_RF433();
+    //	 CMT2300A_SetGpio1In_RF433();
+    //    CMT2300A_SetGpio2In_RF433();
     CMT2300A_SetGpio3In_RF433();
-	//CMT2300A_GPIO_RF433();
+    //CMT2300A_GPIO_RF433();
     cmt_spi3_init_RF433();
 }
 
@@ -68,7 +65,7 @@ u8 CMT2300A_ReadReg_RF433(u8 addr)
 {
     u8 dat = 0xFF;
     cmt_spi3_read_RF433(addr, &dat);
-	
+
     return dat;
 }
 

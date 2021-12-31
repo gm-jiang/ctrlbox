@@ -1,13 +1,12 @@
 #include "lcd.h"
-#include "mt_common.h"	 
+#include "mt_common.h"
 
 char ceshi;
 
 _lcd_dev lcddev;
 
-u16 POINT_COLOR = WHITE,BACK_COLOR = 0xFFFF;
+u16 POINT_COLOR = WHITE, BACK_COLOR = 0xFFFF;
 u16 DeviceCode;
-
 
 //******************************************************************
 //????????  LCD_WR_REG
@@ -16,27 +15,27 @@ u16 DeviceCode;
 //?????    ???????????????16????
 //?????????Reg:??????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_WR_REG(u8 data)
-{ 
-#if LCD_USE8BIT_MODEL==1//'??8?????????????g?
-	LCD_RS_CLR;
-	LCD_CS_CLR;
-	DATAOUT(data);
-	LCD_WR_CLR;
-	LCD_WR_SET;
-	LCD_CS_SET;
-	
-#else//'??16?????????????g?
-	LCD_RS_CLR;
-	LCD_CS_CLR;
-	DATAOUT(data);
-	LCD_WR_CLR;
-	LCD_WR_SET;
-	LCD_CS_SET;
-			
-#endif	
+{
+#if LCD_USE8BIT_MODEL == 1 //'??8?????????????g?
+    LCD_RS_CLR;
+    LCD_CS_CLR;
+    DATAOUT(data);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
+
+#else //'??16?????????????g?
+    LCD_RS_CLR;
+    LCD_CS_CLR;
+    DATAOUT(data);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
+
+#endif
 }
 
 //******************************************************************
@@ -46,30 +45,27 @@ void LCD_WR_REG(u8 data)
 //?????    ???????????????16?????
 //?????????Data:??????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_WR_DATA(u16 data)
 {
-	
+#if LCD_USE8BIT_MODEL == 1 //'??8?????????????g?
+    LCD_RS_SET;
+    LCD_CS_CLR;
+    DATAOUT(data);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
 
-#if LCD_USE8BIT_MODEL==1//'??8?????????????g?
-	LCD_RS_SET;
-	LCD_CS_CLR;
-	DATAOUT(data);
-	LCD_WR_CLR;
-	LCD_WR_SET;
-	LCD_CS_SET;
-	
-#else//'??16?????????????g?
-	LCD_RS_SET;
-	LCD_CS_CLR;
-	DATAOUT(data);
-	LCD_WR_CLR;
-	LCD_WR_SET;
-	LCD_CS_SET;
-			
+#else //'??16?????????????g?
+    LCD_RS_SET;
+    LCD_CS_CLR;
+    DATAOUT(data);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
+
 #endif
-
 }
 //******************************************************************
 //????????  LCD_DrawPoint_16Bit
@@ -78,119 +74,115 @@ void LCD_WR_DATA(u16 data)
 //?????    8?????????????h??16?????
 //?????????(x,y):???????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_DrawPoint_16Bit(u16 color)
 {
-#if LCD_USE8BIT_MODEL==1
-	LCD_CS_CLR;
-	LCD_RD_SET;
-	LCD_RS_SET;//????  	 
-	DATAOUT(color>>8);	
-	LCD_WR_CLR;
-	LCD_WR_SET;	
-	DATAOUT(color);	
-	LCD_WR_CLR;
-	LCD_WR_SET;	 
-	LCD_CS_SET;
+#if LCD_USE8BIT_MODEL == 1
+    LCD_CS_CLR;
+    LCD_RD_SET;
+    LCD_RS_SET; //????
+    DATAOUT(color >> 8);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    DATAOUT(color);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
 #else
-	LCD_WR_DATA(color); 
+    LCD_WR_DATA(color);
 #endif
-
-
 }
 //????LCD??????????
-//???:????????????????????????õ????(??????9341/6804??????????),
+//???:????????????????????????ï¿½????(??????9341/6804??????????),
 //????,h???????L2R_U2D????,????????????????,????????????????.
 //dir:0~7,????8??????(???????lcd.h)
-//9320/9325/9328/4531/4535/1505/b505/8989/5408/9341??IC?????????	
+//9320/9325/9328/4531/4535/1505/b505/8989/5408/9341??IC?????????
 void LCD_Scan_Dir(u8 dir)
 {
-	u16 regval=0;
-	u8 dirreg=0;
-	u16 temp;  
-	
-	switch(dir)
-	{
-		case L2R_U2D://??????,???????
-			regval|=(0<<7)|(0<<6)|(0<<5); 
-			break;
-		case L2R_D2U://??????,???µ???
-			regval|=(1<<7)|(0<<6)|(0<<5); 
-			break;
-		case R2L_U2D://???????,???????
-			regval|=(0<<7)|(1<<6)|(0<<5); 
-			break;
-		case R2L_D2U://???????,???µ???
-			regval|=(1<<7)|(1<<6)|(0<<5); 
-			break;	 
-		case U2D_L2R://???????,??????
-			regval|=(0<<7)|(0<<6)|(1<<5); 
-			break;
-		case U2D_R2L://???????,???????
-			regval|=(0<<7)|(1<<6)|(1<<5); 
-			break;
-		case D2U_L2R://???µ???,??????
-			regval|=(1<<7)|(0<<6)|(1<<5); 
-			break;
-		case D2U_R2L://???µ???,???????
-			regval|=(1<<7)|(1<<6)|(1<<5); 
-			break;	 
-	}
-	dirreg=0X36;
-	regval|=0X00;//BGR   
-	LCD_WriteReg(dirreg,regval);
-	if(regval&0X20)
-	{
-		if(lcddev.width<lcddev.height)//????X,Y
-		{
-			temp=lcddev.width;
-			lcddev.width=lcddev.height;
-			lcddev.height=temp;
-		}
-	}else  
-	{
-		if(lcddev.width>lcddev.height)//????X,Y
-		{
-			temp=lcddev.width;
-			lcddev.width=lcddev.height;
-			lcddev.height=temp;
-		}
-	}  
-	LCD_WR_REG(lcddev.setxcmd); 
-	LCD_WR_DATA(0);LCD_WR_DATA(0);
-	LCD_WR_DATA((lcddev.width-1)>>8);LCD_WR_DATA((lcddev.width-1)&0XFF);
-	LCD_WR_REG(lcddev.setycmd); 
-	LCD_WR_DATA(0);LCD_WR_DATA(0);
-	LCD_WR_DATA((lcddev.height-1)>>8);LCD_WR_DATA((lcddev.height-1)&0XFF);  
-}     
+    u16 regval = 0;
+    u8 dirreg = 0;
+    u16 temp;
 
+    switch (dir) {
+        case L2R_U2D: //??????,???????
+            regval |= (0 << 7) | (0 << 6) | (0 << 5);
+            break;
+        case L2R_D2U: //??????,???ï¿½???
+            regval |= (1 << 7) | (0 << 6) | (0 << 5);
+            break;
+        case R2L_U2D: //???????,???????
+            regval |= (0 << 7) | (1 << 6) | (0 << 5);
+            break;
+        case R2L_D2U: //???????,???ï¿½???
+            regval |= (1 << 7) | (1 << 6) | (0 << 5);
+            break;
+        case U2D_L2R: //???????,??????
+            regval |= (0 << 7) | (0 << 6) | (1 << 5);
+            break;
+        case U2D_R2L: //???????,???????
+            regval |= (0 << 7) | (1 << 6) | (1 << 5);
+            break;
+        case D2U_L2R: //???ï¿½???,??????
+            regval |= (1 << 7) | (0 << 6) | (1 << 5);
+            break;
+        case D2U_R2L: //???ï¿½???,???????
+            regval |= (1 << 7) | (1 << 6) | (1 << 5);
+            break;
+    }
+    dirreg = 0X36;
+    regval |= 0X00; //BGR
+    LCD_WriteReg(dirreg, regval);
+    if (regval & 0X20) {
+        if (lcddev.width < lcddev.height) //????X,Y
+        {
+            temp = lcddev.width;
+            lcddev.width = lcddev.height;
+            lcddev.height = temp;
+        }
+    } else {
+        if (lcddev.width > lcddev.height) //????X,Y
+        {
+            temp = lcddev.width;
+            lcddev.width = lcddev.height;
+            lcddev.height = temp;
+        }
+    }
+    LCD_WR_REG(lcddev.setxcmd);
+    LCD_WR_DATA(0);
+    LCD_WR_DATA(0);
+    LCD_WR_DATA((lcddev.width - 1) >> 8);
+    LCD_WR_DATA((lcddev.width - 1) & 0XFF);
+    LCD_WR_REG(lcddev.setycmd);
+    LCD_WR_DATA(0);
+    LCD_WR_DATA(0);
+    LCD_WR_DATA((lcddev.height - 1) >> 8);
+    LCD_WR_DATA((lcddev.height - 1) & 0XFF);
+}
 
 //????LCD???????6804?????????????
 //dir:0,??????1,????
 void LCD_Display_Dir(u8 dir)
 {
-	if(lcddev.dir==0)//????
-	{
-		lcddev.dir=0;//????
-		lcddev.width=240;
-		lcddev.height=320;
-		lcddev.wramcmd=0x2C;
-		lcddev.setxcmd=0x2a;
-		lcddev.setycmd=0x2b;  
-	}else 
-	{	  
-		lcddev.dir=1;//????
-		lcddev.width=320;
-		lcddev.height=240;
-		lcddev.wramcmd=0x2c;
-		lcddev.setxcmd=0x2a;
-		lcddev.setycmd=0x2b;  
-	} 
-	
-	LCD_Scan_Dir(DFT_SCAN_DIR);	//I???????
-}
+    if (lcddev.dir == 0) //????
+    {
+        lcddev.dir = 0; //????
+        lcddev.width = 240;
+        lcddev.height = 320;
+        lcddev.wramcmd = 0x2C;
+        lcddev.setxcmd = 0x2a;
+        lcddev.setycmd = 0x2b;
+    } else {
+        lcddev.dir = 1; //????
+        lcddev.width = 320;
+        lcddev.height = 240;
+        lcddev.wramcmd = 0x2c;
+        lcddev.setxcmd = 0x2a;
+        lcddev.setycmd = 0x2b;
+    }
 
+    LCD_Scan_Dir(DFT_SCAN_DIR); //I???????
+}
 
 //******************************************************************
 //????????  LCD_WriteReg
@@ -200,28 +192,28 @@ void LCD_Display_Dir(u8 dir)
 //?????????LCD_Reg:?J??????
 //			LCD_RegValue:?????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_WriteReg(u8 LCD_Reg, u16 LCD_RegValue)
-{	
-	LCD_WR_REG(LCD_Reg);  
-	LCD_WR_DATA(LCD_RegValue);	    		 
-}	   
-	 
+{
+    LCD_WR_REG(LCD_Reg);
+    LCD_WR_DATA(LCD_RegValue);
+}
+
 //******************************************************************
 //????????  LCD_WriteRAM_Prepare
 //?????    xiao??@???????
 //?????    2013-02-22
 //?????    ??'?GRAM
-//			????????????RGB????j????÷????GRAM???
+//			????????????RGB????j????ï¿½????GRAM???
 //???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_WriteRAM_Prepare(void)
 {
-	LCD_WR_REG(lcddev.wramcmd);
-}	 
+    LCD_WR_REG(lcddev.wramcmd);
+}
 
 //******************************************************************
 //????????  LCD_DrawPoint
@@ -230,27 +222,25 @@ void LCD_WriteRAM_Prepare(void)
 //?????    ???????????h???????????
 //?????????(x,y):???????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
-void LCD_DrawPoint(u16 x,u16 y)
+void LCD_DrawPoint(u16 x, u16 y)
 {
-	LCD_SetCursor(x,y);//???ù????? 
-#if LCD_USE8BIT_MODEL==1
-	LCD_CS_CLR;
-	LCD_RD_SET;
-	LCD_RS_SET;//????  	 
-	DATAOUT(POINT_COLOR>>8);	
-	LCD_WR_CLR;
-	LCD_WR_SET;	
-	DATAOUT(POINT_COLOR);	
-	LCD_WR_CLR;
-	LCD_WR_SET;	 
-	LCD_CS_SET;
+    LCD_SetCursor(x, y); //???ï¿½?????
+#if LCD_USE8BIT_MODEL == 1
+    LCD_CS_CLR;
+    LCD_RD_SET;
+    LCD_RS_SET; //????
+    DATAOUT(POINT_COLOR >> 8);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    DATAOUT(POINT_COLOR);
+    LCD_WR_CLR;
+    LCD_WR_SET;
+    LCD_CS_SET;
 #else
-	LCD_WR_DATA(POINT_COLOR); 
+    LCD_WR_DATA(POINT_COLOR);
 #endif
-
-
 }
 
 //******************************************************************
@@ -260,28 +250,26 @@ void LCD_DrawPoint(u16 x,u16 y)
 //?????    LCD??????????????
 //?????????Color:???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_Clear(u16 Color)
 {
-	u32 index=0;      
-	LCD_SetWindows(0,0,lcddev.width-1,lcddev.height-1);	
-	
-		LCD_RS_SET;//????? 
-	LCD_CS_CLR;	   
-	for(index=0;index<lcddev.width*lcddev.height;index++)
-	{
-		DATAOUT(Color>>8);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	
-		
-		DATAOUT(Color);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	   
-	}
-	LCD_CS_SET;	
-	
-} 
+    u32 index = 0;
+    LCD_SetWindows(0, 0, lcddev.width - 1, lcddev.height - 1);
+
+    LCD_RS_SET; //?????
+    LCD_CS_CLR;
+    for (index = 0; index < lcddev.width * lcddev.height; index++) {
+        DATAOUT(Color >> 8);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+
+        DATAOUT(Color);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+    }
+    LCD_CS_SET;
+}
 
 //******************************************************************
 //????????  LCD_Clear
@@ -290,28 +278,26 @@ void LCD_Clear(u16 Color)
 //?????    LCD?????????????????????
 //?????????Color:???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
-void LCD_Clear_Rectangle(u16 xStar, u16 yStar,u16 xEnd,u16 yEnd,u16 Color)
+void LCD_Clear_Rectangle(u16 xStar, u16 yStar, u16 xEnd, u16 yEnd, u16 Color)
 {
-	u32 index=0;      
-	LCD_SetWindows(xStar,yStar,xEnd,yEnd);	
-	
-		LCD_RS_SET;//????? 
-	LCD_CS_CLR;	   
-	for(index=0;index<((xEnd-xStar-1)*(yEnd-yStar-1));index++)
-	{
-		DATAOUT(Color>>8);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	
-		
-		DATAOUT(Color);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	   
-	}
-	LCD_CS_SET;	
-	
-} 
+    u32 index = 0;
+    LCD_SetWindows(xStar, yStar, xEnd, yEnd);
+
+    LCD_RS_SET; //?????
+    LCD_CS_CLR;
+    for (index = 0; index < ((xEnd - xStar - 1) * (yEnd - yStar - 1)); index++) {
+        DATAOUT(Color >> 8);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+
+        DATAOUT(Color);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+    }
+    LCD_CS_SET;
+}
 
 //******************************************************************
 //????????  LCD_Clear???????
@@ -320,97 +306,94 @@ void LCD_Clear_Rectangle(u16 xStar, u16 yStar,u16 xEnd,u16 yEnd,u16 Color)
 //?????    LCD??????????????
 //?????????Color:???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_Clear_slow(u16 Color)
 {
-	u32 index=0;      
-	LCD_SetWindows(0,0,lcddev.width-1,lcddev.height-1);	
-	
-		LCD_RS_SET;//????? 
-	LCD_CS_CLR;	   
-	for(index=0;index<lcddev.width*lcddev.height;index++)
-	{
-		DATAOUT(Color>>8);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	
-		
-		DATAOUT(Color);	
-		LCD_WR_CLR;
-		LCD_WR_SET;	
-  delay_us(30);		
-	}
-	LCD_CS_SET;	
-	
-} 
+    u32 index = 0;
+    LCD_SetWindows(0, 0, lcddev.width - 1, lcddev.height - 1);
+
+    LCD_RS_SET; //?????
+    LCD_CS_CLR;
+    for (index = 0; index < lcddev.width * lcddev.height; index++) {
+        DATAOUT(Color >> 8);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+
+        DATAOUT(Color);
+        LCD_WR_CLR;
+        LCD_WR_SET;
+        delay_us(30);
+    }
+    LCD_CS_SET;
+}
 
 //******************************************************************
 //????????  LCD_GPIOInit
 //?????    xiao??@???????
 //?????    2013-02-22
-//?????    ?????IO??'?????????'??j????ô????(????IO?????)
+//?????    ?????IO??'?????????'??j????ï¿½????(????IO?????)
 //???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_GPIOInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-	//GPIO_InitTypeDef GPIO_InitStructure;
-	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE); 
+    //GPIO_InitTypeDef GPIO_InitStructure;
+    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
- 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE); 
-	//GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);
-	//PC4-5??10-12
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_10|GPIO_Pin_11|GPIO_Pin_12;	   //GPIO_Pin_10
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //???????
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_Init(GPIOC, &GPIO_InitStructure); //GPIOC	
-	GPIO_SetBits(GPIOC,GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_10|GPIO_Pin_11|GPIO_Pin_12);		
-	
-	//PA6-7,15
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7|GPIO_Pin_15;	//  PA15
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //???????
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure); //GPIOA
-	GPIO_SetBits(GPIOA,GPIO_Pin_6|GPIO_Pin_7|GPIO_Pin_15);	
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD, ENABLE);
+    //GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);
+    //PC4-5??10-12
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12; //GPIO_Pin_10
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;                                                 //???????
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStructure); //GPIOC
+    GPIO_SetBits(GPIOC, GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12);
+
+    //PA6-7,15
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_15; //  PA15
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;                     //???????
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure); //GPIOA
+    GPIO_SetBits(GPIOA, GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_15);
 
     //PB0,3-5
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5;	   //GPIO_Pin_10
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //???????
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_Init(GPIOB, &GPIO_InitStructure); //GPIOC	
-	GPIO_SetBits(GPIOB,GPIO_Pin_0|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5);	
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5; //GPIO_Pin_10
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;                                 //???????
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure); //GPIOC
+    GPIO_SetBits(GPIOB, GPIO_Pin_0 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5);
 
     //PD2
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;	   //GPIO_Pin_10
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //???????
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_Init(GPIOD, &GPIO_InitStructure); //GPIOD	
-	GPIO_SetBits(GPIOD,GPIO_Pin_2);	
-	
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;        //GPIO_Pin_10
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; //???????
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOD, &GPIO_InitStructure); //GPIOD
+    GPIO_SetBits(GPIOD, GPIO_Pin_2);
 }
 
 //******************************************************************
 //????????  LCD_Reset
 //?????    xiao??@???????
 //?????    2013-02-22
-//?????    LCD??????????????'??j????ô????
+//?????    LCD??????????????'??j????ï¿½????
 //???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_RESET(void)
 {
-	LCD_RST_CLR;
-	delay_ms(500);	
-	LCD_RST_SET;
-	delay_ms(300);
+    LCD_RST_CLR;
+    delay_ms(500);
+    LCD_RST_SET;
+    delay_ms(300);
 }
- 	 
+
 //******************************************************************
 //????????  LCD_Init
 //?????    xiao??@???????
@@ -418,81 +401,81 @@ void LCD_RESET(void)
 //?????    LCD??'??
 //???????????
 //???????  ??
-//??l?¼????
+//??l?ï¿½????
 //******************************************************************
 void LCD_Init(void)
-{  						 
-	LCD_GPIOInit();
- 	LCD_RESET();
+{
+    LCD_GPIOInit();
+    LCD_RESET();
 
-	//************* Start Initial Sequence **********//		
-	LCD_WR_REG(0x11);
-	delay_ms(120); //Delay 120ms
-	//------------------------------display and color format setting--------------------------------//
-	LCD_WR_REG(0x36);
-	LCD_WR_DATA(0x00);
-	LCD_WR_REG(0x3a);
-	LCD_WR_DATA(0x05);
-	//--------------------------------ST7789S Frame rate setting----------------------------------//
-	LCD_WR_REG(0xb2);
-	LCD_WR_DATA(0x0c);
-	LCD_WR_DATA(0x0c);
-	LCD_WR_DATA(0x00);
-	LCD_WR_DATA(0x33);
-	LCD_WR_DATA(0x33);
-	LCD_WR_REG(0xb7);
-	LCD_WR_DATA(0x35);
-	//---------------------------------ST7789S Power setting--------------------------------------//
-	LCD_WR_REG(0xbb);
-	LCD_WR_DATA(0x35);
-	LCD_WR_REG(0xc0);
-	LCD_WR_DATA(0x2c);
-	LCD_WR_REG(0xc2);
-	LCD_WR_DATA(0x01);
-	LCD_WR_REG(0xc3);
-	LCD_WR_DATA(0x0b);
-	LCD_WR_REG(0xc4); 
-	LCD_WR_DATA(0x20);
-	LCD_WR_REG(0xc6);
-	LCD_WR_DATA(0x0f);
-	LCD_WR_REG(0xd0);
-	LCD_WR_DATA(0xa4);
-	LCD_WR_DATA(0xa1);
-	//--------------------------------ST7789S gamma setting---------------------------------------//
-	LCD_WR_REG(0xe0);
-	LCD_WR_DATA(0xd0);
-	LCD_WR_DATA(0x00);
-	LCD_WR_DATA(0x02);
-	LCD_WR_DATA(0x07);
-	LCD_WR_DATA(0x0b);
-	LCD_WR_DATA(0x1a);
-	LCD_WR_DATA(0x31);
-	LCD_WR_DATA(0x54);
-	LCD_WR_DATA(0x40);
-	LCD_WR_DATA(0x29);
-	LCD_WR_DATA(0x12);
-	LCD_WR_DATA(0x12);
-	LCD_WR_DATA(0x12);
-	LCD_WR_DATA(0x17);
-	LCD_WR_REG(0xe1);
-	LCD_WR_DATA(0xd0);
-	LCD_WR_DATA(0x00);
-	LCD_WR_DATA(0x02);
-	LCD_WR_DATA(0x07);
-	LCD_WR_DATA(0x05);
-	LCD_WR_DATA(0x25);
-	LCD_WR_DATA(0x2d);
-	LCD_WR_DATA(0x44);
-	LCD_WR_DATA(0x45);
-	LCD_WR_DATA(0x1c);
-	LCD_WR_DATA(0x18);
-	LCD_WR_DATA(0x16);
-	LCD_WR_DATA(0x1c);
-	LCD_WR_DATA(0x1d);
-	LCD_WR_REG(0x29);	
-	
-	LCD_Display_Dir(1);		 	//I???????
-	LCD_Clear(BLACK);
+    //************* Start Initial Sequence **********//
+    LCD_WR_REG(0x11);
+    delay_ms(120); //Delay 120ms
+    //------------------------------display and color format setting--------------------------------//
+    LCD_WR_REG(0x36);
+    LCD_WR_DATA(0x00);
+    LCD_WR_REG(0x3a);
+    LCD_WR_DATA(0x05);
+    //--------------------------------ST7789S Frame rate setting----------------------------------//
+    LCD_WR_REG(0xb2);
+    LCD_WR_DATA(0x0c);
+    LCD_WR_DATA(0x0c);
+    LCD_WR_DATA(0x00);
+    LCD_WR_DATA(0x33);
+    LCD_WR_DATA(0x33);
+    LCD_WR_REG(0xb7);
+    LCD_WR_DATA(0x35);
+    //---------------------------------ST7789S Power setting--------------------------------------//
+    LCD_WR_REG(0xbb);
+    LCD_WR_DATA(0x35);
+    LCD_WR_REG(0xc0);
+    LCD_WR_DATA(0x2c);
+    LCD_WR_REG(0xc2);
+    LCD_WR_DATA(0x01);
+    LCD_WR_REG(0xc3);
+    LCD_WR_DATA(0x0b);
+    LCD_WR_REG(0xc4);
+    LCD_WR_DATA(0x20);
+    LCD_WR_REG(0xc6);
+    LCD_WR_DATA(0x0f);
+    LCD_WR_REG(0xd0);
+    LCD_WR_DATA(0xa4);
+    LCD_WR_DATA(0xa1);
+    //--------------------------------ST7789S gamma setting---------------------------------------//
+    LCD_WR_REG(0xe0);
+    LCD_WR_DATA(0xd0);
+    LCD_WR_DATA(0x00);
+    LCD_WR_DATA(0x02);
+    LCD_WR_DATA(0x07);
+    LCD_WR_DATA(0x0b);
+    LCD_WR_DATA(0x1a);
+    LCD_WR_DATA(0x31);
+    LCD_WR_DATA(0x54);
+    LCD_WR_DATA(0x40);
+    LCD_WR_DATA(0x29);
+    LCD_WR_DATA(0x12);
+    LCD_WR_DATA(0x12);
+    LCD_WR_DATA(0x12);
+    LCD_WR_DATA(0x17);
+    LCD_WR_REG(0xe1);
+    LCD_WR_DATA(0xd0);
+    LCD_WR_DATA(0x00);
+    LCD_WR_DATA(0x02);
+    LCD_WR_DATA(0x07);
+    LCD_WR_DATA(0x05);
+    LCD_WR_DATA(0x25);
+    LCD_WR_DATA(0x2d);
+    LCD_WR_DATA(0x44);
+    LCD_WR_DATA(0x45);
+    LCD_WR_DATA(0x1c);
+    LCD_WR_DATA(0x18);
+    LCD_WR_DATA(0x16);
+    LCD_WR_DATA(0x1c);
+    LCD_WR_DATA(0x1d);
+    LCD_WR_REG(0x29);
+
+    LCD_Display_Dir(1); //I???????
+    LCD_Clear(BLACK);
 }
 
 /*************************************************
@@ -501,117 +484,110 @@ void LCD_Init(void)
 ????????xy???????
 ?????????
 *************************************************/
-void LCD_SetWindows(u16 xStar, u16 yStar,u16 xEnd,u16 yEnd)
-{	
-	LCD_WR_REG(lcddev.setxcmd);	
-	LCD_WR_DATA(xStar>>8);
-	LCD_WR_DATA(0x00FF&xStar);		
-	LCD_WR_DATA(xEnd>>8);
-	LCD_WR_DATA(0x00FF&xEnd);
+void LCD_SetWindows(u16 xStar, u16 yStar, u16 xEnd, u16 yEnd)
+{
+    LCD_WR_REG(lcddev.setxcmd);
+    LCD_WR_DATA(xStar >> 8);
+    LCD_WR_DATA(0x00FF & xStar);
+    LCD_WR_DATA(xEnd >> 8);
+    LCD_WR_DATA(0x00FF & xEnd);
 
-	LCD_WR_REG(lcddev.setycmd);	
-	LCD_WR_DATA(yStar>>8);
-	LCD_WR_DATA(0x00FF&yStar);		
-	LCD_WR_DATA(yEnd>>8);
-	LCD_WR_DATA(0x00FF&yEnd);	
+    LCD_WR_REG(lcddev.setycmd);
+    LCD_WR_DATA(yStar >> 8);
+    LCD_WR_DATA(0x00FF & yStar);
+    LCD_WR_DATA(yEnd >> 8);
+    LCD_WR_DATA(0x00FF & yEnd);
 
-	LCD_WriteRAM_Prepare();	//??'???GRAM				
-}   
+    LCD_WriteRAM_Prepare(); //??'???GRAM
+}
 
 /*************************************************
 ????????LCD_SetCursor
-????????ù?????
+????????ï¿½?????
 ????????xy????
 ?????????
 *************************************************/
 void LCD_SetCursor(u16 Xpos, u16 Ypos)
-{	  	    			
-	LCD_WR_REG(lcddev.setxcmd);	
-	LCD_WR_DATA(Xpos>>8);
-	LCD_WR_DATA(0x00FF&Xpos);		
+{
+    LCD_WR_REG(lcddev.setxcmd);
+    LCD_WR_DATA(Xpos >> 8);
+    LCD_WR_DATA(0x00FF & Xpos);
 
-	
-	LCD_WR_REG(lcddev.setycmd);	
-	LCD_WR_DATA(Ypos>>8);
-	LCD_WR_DATA(0x00FF&Ypos);		
+    LCD_WR_REG(lcddev.setycmd);
+    LCD_WR_DATA(Ypos >> 8);
+    LCD_WR_DATA(0x00FF & Ypos);
 
-	LCD_WriteRAM_Prepare();	//??'???GRAM	
-} 
+    LCD_WriteRAM_Prepare(); //??'???GRAM
+}
 
 //????LCD????
 //????????????g????
 void LCD_SetParam(void)
-{ 	
-	lcddev.wramcmd=0x2C;
-#if USE_HORIZONTAL==1	//'?ú???	  
-	lcddev.dir=1;//????
-	lcddev.width=320;
-	lcddev.height=240;
-	lcddev.setxcmd=0x2A;
-	lcddev.setycmd=0x2B;			
-	LCD_WriteReg(0x36,0x6C);
+{
+    lcddev.wramcmd = 0x2C;
+#if USE_HORIZONTAL == 1 //'?ï¿½???
+    lcddev.dir = 1;     //????
+    lcddev.width = 320;
+    lcddev.height = 240;
+    lcddev.setxcmd = 0x2A;
+    lcddev.setycmd = 0x2B;
+    LCD_WriteReg(0x36, 0x6C);
 
-#else//????
-	lcddev.dir=0;//????				 	 		
-	lcddev.width=240;
-	lcddev.height=320;
-	lcddev.setxcmd=0x2A;
-	lcddev.setycmd=0x2B;	
-	LCD_WriteReg(0x36,0xC9);
+#else //????
+    lcddev.dir = 0; //????
+    lcddev.width = 240;
+    lcddev.height = 320;
+    lcddev.setxcmd = 0x2A;
+    lcddev.setycmd = 0x2B;
+    LCD_WriteReg(0x36, 0xC9);
 #endif
-}	
+}
 
+void LCD_Set_Window(u16 sx, u16 sy, u16 width, u16 height)
+{
+    LCD_WR_REG(0x2A);
+    LCD_WR_DATA(sx >> 8);
+    LCD_WR_DATA(0x00FF & sx);
+    LCD_WR_DATA((sx + width) >> 8);
+    LCD_WR_DATA(0x00FF & (sx + width));
 
+    LCD_WR_REG(0x2B);
+    LCD_WR_DATA(sy >> 8);
+    LCD_WR_DATA(0x00FF & sy);
+    LCD_WR_DATA((sy + height) >> 8);
+    LCD_WR_DATA(0x00FF & (sy + height));
 
-void LCD_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
-{  
-
-	LCD_WR_REG(0x2A);	
-	LCD_WR_DATA(sx>>8);
-	LCD_WR_DATA(0x00FF&sx);		
-	LCD_WR_DATA((sx+width)>>8);
-	LCD_WR_DATA(0x00FF&(sx+width));
-
-	LCD_WR_REG(0x2B);	
-	LCD_WR_DATA(sy>>8);
-	LCD_WR_DATA(0x00FF&sy);		
-	LCD_WR_DATA((sy+height)>>8);
-	LCD_WR_DATA(0x00FF&(sy+height));	
-
-	LCD_WR_REG(0x2C);	//??'???GRAM			
-} 
-
-
+    LCD_WR_REG(0x2C); //??'???GRAM
+}
 
 void DATAOUT(u16 x)
 {
-	//4??IO??
-	//V11?????Y???DA0-DA7???PA15??PC10-12??PD2??PB3-5
-	//DA7   DA6   DA5   DA4   DA3   DA2   DA1   DA0
-	//PB5  PB4    PB3   PD2   PC12  PC11  PC10  PA15
-	(GPIOA->ODR=((GPIOA->ODR)&0x7FFF)|(((x&0x01)<<15)&0x8000));  //????ok
-	(GPIOB->ODR=((GPIOB->ODR)&0xFFC7)|(((x&0xE0)>>2)&0x0038));   //????ok
-	(GPIOC->ODR=((GPIOC->ODR)&0xE3FF)|(((x&0x0E)<<9)&0x1C00));   //????ok
-	(GPIOD->ODR=((GPIOD->ODR)&0xFFFB)|(((x&0x10)>>2)&0x0004));   //????ok
+    //4??IO??
+    //V11?????Y???DA0-DA7???PA15??PC10-12??PD2??PB3-5
+    //DA7   DA6   DA5   DA4   DA3   DA2   DA1   DA0
+    //PB5  PB4    PB3   PD2   PC12  PC11  PC10  PA15
+    (GPIOA->ODR = ((GPIOA->ODR) & 0x7FFF) | (((x & 0x01) << 15) & 0x8000)); //????ok
+    (GPIOB->ODR = ((GPIOB->ODR) & 0xFFC7) | (((x & 0xE0) >> 2) & 0x0038));  //????ok
+    (GPIOC->ODR = ((GPIOC->ODR) & 0xE3FF) | (((x & 0x0E) << 9) & 0x1C00));  //????ok
+    (GPIOD->ODR = ((GPIOD->ODR) & 0xFFFB) | (((x & 0x10) >> 2) & 0x0004));  //????ok
 
-  ceshi=((((x&0x01)<<15)&0x8000)+(((x&0xE0)>>2)&0x0038)+(((x&0x0E)<<9)&0x1C00)+(((x&0x10)>>2)&0x0004));
-	
-	
-//V6.0?????Y???DA0-DA7?????PB15??PC6-9??PA8??PA11-12	
-//??h???????????????????w???ã???????????????0??,???16?
-//??
-//DA7   DA6   DA5   DA4   DA3   DA2   DA1   DA0
-//PA12  PA11  PA8   PC9   PC8   PC7   PC6   PB15
+    ceshi = ((((x & 0x01) << 15) & 0x8000) + (((x & 0xE0) >> 2) & 0x0038) + (((x & 0x0E) << 9) & 0x1C00) + (((x & 0x10) >> 2) & 0x0004));
 
-//(GPIOA->ODR=((GPIOA->ODR)&0xE6FF)|((((x&0xC0)<<5)+(((x&0x20)<<3)))&0x1900));
-//(GPIOB->ODR=((GPIOB->ODR)&0x7FFF)|(((x&0x01)<<15)&0x8000));
-//(GPIOC->ODR=((GPIOC->ODR)&0xFC3F)|(((x&0x1E)<<5)&0x03C0));
+    //V6.0?????Y???DA0-DA7?????PB15??PC6-9??PA8??PA11-12
+    //??h???????????????????w???ï¿½???????????????0??,???16?
+    //??
+    //DA7   DA6   DA5   DA4   DA3   DA2   DA1   DA0
+    //PA12  PA11  PA8   PC9   PC8   PC7   PC6   PB15
 
-//?????????????Y???????IO?????ã????z????????'??????????IO????????????	
-	
-//	(GPIOA->ODR=((GPIOA->ODR)&(0xE6FF))|((((x&0xC0)<<5)+((x&0x20)<<3))&0x1900));
-//	//(GPIOA->ODR=((GPIOA->ODR)&(0xff00))|(((x&0x20)<<3)&0xffff));
-//	(GPIOB->ODR=((GPIOB->ODR)&0x7FFF)|(((x&0x01)<<15)&0x8000));
-//	(GPIOC->ODR=((GPIOC->ODR)&0xFC3F)|(((x&0x1E)<<5)&0x03C0));
-//	ceshi =(((((x&0xC0)<<5)+((x&0x20)<<3))&0x1900)+(((x&0x01)<<15)&0x8000)+(((x&0x1E)<<5)&0x03C0));
+    //(GPIOA->ODR=((GPIOA->ODR)&0xE6FF)|((((x&0xC0)<<5)+(((x&0x20)<<3)))&0x1900));
+    //(GPIOB->ODR=((GPIOB->ODR)&0x7FFF)|(((x&0x01)<<15)&0x8000));
+    //(GPIOC->ODR=((GPIOC->ODR)&0xFC3F)|(((x&0x1E)<<5)&0x03C0));
+
+    //?????????????Y???????IO?????ï¿½????z????????'??????????IO????????????
+
+    //	(GPIOA->ODR=((GPIOA->ODR)&(0xE6FF))|((((x&0xC0)<<5)+((x&0x20)<<3))&0x1900));
+    //	//(GPIOA->ODR=((GPIOA->ODR)&(0xff00))|(((x&0x20)<<3)&0xffff));
+    //	(GPIOB->ODR=((GPIOB->ODR)&0x7FFF)|(((x&0x01)<<15)&0x8000));
+    //	(GPIOC->ODR=((GPIOC->ODR)&0xFC3F)|(((x&0x1E)<<5)&0x03C0));
+    //	ceshi =(((((x&0xC0)<<5)+((x&0x20)<<3))&0x1900)+(((x&0x01)<<15)&0x8000)+(((x&0x1E)<<5)&0x03C0));
 }
